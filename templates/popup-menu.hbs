@@ -1,0 +1,11 @@
+<form class="popup-menu-form">
+  <div class="popup-menu">
+    {{#each options.choices as |choice|}}
+      {{#if choice.hint}}
+        <p><span data-tooltip="<div>{{localize choice.hint}}</div>"><a data-action="popupClick" data-key="{{choice.key}}">{{localize choice.label}}</a></span></p>
+      {{else}}
+        <p><a data-action="popupClick" data-key="{{choice.key}}">{{localize choice.label}}</a></p>
+      {{/if}}
+    {{/each}}
+  </div>
+</form>

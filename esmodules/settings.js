@@ -1,0 +1,221 @@
+import { MODULE_ID } from "./const.js";
+import { invokeMenu } from "./menu.js";
+import {
+  setupVisibilityHooks,
+  releaseVisibilityHooks,
+  refreshVisibilityCache,
+} from "./visibility.js";
+import { debuglog, refreshPerception } from "./utils.js";
+
+export const SETTINGS = {
+  // General settings
+  hideFromAllies: "hideFromAllies",
+  requireActivity: "requireActivity",
+  useEffects: "useEffects",
+  panZoomToCombat: "panZoomToCombat",
+  showEyeballs: "showEyeballs",
+  collapseTargetList: "collapseTargetList",
+  visionHack: "visionHack",
+
+  // Advanced settings
+  logLevel: "logLevel",
+  schema: "schema",
+
+  // keybindings
+  menu: "menu",
+};
+
+export let cachedSettings = {
+  hideFromAllies: false,
+  requireActivity: true,
+  useEffects: true,
+  panZoomToCombat: true,
+  showEyeballs: true,
+  collapseTargetList: false,
+  visionHack: true,
+  logLevel: "none",
+};
+
+export function setupSettings() {
+  game.settings.register(MODULE_ID, SETTINGS.panZoomToCombat, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.panZoomToCombat}.name`),
+    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.panZoomToCombat}.hint`),
+    scope: "client",
+    config: true,
+    type: Boolean,
+    default: cachedSettings.panZoomToCombat,
+    onChange: (newValue) => {
+      cachedSettings.panZoomToCombat = newValue;
+    },
+  });
+  cachedSettings.panZoomToCombat = game.settings.get(
+    MODULE_ID,
+    SETTINGS.panZoomToCombat,
+  );
+
+  game.settings.register(MODULE_ID, SETTINGS.useEffects, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.useEffects}.name`),
+    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.useEffects}.hint`),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: cachedSettings.useEffects,
+    onChange: (newValue) => {
+      cachedSettings.useEffects = newValue;
+      cachedSettings.visionHack = false;
+      if (!newValue) {
+        releaseVisibilityHooks();
+        refreshVisibilityCache();
+        refreshPerception();
+      }
+    },
+  });
+  cachedSettings.useEffects = game.settings.get(MODULE_ID, SETTINGS.useEffects);
+
+  game.settings.register(MODULE_ID, SETTINGS.visionHack, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.visionHack}.name`),
+    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.visionHack}.hint`),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: cachedSettings.visionHack,
+    onChange: (newValue) => {
+      cachedSettings.visionHack = newValue;
+      if (newValue && cachedSettings.useEffects) {
+        setupVisibilityHooks();
+      } else {
+        releaseVisibilityHooks();
+      }
+      refreshVisibilityCache();
+      refreshPerception();
+    },
+  });
+  cachedSettings.visionHack = game.settings.get(MODULE_ID, SETTINGS.visionHack);
+
+  game.settings.register(MODULE_ID, SETTINGS.requireActivity, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.requireActivity}.name`),
+    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.requireActivity}.hint`),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: cachedSettings.requireActivity,
+    onChange: (newValue) => {
+      cachedSettings.requireActivity = newValue;
+    },
+  });
+  cachedSettings.requireActivity = game.settings.get(
+    MODULE_ID,
+    SETTINGS.requireActivity,
+  );
+
+  game.settings.register(MODULE_ID, SETTINGS.showEyeballs, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.showEyeballs}.name`),
+    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.showEyeballs}.hint`),
+    scope: "world",
+    config: false,
+    type: Boolean,
+    default: cachedSettings.showEyeballs,
+    onChange: (newValue) => {
+      cachedSettings.showEyeballs = newValue;
+      refreshVisibilityCache();
+      refreshPerception();
+    },
+  });
+  cachedSettings.showEyeballs = false;
+  // cachedSettings.showEyeballs = game.settings.get(
+  //   MODULE_ID,
+  //   SETTINGS.showEyeballs,
+  // );
+
+  game.settings.register(MODULE_ID, SETTINGS.collapseTargetList, {
+    name: game.i18n.localize(
+      `${MODULE_ID}.${SETTINGS.collapseTargetList}.name`,
+    ),
+    hint: game.i18n.localize(
+      `${MODULE_ID}.${SETTINGS.collapseTargetList}.hint`,
+    ),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: cachedSettings.collapseTargetList,
+    onChange: (newValue) => {
+      cachedSettings.collapseTargetList = newValue;
+    },
+  });
+  cachedSettings.collapseTargetList = game.settings.get(
+    MODULE_ID,
+    SETTINGS.collapseTargetList,
+  );
+
+  game.settings.register(MODULE_ID, SETTINGS.hideFromAllies, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.hideFromAllies}.name`),
+    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.hideFromAllies}.hint`),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: cachedSettings.hideFromAllies,
+    onChange: (newValue) => {
+      cachedSettings.hideFromAllies = newValue;
+    },
+  });
+  cachedSettings.hideFromAllies = game.settings.get(
+    MODULE_ID,
+    SETTINGS.hideFromAllies,
+  );
+
+  game.settings.register(MODULE_ID, SETTINGS.logLevel, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.logLevel}.name`),
+    scope: "client",
+    config: true,
+    type: String,
+    choices: {
+      none: game.i18n.localize(`${MODULE_ID}.${SETTINGS.logLevel}.none`),
+      debug: game.i18n.localize(`${MODULE_ID}.${SETTINGS.logLevel}.debug`),
+      log: game.i18n.localize(`${MODULE_ID}.${SETTINGS.logLevel}.log`),
+    },
+    default: cachedSettings.logLevel,
+    onChange: (newValue) => {
+      cachedSettings.logLevel = newValue;
+    },
+  });
+  cachedSettings.logLevel = game.settings.get(MODULE_ID, SETTINGS.logLevel);
+}
+
+export function setupKeybindings() {
+  game.keybindings.register(MODULE_ID, SETTINGS.menu, {
+    name: `${MODULE_ID}.${SETTINGS.menu}.bindings.name`,
+    hint: `${MODULE_ID}.${SETTINGS.menu}.bindings.hint`,
+    editable: [{ key: "Equal", modifiers: [] }],
+    onDown: async () => {
+      if (!game.user.isGM) return;
+      invokeMenu();
+    },
+  });
+}
+
+const SETTING_GROUPS = [
+  { label: "general", before: SETTINGS.panZoomToCombat },
+  { label: "debug", before: SETTINGS.logLevel },
+];
+
+globalThis.Hooks.on("renderSettingsConfig", (_app, html, _data) => {
+  const visionHackName = `settings-config-${MODULE_ID}.${SETTINGS.visionHack}`;
+  const hackLabel = html.querySelector(`label[for="${visionHackName}"]`);
+  if (hackLabel) {
+    const group = hackLabel.closest(".form-group");
+    if (group) {
+      group.style.opacity = cachedSettings.useEffects ? "1.0" : "0.5";
+      group.style.pointerEvents = cachedSettings.useEffects ? "auto" : "none";
+    }
+  }
+  for (const section of SETTING_GROUPS) {
+    $("<div>")
+      .addClass("form-group group-header")
+      .html(game.i18n.localize(`${MODULE_ID}.config.${section.label}`))
+      .insertBefore(
+        $(`[name="${MODULE_ID}.${section.before}"]`).parents(
+          "div.form-group:first",
+        ),
+      );
+  }
+});

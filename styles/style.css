@@ -1,0 +1,257 @@
+.critical-success {
+  color: var(--color-pf-text-critical-success);
+}
+.success {
+  color: var(--color-pf-text-success);
+}
+.failure {
+  color: var(--color-pf-text-failure);
+}
+.critical-failure {
+  color: var(--color-pf-text-critical-failure);
+}
+
+#pf2e-stealthy-popup-menu .window-header {
+  display: none;
+}
+
+/* Avoidance Check structure */
+
+.pf2e-stealthy-avoidance-check {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column;
+}
+
+.pf2e-stealthy-encounter,
+.pf2e-stealthy-alert,
+.pf2e-stealthy-enemies,
+.pf2e-stealthy-enemy-avoiders,
+.pf2e-stealthy-friendlies,
+.pf2e-stealthy-noticable-friendlies,
+.pf2e-stealthy-noticable-enemies,
+.pf2e-stealthy-noticables,
+.pf2e-stealthy-friendly-avoiders,
+.pf2e-stealthy-player-results,
+.pf2e-stealthy-hide,
+.pf2e-stealthy-sneak,
+.pf2e-stealthy-seek,
+.pf2e-stealthy-edit,
+.pf2e-stealthy-point-out,
+.pf2e-stealthy-edit,
+.pf2e-stealthy-designated,
+.pf2e-stealthy-detectors,
+.pf2e-stealthy-avoider {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.pf2e-stealthy-description,
+.pf2e-stealthy-summary {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+}
+
+.pf2e-stealthy-observed {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+
+  background-color: #ecc;
+  border: 1px solid transparent;
+}
+.pf2e-stealthy-hidden {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+
+  background-color: #dc966e;
+  border: 1px solid transparent;
+}
+.pf2e-stealthy-undetected {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+
+  background-color: #cce;
+  border: 1px solid transparent;
+}
+/* Target list structure */
+
+.pf2e-stealthy-target-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 0.5rem;
+  border: 1px solid var(--color-border-divider);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.pf2e-stealthy-noticable,
+.pf2e-stealthy-detector,
+.pf2e-stealthy-target {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  /* font-size: var(--font-size-12, 12px); */
+}
+
+.pf2e-stealthy-noticable:nth-child(even),
+.pf2e-stealthy-detector:nth-child(even),
+.pf2e-stealthy-target:nth-child(even) {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.pf2e-stealthy-noticable:last-child,
+.pf2e-stealthy-detector:last-child,
+.pf2e-stealthy-target:last-child {
+  border-bottom: none;
+}
+
+.pf2e-stealthy-name {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pf2e-stealthy-name:hover {
+  font-weight: 500;
+  color: var(--tertiary);
+  border-bottom-color: var(--tertiary);
+  text-shadow: 0 0 2px var(--color-shadow-highlight);
+}
+
+.pf2e-stealthy-dc {
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* non-interactive result */
+
+.pf2e-stealthy-result[data-interactive="false"] {
+  cursor: default;
+  user-select: text;
+  font-weight: normal;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* interactive result */
+
+.pf2e-stealthy-result[data-interactive="true"] {
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 1px 6px;
+  transition: all 0.15s ease-in-out;
+}
+
+.pf2e-stealthy-result[data-interactive="true"]:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: var(--color-pf-primary-lighter);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.pf2e-stealthy-result[data-interactive="true"]:active {
+  transform: scale(0.95);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+/* Button structure */
+
+button.pf2e-stealthy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 28px;
+  border-radius: 3px;
+  box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+button.pf2e-stealthy-button:hover {
+  background: var(--button-hover-background-color);
+  color: var(--button-hover-text-color);
+  border-color: var(--tertiary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+button.pf2e-stealthy-button:active {
+  background: var(--primary);
+  color: var(--text-light);
+  transform: scale(0.95);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+button.pf2e-stealthy-button:disabled {
+  background: var(--color-light-4);
+  color: var(--color-dark-6);
+  border-color: var(--color-light-5);
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+/* missing PCs alert */
+
+.pf2e-stealthy-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0 0.75rem 0;
+
+  border: 1px solid var(--alt);
+  border-left: 4px solid #d09700;
+  border-radius: 4px;
+  background: rgba(208, 151, 0, 0.08);
+
+  font-family: var(--font-primary, "Signika", sans-serif);
+  font-size: var(--font-size-12, 12px);
+  line-height: 1.3;
+}
+
+.pf2e-stealthy-alert i.fa-triangle-exclamation {
+  color: #ff9100;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.pf2e-stealthy-alert i.fa-triangle-exclamation {
+  font-weight: 500;
+}

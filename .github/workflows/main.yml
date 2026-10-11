@@ -1,0 +1,120 @@
+name: PF2e Avoid Notice Release Pipeline
+
+env:
+  project_url: "https://github.com/${{ github.repository }}"
+  latest_manifest_url: >-
+    ${{ github.event_name == 'release' 
+    && format('https://github.com{0}/releases/latest/download/module.json', github.repository) 
+    || format('https://github.com{0}/releases/download/test-build/module.json', github.repository) }}
+  release_module_url: >-
+    ${{ github.event_name == 'release' 
+    && format('https://github.com{0}/releases/download/{1}/module.zip', github.repository, github.event.release.tag_name) 
+    || format('https://github.com{0}/releases/download/test-build/module.zip', github.repository) }}
+  release_blob: >-
+    ${{ github.event_name == 'release' 
+    && format('https://github.com{0}/blob/{1}', github.repository, github.event.release.tag_name) 
+    || format('https://github.com{0}/blob/{1}', github.repository, github.ref_name) }}
+
+on:
+  release:
+    types: [published, released]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: replace js and css files with minified ones
+        uses: nizarmah/auto-minify@v3
+        with:
+          overwrite: true
+          js_engine: "uglify-js"
+
+      # Extracted version fallback: parses release tags or generates a fake test version string
+      - name: Extract tag version number
+        id: get_version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || '' }}
+        run: |
+          if [ "${{ github.event_name }}" = "release" ] && [ -n "$RELEASE_TAG" ]; then
+            CLEAN_VER=$(echo "$RELEASE_TAG" | sed 's/^v//')
+          else
+            CLEAN_VER="0.0.0-test.${{ github.run_number }}"
+          fi
+          echo "version-without-v=$CLEAN_VER" >> $GITHUB_OUTPUT
+
+      - name: Substitute manifest and download links for versioned ones
+        id: sub_manifest_link_version
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: "module.json"
+        env:
+          version: ${{ steps.get_version.outputs.version-without-v }}
+          url: ${{ env.project_url }}
+          manifest: ${{ env.latest_manifest_url }}
+          download: ${{ env.release_module_url }}
+          changelog: ${{ env.release_blob }}/CHANGELOG.md
+          bugs: ${{ env.project_url }}/issues
+          readme: ${{ env.release_blob }}/README.md
+          license: ${{ env.release_blob }}/LICENSE
+
+      # Create a zip file with all files required by the module to add to the release
+      # 7z u module.zip module.json README.md LICENSE CHANGELOG.md languages/ esmodules/ styles/ templates/
+      - name: Create module zip
+        run: |
+          zip -r ./module.zip \
+          module.json \
+          README.md \
+          LICENSE \
+          CHANGELOG.md \
+          languages/ \
+          esmodules/ \
+          styles/ \
+          templates/
+
+      # Create a release for this specific version (Only runs on actual releases)
+      - name: Create version release
+        id: create_version_release
+        if: github.event_name == 'release'
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true 
+          name: ${{ github.event.release.name }}
+          draft: ${{ github.event.release.unpublished }}
+          prerelease: ${{ github.event.release.prerelease }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "./module.json, ./module.zip"
+          tag: ${{ github.event.release.tag_name }}
+          body: ${{ github.event.release.body }}
+
+      # For manual runs: Overwrites a persistent static release tagged 'test-build'
+      - name: Update Test Release Artifacts
+        if: github.event_name == 'workflow_dispatch'
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          name: "Test Branch Bleeding Edge Build"
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "./module.json, ./module.zip"
+          tag: "test-build"
+          body: "Automated continuous compilation from manual run. Build number: ${{ github.run_number }}"
+
+  release:
+    name: Release to Foundry
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: ${{ github.event_name == 'release' && github.event.release.prerelease == false }}
+
+    steps:
+      - name: Release to Foundry VTT
+        uses: cs96and/FoundryVTT-release-package@v1
+        with:
+          package-token: ${{ secrets.FOUNDRY_PACKAGE_TOKEN }}
+          manifest-url: ${{ env.latest_manifest_url }}

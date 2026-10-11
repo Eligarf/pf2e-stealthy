@@ -1,0 +1,194 @@
+{
+  "pf2e-stealthy": {
+    "lesserCover": "Lesser Cover: +1",
+    "standardCover": "Standard Cover: +2",
+    "greaterCover": "Greater Cover: +4",
+    "logLevel": {
+      "name": "Logging Level",
+      "none": "No logging",
+      "debug": "Debug level",
+      "log": "Log level"
+    },
+    "activity": "Exploration Activity: {activity}",
+    "panZoomToCombat": {
+      "name": "Pan/Zoom to combat",
+      "hint": "When combat starts, pan/zoom-out the camera to fit observed and hidden combatants for controlled tokens without removing any currently viewed portion of the canvas from view. It will ignore any foundry-hidden or undetected combatants."
+    },
+    "useEffects": {
+      "name": "Use PF2e Stealthy effects",
+      "hint": "If enabled, a Stealth effect will be applied to avoiding tokens which can track per-token visibility."
+    },
+    "visionHack": {
+      "name": "per-Token canvas visibility",
+      "hint": "Tokens with a Stealth effect will dynamically adjust their visibility depending on their hidden or undetected status relevant to the controlled token(s).\nNote: this is a hacky vanilla solution and will likely experience weirdness mixing with invisibility, etc.\nNote: Requires PF2e Stealthy effects to be enabled."
+    },
+    "requireActivity": {
+      "name": "Require 'Avoid Notice' activity",
+      "hint": "PCs are required to set the 'Avoid Notice' exploration activity active to sneak at combat start. If disabled, PCs instead need to use stealth for initiative.",
+      "error": "{actor} needs to use {action} if wanting to sneak at combat start."
+    },
+    "showEyeballs": {
+      "name": "Enable eyeball indicators",
+      "hint": "Display eyeballs on canvas tokens that ignore the controlled tokens' stealth-based hidden and/or undetected conditions"
+    },
+    "collapseTargetList": {
+      "name": "Collapse initiative target lists",
+      "hint": "Initially collapse target lists when adding them to initiative chat cards"
+    },
+    "hideFromAllies": {
+      "name": "Party stealth affects party members",
+      "hint": "If enabled, party member stealth effect can affect other party members. This checkbox doesn't apply to neutral or opposing tokens."
+    },
+    "notifications": {
+      "noSocketLib": "PF2e Stealthy needs socketlib module to be active in order to pan/zoom to combat. Please activate it.",
+      "target1": "Point Out action requires a single token to be targeted"
+    },
+    "schema": {
+      "name": "Schema Version",
+      "hint": "Set this to a previous version to force a data migration from the specified version to the current version"
+    },
+    "config": {
+      "general": "General Options",
+      "misfits": "Misfit Features",
+      "debug": "Debug Options"
+    },
+    "menu": {
+      "name": "PF2e Stealthy popup menu",
+      "hint": "Main interface for PF2e Stealthy",
+      "bindings": {
+        "name": "PF2e Stealthy Menu",
+        "hint": "Open the PF2e Stealthy menu"
+      },
+      "nothingToDo": "PF2e Stealthy has no available actions for the given token(s)",
+      "noTokensSelected": "No tokens selected",
+      "tokensSelected": "{type} Tokens",
+      "tokensConnected": "Connected Tokens",
+      "type": {
+        "targeted": "Targeted",
+        "controlled": "Controlled"
+      },
+      "cancel": "Cancel",
+      "refresh": {
+        "label": "Refresh All Clients",
+        "hint": "Refresh all client screens to clear up any visibility issues"
+      },
+      "clearAllStealth": {
+        "label": "Remove All Stealth Effects",
+        "hint": "Remove stealth effects from all canvas tokens"
+      },
+      "prepareAmbush": {
+        "label": "Prepare Ambush",
+        "hint": "All {type} NPC tokens become ghosted and use stealth for initiative"
+      },
+      "clearAmbush": {
+        "label": "Clear Ambush",
+        "hint": "All {type} NPC tokens become unghosted and use perception for initiative"
+      },
+      "editStealth": {
+        "label": "Edit Stealth Effect"
+      },
+      "removeStealth": {
+        "label": "Remove Stealth Effects"
+      },
+      "editControlledStealth": {
+        "label": "Edit Controlled Stealth Effect",
+        "hint": "Edit Stealth Effects for controlled token"
+      },
+      "removeControlledStealth": {
+        "label": "Remove Controlled Stealth Effects",
+        "hint": "Remove Stealth Effects from controlled tokens"
+      },
+      "editTargetedStealth": {
+        "label": "Edit Targeted Stealth Effect",
+        "hint": "Edit Stealth Effect for targeted token"
+      },
+      "removeTargetedStealth": {
+        "label": "Remove Targeted Stealth Effects",
+        "hint": "Remove Stealth Effects from targeted tokens"
+      },
+      "undoReveals": {
+        "label": "Undo Stealth Reveals",
+        "hint": "Undo any stealth reveals of {type} tokens"
+      },
+      "avoidanceCheck": {
+        "label": "Check Avoidance",
+        "hint": "Run a stealth vs perception check for all stealthing {type} tokens"
+      },
+      "revealControlledToTargeted": {
+        "label": "Reveal controlled tokens to targeted",
+        "hint": "Reveal controlled tokens to targeted tokens"
+      },
+      "revealControlledAsHiddenToTargeted": {
+        "label": "Reveal controlled tokens as hidden to targeted",
+        "hint": "Reveal controlled tokens as hidden to targeted tokens"
+      },
+      "revealTargetedToControlled": {
+        "label": "Reveal targeted tokens to controlled",
+        "hint": "Reveal targeted tokens to controlled tokens"
+      },
+      "revealTargetedAsHiddenToControlled": {
+        "label": "Reveal targeted tokens as hidden to controlled",
+        "hint": "Reveal targeted tokens as hidden to controlled tokens"
+      },
+      "undoControlledRevealsToTargeted": {
+        "label": "Undo controlled tokens' reveals to targeted",
+        "hint": "Undo any reveals of controlled tokens' to targeted tokens"
+      },
+      "undoTargetedRevealsToControlled": {
+        "label": "Undo reveals of targeted tokens' condition",
+        "hint": "Undo any reveals of targeted tokens' to controlled tokens"
+      },
+      "declump": {
+        "label": "Declump Initiative",
+        "hint": "Preserve initiative order but spread out all initiatives"
+      },
+      "endOfList": "end of list so I don't have to mess with commas"
+    },
+    "effects": {
+      "stealth": {
+        "name": "Stealth",
+        "description": "Stealth effect will apply hidden/undetected to observer tokens as appropriate"
+      },
+      "apply": "Apply Changes",
+      "noChange": "No Change"
+    },
+    "initiative": {
+      "vs": "vs {name}"
+    },
+    "avoidanceCheck": {
+      "title": "Avoidance Check",
+      "secretTitle": "Secret Avoidance Check",
+      "checkLabel": "Check result:",
+      "observed": "Observed: {observed}",
+      "hidden": "Hidden: {hidden}",
+      "undetected": "Undetected: {undetected}",
+      "createEncounter": "Add All to Combat",
+      "createEncounterTooltip": "Add all tokens in this card to the combat using the rolled stealth results as initiative.&#10Note that some initiative adjustments might shift slightly due to the approximations used in the Avoidance Check",
+      "missingActors": "Please {clownCar} to the canvas before pressing the {createEncounter} button:",
+      "observedEnemies": "Noticable Enemies",
+      "observedFriendlies": "Noticable Party Members"
+    },
+    "hide": {
+      "retain": "Success retains undetected status"
+    },
+    "sneak": {
+      "observed": "Prerequisite: hidden or undetected condition"
+    },
+    "seek": {
+      "was": "Was {stealth}"
+    },
+    "pointOut": {
+      "subject": "Points out {name}",
+      "to": "to {name}",
+      "hiddens": "Hidden to {count}"
+    },
+    "edit": {
+      "subject": "Editing stealth for {name}"
+    },
+    "badge": {
+      "observed": "OBS",
+      "hidden": "HDN",
+      "undetected": "UDT"
+    }
+  }
+}

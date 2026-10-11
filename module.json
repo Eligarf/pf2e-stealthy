@@ -1,0 +1,74 @@
+{
+  "id": "pf2e-stealthy",
+  "title": "PF2e Stealthy",
+  "description": "Manages token-paired initiative and action-related stealth checks using chat cards",
+  "authors": [
+    {
+      "name": "Rule",
+      "url": "https://github.com/Eligarf",
+      "discord": "rule6296",
+      "ko-fi": "rule671908"
+    }
+  ],
+  "version": "0.3",
+  "compatibility": {
+    "minimum": "14",
+    "maximum": "14",
+    "verified": "14"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "pf2e",
+        "type": "system",
+        "compatibility": {
+          "verified": "8.6"
+        }
+      },
+      {
+        "id": "sf2e",
+        "type": "system",
+        "compatibility": {
+          "verified": "1.6"
+        }
+      }
+    ],
+    "requires": [
+      {
+        "id": "lib-wrapper",
+        "type": "module",
+        "manifest": "https://github.com/ruipin/fvtt-lib-wrapper/releases/latest/download/module.json",
+        "compatibility": {}
+      },
+      {
+        "id": "socketlib",
+        "type": "module",
+        "manifest": "https://raw.githubusercontent.com/manuelVo/foundryvtt-socketlib/master/module.json",
+        "compatibility": {}
+      }
+    ]
+  },
+  "esmodules": [
+    "esmodules/main.js",
+    "esmodules/combat.js",
+    "esmodules/action.js",
+    "esmodules/render-card.js"
+  ],
+  "styles": ["styles/style.css"],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "languages/en.json",
+      "flags": {}
+    }
+  ],
+  "socket": true,
+  "url": "replaced",
+  "manifest": "replaced",
+  "download": "replaced",
+  "changelog": "replaced",
+  "bugs": "replaced",
+  "readme": "replaced",
+  "license": "replaced"
+}
