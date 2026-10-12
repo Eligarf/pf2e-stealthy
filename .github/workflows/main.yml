@@ -4,16 +4,16 @@ env:
   project_url: "https://github.com/${{ github.repository }}"
   latest_manifest_url: >-
     ${{ github.event_name == 'release' 
-    && format('https://github.com{0}/releases/latest/download/module.json', github.repository) 
-    || format('https://github.com{0}/releases/download/test-build/module.json', github.repository) }}
+    && format('https://github.com/{0}/releases/latest/download/module.json', github.repository) 
+    || format('https://github.com/{0}/releases/download/test-build/module.json', github.repository) }}
   release_module_url: >-
     ${{ github.event_name == 'release' 
-    && format('https://github.com{0}/releases/download/{1}/module.zip', github.repository, github.event.release.tag_name) 
-    || format('https://github.com{0}/releases/download/test-build/module.zip', github.repository) }}
+    && format('https://github.com/{0}/releases/download/{1}/module.zip', github.repository, github.event.release.tag_name) 
+    || format('https://github.com/{0}/releases/download/test-build/module.zip', github.repository) }}
   release_blob: >-
     ${{ github.event_name == 'release' 
-    && format('https://github.com{0}/blob/{1}', github.repository, github.event.release.tag_name) 
-    || format('https://github.com{0}/blob/{1}', github.repository, github.ref_name) }}
+    && format('https://github.com/{0}/blob/{1}', github.repository, github.event.release.tag_name) 
+    || format('https://github.com/{0}/blob/{1}', github.repository, github.ref_name) }}
 
 on:
   release:
