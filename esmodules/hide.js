@@ -12,8 +12,8 @@ import { renderTargetList, renderSummary } from "./render-status.js";
 import { cachedSettings } from "./settings.js";
 import { prepareStealthChecks } from "./action.js";
 import {
-  adaptStealthEffectToObservers,
-  getStealthEffect,
+  adaptStealthyToObservers,
+  getStealthyEffect,
   getStealthBaseline,
   getStealthinessTo,
 } from "./effects.js";
@@ -61,9 +61,9 @@ export async function prepareHideData(message, userId, actingToken) {
 
 async function applyHideEffects(message, _event, flags) {
   if (!game.user.isGM) return;
-  const stealthEffect = getStealthEffect(message.token);
-  const baselineStealth = stealthEffect
-    ? Math.max(getStealthBaseline(stealthEffect), HIDDEN)
+  const stealthy = getStealthyEffect(message.token);
+  const baselineStealth = stealthy
+    ? Math.max(getStealthBaseline(stealthy), HIDDEN)
     : HIDDEN;
   const hide = flags.hide;
   const detectors = Object.fromEntries(
@@ -82,7 +82,7 @@ async function applyHideEffects(message, _event, flags) {
         ]),
       ),
   );
-  await adaptStealthEffectToObservers({
+  await adaptStealthyToObservers({
     actor: message.token.actor,
     baselineStealth,
     detectors,

@@ -9,7 +9,7 @@ import {
 import { findCompanionsOnCanvas } from "./combat.js";
 import { cachedSettings } from "./settings.js";
 import {
-  getStealthEffect,
+  getStealthyEffect,
   getStealthBaseline,
   setStealthinessTo,
 } from "./effects.js";
@@ -50,12 +50,12 @@ export async function preparePointOutData(message, userId, actingToken) {
   if (!turns) return message.update(update);
 
   // ... and if they are stealthy
-  const stealthEffect = getStealthEffect(subject);
-  const stealthBaseline = getStealthBaseline(stealthEffect);
+  const stealthy = getStealthyEffect(subject);
+  const stealthBaseline = getStealthBaseline(stealthy);
   if (stealthBaseline !== UNDETECTED) return message.update(update);
 
   // ... and if we are a detector
-  const flags = stealthEffect?.flags?.[MODULE_ID];
+  const flags = stealthy?.flags?.[MODULE_ID];
   const detectors = flags?.undetected || {};
   if (!detectors?.except?.includes(actingToken.id))
     return message.update(update);

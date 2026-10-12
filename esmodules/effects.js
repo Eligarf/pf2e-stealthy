@@ -14,7 +14,7 @@ import { cachedSettings } from "./settings.js";
 export function isAvoider(tokenOrActor) {
   const actor = tokenOrActor?.actor ?? tokenOrActor;
   // If you have a stealth effect you are an avoider
-  if (actor?.items?.some((item) => item.system.slug === SLUGS.stealthEffect))
+  if (actor?.items?.some((item) => item.system.slug === SLUGS.stealthy))
     return true;
 
   // once combat starts, a combantant has to have the stealth effect
@@ -40,9 +40,9 @@ export function isAvoider(tokenOrActor) {
   );
 }
 
-export function getStealthEffect(token) {
+export function getStealthyEffect(token) {
   const actor = token.actor;
-  return actor?.items?.find((item) => item.system.slug === SLUGS.stealthEffect);
+  return actor?.items?.find((item) => item.system.slug === SLUGS.stealthy);
 }
 
 export function getStealthBaseline(stealth) {
@@ -51,11 +51,11 @@ export function getStealthBaseline(stealth) {
 
 export function getStealthinessTo(origin, targetId) {
   const actor = origin.actor || origin.tokenDoc.actor;
-  const stealthEffect = actor?.items?.find(
-    (item) => item.system.slug === SLUGS.stealthEffect,
+  const stealthy = actor?.items?.find(
+    (item) => item.system.slug === SLUGS.stealthy,
   );
-  const stealthBaseline = getStealthBaseline(stealthEffect);
-  const flags = stealthEffect?.flags?.[MODULE_ID];
+  const stealthBaseline = getStealthBaseline(stealthy);
+  const flags = stealthy?.flags?.[MODULE_ID];
   if (stealthBaseline === UNDETECTED) {
     const undetected = flags?.undetected || {};
     if (!undetected?.except?.includes(targetId)) return UNDETECTED;
@@ -103,17 +103,14 @@ function buildRulesFromFlags(flags, stealthBaseline) {
 
 export async function setStealthinessTo(origin, target, stealth) {
   const actor = origin.actor || origin.tokenDoc.actor;
-  const stealthEffect = actor?.items?.find(
-    (item) => item.system.slug === SLUGS.stealthEffect,
+  const stealthy = actor?.items?.find(
+    (item) => item.system.slug === SLUGS.stealthy,
   );
-  if (
-    stealthEffect?.flags?.[MODULE_ID]?.detectors?.[target.id]?.stealth ===
-    stealth
-  )
+  if (stealthy?.flags?.[MODULE_ID]?.detectors?.[target.id]?.stealth === stealth)
     return;
 
-  const stealthBaseline = getStealthBaseline(stealthEffect);
-  let flags = foundry.utils.duplicate(stealthEffect?.flags?.[MODULE_ID]);
+  const stealthBaseline = getStealthBaseline(stealthy);
+  let flags = foundry.utils.duplicate(stealthy?.flags?.[MODULE_ID]);
   if (stealthBaseline <= stealth) {
     for (let condition = stealthBaseline; condition >= HIDDEN; --condition) {
       const stealthLabel = STEALTH_LABELS[condition];
@@ -144,17 +141,17 @@ export async function setStealthinessTo(origin, target, stealth) {
       rules: buildRulesFromFlags(flags, stealthBaseline),
     },
   };
-  return stealthEffect.update(update);
+  return stealthy.update(update);
 }
 
 export async function undoRevealsOf({ avoiders, observers = [] }) {
   debuglog("undoRevealsOf", { avoiders, observers });
   for (const avoider of avoiders) {
     const actor = avoider?.actor;
-    const stealthEffect = actor?.items?.find(
-      (item) => item.system.slug === SLUGS.stealthEffect,
+    const stealthy = actor?.items?.find(
+      (item) => item.system.slug === SLUGS.stealthy,
     );
-    const flags = stealthEffect?.flags?.[MODULE_ID] || {};
+    const flags = stealthy?.flags?.[MODULE_ID] || {};
     if (!flags) continue;
     const undoSet = new Set(flags.hidden?.except || []);
     (flags.undetected?.except || []).forEach((id) => undoSet.add(id));
@@ -164,11 +161,11 @@ export async function undoRevealsOf({ avoiders, observers = [] }) {
     }
 
     const oldDetectors = foundry.utils.duplicate(flags.detectors);
-    const baselineStealth = getStealthBaseline(stealthEffect);
+    const baselineStealth = getStealthBaseline(stealthy);
     const detectors = Object.fromEntries(
       Object.entries(oldDetectors).filter(([id, _]) => !undos.includes(id)),
     );
-    await adaptStealthEffectToObservers({
+    await adaptStealthyToObservers({
       actor,
       baselineStealth,
       detectors,
@@ -196,14 +193,14 @@ export async function revealAvoidersTo({
   });
   for (const avoider of avoiders) {
     const actor = avoider?.actor;
-    const stealthEffect = actor?.items?.find(
-      (item) => item.system.slug === SLUGS.stealthEffect,
+    const stealthy = actor?.items?.find(
+      (item) => item.system.slug === SLUGS.stealthy,
     );
-    if (!stealthEffect) continue;
-    const flags = stealthEffect?.flags?.[MODULE_ID] || {};
+    if (!stealthy) continue;
+    const flags = stealthy?.flags?.[MODULE_ID] || {};
     if (!flags) continue;
     const detectors = foundry.utils.duplicate(flags.detectors || {});
-    const baselineStealth = getStealthBaseline(stealthEffect);
+    const baselineStealth = getStealthBaseline(stealthy);
     for (const detector of observers) {
       const id = detector.id;
       if (id in detectors) {
@@ -218,7 +215,7 @@ export async function revealAvoidersTo({
         };
       }
     }
-    await adaptStealthEffectToObservers({
+    await adaptStealthyToObservers({
       actor,
       baselineStealth,
       detectors,
@@ -229,16 +226,16 @@ export async function revealAvoidersTo({
 async function createStealthEffect(actor, rules, flags, baselineStealth) {
   let effectData = {
     type: "effect",
-    name: game.i18n.localize(`${MODULE_ID}.effects.stealth.name`),
+    name: game.i18n.localize(`${MODULE_ID}.effects.stealthy.name`),
     img: "systems/pf2e/icons/conditions/unnoticed.webp",
     flags: {
       [MODULE_ID]: flags,
     },
     system: {
       description: {
-        value: game.i18n.localize(`${MODULE_ID}.effects.stealth.description`),
+        value: game.i18n.localize(`${MODULE_ID}.effects.stealthy.description`),
       },
-      slug: SLUGS.stealthEffect,
+      slug: SLUGS.stealthy,
       duration: {
         value: -1,
         unit: "unlimited",
@@ -311,7 +308,7 @@ function buildFlagsAndRules(stealths, detectors, baselineStealth) {
   return { flags, rules: buildRulesFromFlags(flags, baselineStealth) };
 }
 
-export async function adaptStealthEffectToObservers({
+export async function adaptStealthyToObservers({
   actor,
   baselineStealth,
   detectors,
@@ -328,7 +325,7 @@ export async function adaptStealthEffectToObservers({
     baselineStealth,
   );
   const effect = actor?.items?.find(
-    (item) => item.system.slug === SLUGS.stealthEffect,
+    (item) => item.system.slug === SLUGS.stealthy,
   );
   if (effect) {
     return effect.update({

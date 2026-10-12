@@ -4,7 +4,7 @@ import { interpolateString, refreshPerception } from "./utils.js";
 export async function clearActorStealth({ actor }) {
   const conditions =
     actor?.items
-      .filter((i) => i.system.slug === SLUGS.stealthEffect)
+      .filter((i) => i.system.slug === SLUGS.stealthy)
       .map((i) => i.id) || [];
   if (conditions.length > 0) {
     await actor.deleteEmbeddedDocuments("Item", conditions);

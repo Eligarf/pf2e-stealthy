@@ -14,13 +14,16 @@ A module for PF2e/SF2e in FoundryVTT that manages token-to-token hidden and unde
 ## Module Tenets
 
 > [!CAUTION]
-> PF2e Stealthy is not and will not be a general vision solution. It is likely that there many edge cases between *stealth*-based hidden and other sources of hidden or undetected such as Invisibility - most of these will be considered out-of-scope.
+> PF2e Stealthy is not and will not be a general vision solution. It is likely that there many edge cases between stealth-based hidden and other sources of hidden or undetected - most of these will be considered out-of-scope.
+
+> [!NOTE]
+> For brevity, I'll define *Stealthy* to be the module's generated effect and a *Stealthy* token or actor as one which has the *Stealthy* effect.
 
 PF2e Stealth:
-- is for tactical combat stealth only, and its *stealth* effects are only valid during initiative and encounter mode.
-- uses *stealth* effects which control the hidden and undetected conditions based on the results of stealth or perception checks. These are straightforward effects plainly visible to the GM and use standard REs.
+- uses the *Stealthy* effect which control the hidden and undetected conditions based on the results of stealth or perception checks. These are straightforward effects plainly visible to the GM and use standard REs.
+- is for tactical combat stealth only, and *stealthy* effects are only valid during initiative and encounter mode.
 - uses chat cards as its primary interface.
-- requires no prep on non-stealthing tokens. All data is carried in the *stealth* effects on the stealthing tokens.
+- requires no prep on non-*stealthy* tokens. All data is carried on the *stealthy* actors.
 - does not police actions or states for cover or validity and simple does the mechanics since the GM is free to adjust results before they are applied.
 
 ## Exploration Mode
@@ -28,21 +31,33 @@ PF2e Stealth:
 > [!CAUTION]
 > Implementing any tactical exploration features during encounter mode is out-of-scope for PF2e Stealthy. GMs wishing to do more tactical exploration probably should look elsewhere for vision/stealth support.
 
-As explained in GM Core, exploration mode is hand-wavey by its very nature, so this module assumes that the party token is a valid choice to focus on during exploration mode in Foundry. An 'Avoidance Check' is available on PF2e Stealthy's context menu that manages having the selected party, character, and monster tokens do Avoid Notice rolls so the GM can determine whether or not there is to be an encounter. Selected Party tokens will generate stealth roll requests for any PCs using Avoid Notice even if they aren't on the map yet, and if the GM determines there will be an encounter based on the results, PCs can be deposited from the party token, positioned on the map in some way that makes sense to everyone, and then stealthing characters will use the Avoidance Check results as their initiative rolls.
+As explained in GM Core, exploration mode is hand-wavey by its very nature, so this module assumes that the party token is a valid choice to focus on during exploration mode in Foundry. An 'Avoidance Check' is available on PF2e Stealthy's context menu that manages having any selected party, character, and monster tokens do Avoid Notice rolls so the GM can determine whether or not there is to be an encounter. Selected Party tokens will generate stealth roll requests for any PCs using Avoid Notice even if they aren't on the map yet, and if the GM determines there will be an encounter based on the results, PCs can be deposited from the party token, positioned on the map in some way that makes sense to everyone, and then *stealthy* characters will use the Avoidance Check results as their initiative rolls.
 
 ## Combat Mode
 
 > [!CAUTION]
-> Cover calculations, Darkness, Concealment, etc are not taken into account when granting *stealth* conditions. It is up to the GM to modify any results accordingly on the chat cards.
+> Cover calculations, Darkness, Concealment, etc are not taken into account when granting stealth. It is up to the GM to verify or modify any results accordingly on the chat cards.
 
-This module basically tracks which tokens should be granted an exception to the hidden or undetected conditions carried by the stealthing token. It assumes that if a stealthing creature has achieved the hidden or undetected condition, it is hidden to all other tokens except for those who are on its specific exception list for its stealthy conditions. No cover calculations are done (this is out-of-scope), but if one day there is a standard way to calculate cover I'll likely use it to add the bonus to the sneak checks. The cover condition is used if present, but nothing token-to-token
+This module basically tracks which tokens should be granted an exception to the hidden or undetected conditions carried by *stealthy* actors. It assumes that if a *stealthy* actor has achieved the hidden or undetected condition, it is hidden to all other tokens except for those who are on its specific exception list for its conditions. No cover calculations are done (this is out-of-scope), but if one day there is a standard way to calculate cover I'll likely use it to add the bonus to the sneak checks. The cover condition is used if present, but nothing token-to-token
 
-When a creature takes a Hide or Sneak action, PF2e Stealthy will append a target list to the roll chat card listing each observing token, dc, and resulting stealth status for that observer. The GM can click on any results to change specific ones for whatever reason like missing cover or whatever, and the clicks the Apply Effects button to store that info into the *stealth* effect. Once the *stealth* effect is on the token, the module's context menu will offer a choice to edit the *stealth* effect of a selected token and present a new chat card where the GM can tweak stealth settings as needed.
+When a creature takes a Hide or Sneak action, PF2e Stealthy will append a target list to the roll chat card listing each observing token, dc, and resulting stealth status for that observer. The GM can click on any results to change specific ones for whatever reason like missing cover or whatever, and the clicks the Apply Effects button to store that info into the *stealthy* effect. Once the actor is *stealthy*, the module's context menu will offer a choice to edit and present a new chat card where the GM can tweak stealth settings as needed. Seek checks work similarly, allowing the GM to modify the seek results prior to accepting the changes, and the Point Out action, if accepted, will set appropriate allied tokens to see the pointed out token as hidden.
 
-Seek checks work similarly, allowing the GM to modify the seek results prior to accepting the changes, and the Point Out action, if accepted, will set appropriate allied tokens to see the pointed out token as hidden.
+The *Stealthy* effect uses a badge to track the baseline stealth of the actor, and grants the hidden and undetected conditions based on the level of the badge. It uses signature predicates to conditionally disable the condition roll options it grants depending on the target of the roll.
 
 ## Context Menu
 
-I have a context menu assigned in the key maps. (There is probably a better way to do it but this keeps it out of the way). When pressed, it will list some relevant options based on what tokens were controlled/targeted/or both. If there are only controlled tokens or targeted tokens, the menu options will list the same and apply the actions accordingly - no need to switch which way you might be designating something. When both controlled and targeted tokens are present, the menus will present mirrored choices; you might want to clear *stealth* on the attacking token, or you might need to clear out a forgotten state on the targeted token.
+I have a context menu assigned in the key maps (there is probably a better way to do it but this keeps it out of the way). When pressed, it will list some relevant options based on what tokens were controlled/targeted/or both. If there are only controlled tokens or targeted tokens, the menu options will list the same and apply the actions accordingly - no need to switch which way you might be designating something. When both controlled and targeted tokens are present, the menus will present mirrored choices; you might want to clear stealth on the attacking token, or you might need to clear out a forgotten state on the targeted token.
 
+The following is a list of the menu options that can appear when pressing the menu context key. In practice you will find some variations on some of the entries, but the jist of them are here.
 
+| Menu option | Prerequisites | Details |
+| ----------- | ------------- | ------- |
+| Avoidance Check | Selected or targeted tokens | Sends a chat message with the avoidance check details to the GM |
+| Clear Ambush | Out of combat, selected or targeted non-party tokens using stealth for initiative | Set initiative statistic to 'perception' for any actors using 'stealth' |
+| De-clump Initiative | In combat, no tokens controlled or targeted | Spreads out the initiative value of all combatants, resulting in a gap of 3 between each |
+| Edit Stealth | Single *stealthy* token selected or targeted | Sends a chat card to the GM where they can edit the stealth values vs that token's potential observers |
+| Prepare Ambush | Out of combat, selected or targeted non-party tokens not using stealth for initiative | Sets the actors' initiative statistics to 'stealth', and ghosts the tokens (sets Foundry hidden) |
+| Refresh all | None | Sends a refresh perception signal to all clients |
+| Remove stealth | group of controlled or targeted tokens | Removes all stealth effects from the selected *stealthy* actors |
+| Reveal controlled token | Set of controlled and set of targeted tokens | Adds exceptions for the targeted tokens to the stealth conditions of any *stealthy* controlled actors | 
+| Undo controlled reveals | Set of controlled and set of targeted tokens | Removes any exceptions for the targeted tokens from the stealth conditions of the *stealthy* controlled actors |

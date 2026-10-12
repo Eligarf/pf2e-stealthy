@@ -8,7 +8,7 @@ import {
 } from "./const.js";
 import { renderTargetList, renderSummary } from "./render-status.js";
 import { cachedSettings } from "./settings.js";
-import { adaptStealthEffectToObservers, getStealthinessTo } from "./effects.js";
+import { adaptStealthyToObservers, getStealthinessTo } from "./effects.js";
 import { findCompanionsOnCanvas, findPossibleTargets } from "./combat.js";
 
 export async function editStealth(actingToken) {
@@ -76,7 +76,7 @@ async function applyEditEffects(message, _event, flags) {
   );
 
   const origin = getToken(edit.originId);
-  await adaptStealthEffectToObservers({
+  await adaptStealthyToObservers({
     actor: origin?.actor,
     baselineStealth: edit.targetList.reduce(
       (b, t) => Math.max(b, t.stealth),

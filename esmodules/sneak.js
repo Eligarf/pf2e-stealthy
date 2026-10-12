@@ -12,7 +12,7 @@ import {
 import { renderTargetList, renderSummary } from "./render-status.js";
 import { cachedSettings } from "./settings.js";
 import { prepareStealthChecks } from "./action.js";
-import { adaptStealthEffectToObservers, getStealthinessTo } from "./effects.js";
+import { adaptStealthyToObservers, getStealthinessTo } from "./effects.js";
 
 export function resolveAvoidNotice(_origin, check) {
   check.stealth =
@@ -84,7 +84,7 @@ async function applySneakEffects(message, _event, flags) {
         ]),
       ),
   );
-  await adaptStealthEffectToObservers({
+  await adaptStealthyToObservers({
     actor: message.token.actor,
     baselineStealth: UNDETECTED,
     detectors,

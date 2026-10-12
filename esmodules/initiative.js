@@ -1,4 +1,4 @@
-import { adaptStealthEffectToObservers } from "./effects.js";
+import { adaptStealthyToObservers } from "./effects.js";
 import { UNDETECTED, OBSERVED } from "./const.js";
 import { debuglog, interpolateString, getToken } from "./utils.js";
 
@@ -47,7 +47,7 @@ export async function applyInitiativeConditions(observations, tokenUpdates) {
           ]),
         ),
     );
-    await adaptStealthEffectToObservers({
+    await adaptStealthyToObservers({
       actor: avoider.tokenDoc.actor,
       baselineStealth,
       detectors,

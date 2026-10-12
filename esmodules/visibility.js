@@ -40,7 +40,7 @@ export function refreshVisibilityCache() {
 
 function findObservations(token) {
   const actor = token?.actor;
-  const stealth = actor?.items.find((i) => i.slug === SLUGS.stealthEffect);
+  const stealth = actor?.items.find((i) => i.slug === SLUGS.stealthy);
   if (!stealth) return null;
   const flags = stealth.flags[MODULE_ID];
   if (!flags) return null;
@@ -221,7 +221,7 @@ function refreshTokenHook(token, _options) {
 
   const actor = token?.actor;
   if (!actor) return;
-  const stealth = actor?.items.find((i) => i.slug === SLUGS.stealthEffect);
+  const stealth = actor?.items.find((i) => i.slug === SLUGS.stealthy);
   if (!stealth) return;
   const states = stealth.flags[MODULE_ID];
   if (!states) return false;
@@ -241,7 +241,7 @@ function refreshTokenHook(token, _options) {
 }
 
 function createItemHook(item, options, userId) {
-  if (item?.system?.slug !== SLUGS.stealthEffect) return;
+  if (item?.system?.slug !== SLUGS.stealthy) return;
   const actor = options.parent;
   debuglog(`'${actor?.name}' stealth effect created`, {
     item,
@@ -251,7 +251,7 @@ function createItemHook(item, options, userId) {
 }
 
 function deleteItemHook(item, options, userId) {
-  if (item?.system?.slug !== SLUGS.stealthEffect) return;
+  if (item?.system?.slug !== SLUGS.stealthy) return;
   debuglog(`stealth effect deleted`, {
     item,
     options,
@@ -269,9 +269,7 @@ function updateTokenHook(tokenDoc, data, options, userId) {
 
 function deleteTokenHook(tokenDoc, options, userId) {
   debuglog(`'${tokenDoc.name}' deleted`, { tokenDoc, options, userId });
-  const stealth = tokenDoc?.actor?.items.find(
-    (i) => i.slug === SLUGS.stealthEffect,
-  );
+  const stealth = tokenDoc?.actor?.items.find((i) => i.slug === SLUGS.stealthy);
   if (!stealth) return;
   cache.removeAvoider(tokenDoc, handleMutations);
 }

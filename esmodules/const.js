@@ -43,7 +43,7 @@ export const SLUGS = {
   scout: "scout",
   scoutDedication: "scout-dedication",
   stealth: "stealth",
-  stealthEffect: `${MODULE_ID}-stealth`,
+  stealthy: `${MODULE_ID}-stealth`,
 };
 
 export const COMBAT_STATES = {

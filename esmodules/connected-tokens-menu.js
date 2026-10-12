@@ -10,15 +10,11 @@ export async function invokeConnectedTokensMenu({ controlled, targeted }) {
 
   const controlledAvoidingTokens = controlled.tokens.filter((t) => {
     const actor = t?.actor;
-    return actor?.items?.some(
-      (item) => item.system.slug === SLUGS.stealthEffect,
-    );
+    return actor?.items?.some((item) => item.system.slug === SLUGS.stealthy);
   });
   const targetedAvoidingTokens = targeted.tokens.filter((t) => {
     const actor = t?.actor;
-    return actor?.items?.some(
-      (item) => item.system.slug === SLUGS.stealthEffect,
-    );
+    return actor?.items?.some((item) => item.system.slug === SLUGS.stealthy);
   });
   let controlledObservingTokens = [];
 
@@ -40,10 +36,8 @@ export async function invokeConnectedTokensMenu({ controlled, targeted }) {
     });
     controlledObservingTokens = controlledAvoidingTokens.filter((c) => {
       const avoider = c?.actor;
-      const stealth = avoider?.items?.find(
-        (i) => i.slug === SLUGS.stealthEffect,
-      );
-      const flags = stealth?.flags?.[MODULE_ID];
+      const stealthy = avoider?.items?.find((i) => i.slug === SLUGS.stealthy);
+      const flags = stealthy?.flags?.[MODULE_ID];
       const exceptions = (flags?.hidden?.except || []).concat(
         flags?.undetected?.except || [],
       );

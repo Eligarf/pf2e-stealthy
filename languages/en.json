@@ -145,9 +145,9 @@
       "endOfList": "end of list so I don't have to mess with commas"
     },
     "effects": {
-      "stealth": {
-        "name": "Stealth",
-        "description": "Stealth effect will apply hidden/undetected to observer tokens as appropriate"
+      "stealthy": {
+        "name": "Stealthy",
+        "description": "Stealth effect which applies hidden/undetected to observer tokens as appropriate"
       },
       "apply": "Apply Changes",
       "noChange": "No Change"

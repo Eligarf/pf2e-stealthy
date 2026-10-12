@@ -26,7 +26,7 @@ export async function invokeTokensMenu({ selection }) {
 
   if (cachedSettings.useEffects) {
     const avoiders = selection.tokens.filter((token) =>
-      token.actor?.items?.some((i) => i.slug === SLUGS.stealthEffect),
+      token.actor?.items?.some((i) => i.slug === SLUGS.stealthy),
     );
 
     if (avoiders.length > 0) {
@@ -67,7 +67,7 @@ export async function invokeTokensMenu({ selection }) {
 
       const observed = avoiders.some((token) => {
         const stealth = token.actor?.items?.find(
-          (i) => i.slug === SLUGS.stealthEffect,
+          (i) => i.slug === SLUGS.stealthy,
         );
         const flags = stealth?.flags?.[MODULE_ID];
         if (!flags) return false;
