@@ -25,7 +25,7 @@ export function prepareTargetList(sortedChecks) {
       stealth: check.stealth,
       ...(check.was && { was: check.was }),
       stealthLabel: check.stealthLabel,
-      ...(check.tooltip && { tooltip: check.tooltip }),
+      ...(check.tooltips?.length > 0 && { tooltips: check.tooltips }),
     };
     return entry;
   });
@@ -83,9 +83,31 @@ export function renderTargetList(targetList, summary, context) {
       resultTag = `
       <div class="${MODULE_ID}-result" data-interactive="false">`;
     }
-    const tooltip = target.tooltip
-      ? `data-tooltip="<div>${target.tooltip}</div>"`
-      : "";
+
+    let tooltip = "";
+    if (target.tooltips?.length > 0) {
+      tooltip =
+        `data-tooltip="<div>` +
+        target.tooltips.reduce(
+          (str, t) =>
+            str +
+            (str.length ? "<br>" : "") +
+            localizeString(
+              t.format,
+              t.interpolations?.length > 0
+                ? Object.fromEntries(
+                    Object.entries(t.interpolations).map((n, i) => [
+                      n,
+                      game.i18n.localize(i),
+                    ]),
+                  )
+                : {},
+            ),
+          "",
+        ) +
+        `</div>"`;
+    }
+
     content += `
       <div class="${MODULE_ID}-target" data-hover-id="${hoverId}">
         <div class="${MODULE_ID}-name">${vs}</div>

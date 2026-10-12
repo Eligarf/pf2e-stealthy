@@ -23,10 +23,7 @@ function resolveHide(origin, check) {
   check.was = stealth;
   if (check.degreeOfSuccess >= SUCCESS) {
     if (stealth === UNDETECTED) {
-      const tooltip = game.i18n.localize(`${MODULE_ID}.hide.retain`);
-      check.tooltip = check.tooltip
-        ? `${check.tooltip}<br>${tooltip}`
-        : tooltip;
+      (check.tooltips ??= []).push({ format: `${MODULE_ID}.hide.retain` });
       check.stealth = UNDETECTED;
     } else check.stealth = HIDDEN;
   } else check.stealth = OBSERVED;

@@ -20,15 +20,18 @@ import { getStealthinessTo, setStealthinessTo } from "./effects.js";
 function resolveSeek(origin, check) {
   const stealth = getStealthinessTo(check.tokenDoc, origin.tokenDoc.id);
   check.was = stealth;
-  const tooltip = localizeString(`${MODULE_ID}.seek.was`, {
-    stealth: game.i18n.localize(LOCALIZATION_KEYS[STEALTH_LABELS[stealth]]),
-  });
+  const tooltip = {
+    format: `${MODULE_ID}.seek.was`,
+    interpolations: {
+      stealth: LOCALIZATION_KEYS[STEALTH_LABELS[stealth]],
+    },
+  };
   if (check.degreeOfSuccess === CRITICAL_SUCCESS) {
     check.stealth = OBSERVED;
-    check.tooltip = tooltip;
+    (check.tooltips ??= []).push(tooltip);
   } else if (check.degreeOfSuccess === SUCCESS) {
     check.stealth = Math.max(OBSERVED, stealth - 1);
-    check.tooltip = tooltip;
+    (check.tooltips ??= []).push(tooltip);
   } else {
     check.stealth = stealth;
   }

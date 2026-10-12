@@ -7,7 +7,7 @@ import { updateInitiativeCards } from "./render-status.js";
 import { zoomToCombat } from "./socket.js";
 import { resolveAvoidNotice } from "./sneak.js";
 import { breakdownRoll, debuglog, refreshPerception } from "./utils.js";
-import { MODULE_ID } from "./const.js";
+import { MODULE_ID, SLUGS } from "./const.js";
 
 export function findCompanionsOnCanvas() {
   const minionTokens = canvas.scene.tokens.filter(

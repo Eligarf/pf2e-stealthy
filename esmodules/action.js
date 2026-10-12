@@ -48,7 +48,7 @@ Hooks.on("createChatMessage", async (message, options, userId) => {
   if (!combat) return;
   const flags = message.flags[game.system.id];
   if (!flags) return;
-  debuglog("createChatMessage (action)", { message, options, userId, flags });
+  // debuglog("createChatMessage (action)", { message, options, userId, flags });
 
   const actingToken = message.token;
   const context = flags.context;

@@ -1,7 +1,7 @@
 {
   "id": "pf2e-stealthy",
   "title": "PF2e Stealthy",
-  "description": "Manages token-paired initiative and action-related stealth checks during combat using chat cards",
+  "description": "Manages PF2e/SF2e token-paired initiative and action-related stealth checks during combat using chat cards",
   "authors": [
     {
       "name": "Rule",
@@ -34,12 +34,6 @@
       }
     ],
     "requires": [
-      {
-        "id": "lib-wrapper",
-        "type": "module",
-        "manifest": "https://github.com/ruipin/fvtt-lib-wrapper/releases/latest/download/module.json",
-        "compatibility": {}
-      },
       {
         "id": "socketlib",
         "type": "module",

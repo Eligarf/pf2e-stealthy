@@ -15,10 +15,10 @@ export function resolveStealthCheck({ origin, target, resolver }) {
     check.coverBonus = coverBonus;
     switch (coverBonus) {
       case 2:
-        check.tooltip = game.i18n.localize(`${MODULE_ID}.standardCover`);
+        (check.tooltips ??= []).push({ format: `${MODULE_ID}.standardCover` });
         break;
       case 4:
-        check.tooltip = game.i18n.localize(`${MODULE_ID}.greaterCover`);
+        (check.tooltips ??= []).push({ format: `${MODULE_ID}.greaterCover` });
         break;
     }
   }

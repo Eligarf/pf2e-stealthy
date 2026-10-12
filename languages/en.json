@@ -163,7 +163,7 @@
       "hidden": "Hidden: {hidden}",
       "undetected": "Undetected: {undetected}",
       "createEncounter": "Add All to Combat",
-      "createEncounterTooltip": "Add all tokens in this card to the combat using the rolled stealth results as initiative.&#10Note that some initiative adjustments might shift slightly due to the approximations used in the Avoidance Check",
+      "createEncounterTooltip": "Add all tokens in this card to the combat using the rolled stealth results as initiative, same as if clicking the 'Set as initiative' button in skill roll chat cards",
       "missingActors": "Please {clownCar} to the canvas before pressing the {createEncounter} button:",
       "observedEnemies": "Noticable Enemies",
       "observedFriendlies": "Noticable Party Members"

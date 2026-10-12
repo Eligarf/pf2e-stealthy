@@ -36,8 +36,7 @@ function resolveSneak(origin, check) {
           : OBSERVED;
   } else {
     check.stealth = OBSERVED;
-    const tooltip = game.i18n.localize(`${MODULE_ID}.sneak.observed`);
-    check.tooltip = check.tooltip ? `${check.tooltip}<br>${tooltip}` : tooltip;
+    (check.tooltips ??= []).push({ format: `${MODULE_ID}.sneak.observed` });
   }
   check.stealthLabel = STEALTH_LABELS[check.stealth];
 }

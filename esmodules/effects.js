@@ -262,7 +262,6 @@ async function createStealthEffect(actor, rules, flags, baselineStealth) {
       },
     },
   };
-  debuglog("effectData", effectData);
 
   return actor.createEmbeddedDocuments("Item", [effectData]);
 }
