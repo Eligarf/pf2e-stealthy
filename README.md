@@ -44,6 +44,10 @@ When a creature takes a Hide or Sneak action, PF2e Stealthy will append a target
 
 The *Stealthy* effect uses a badge to track the baseline stealth of the actor, and grants the hidden and undetected conditions based on the level of the badge. It uses signature predicates to conditionally disable the condition roll options it grants depending on the target of the roll.
 
+## Chat card examples
+
+![Avoidance Check](https://github.com/user-attachments/assets/109db87a-498a-4942-812e-e9fa7962a2f9) ![Initiative](https://github.com/user-attachments/assets/05de5522-a9b9-4952-8d8a-e6588770b92c) ![Hide](https://github.com/user-attachments/assets/bfc9ce59-58c2-4fc6-a6cc-01e01055ad3d) ![Sneak](https://github.com/user-attachments/assets/3b04766a-42f7-4113-a4d4-f705ffd60140) ![Seek](https://github.com/user-attachments/assets/4fc02469-0c4f-4212-8dc7-8d3d697ce67f) ![Point Out](https://github.com/user-attachments/assets/5823e900-0501-4e9f-95a9-60dfe11eb7fa)
+
 ## Context Menu
 
 I have a context menu assigned in the key maps (there is probably a better way to do it but this keeps it out of the way). When pressed, it will list some relevant options based on what tokens were controlled/targeted/or both. If there are only controlled tokens or targeted tokens, the menu options will list the same and apply the actions accordingly - no need to switch which way you might be designating something. When both controlled and targeted tokens are present, the menus will present mirrored choices; you might want to clear stealth on the attacking token, or you might need to clear out a forgotten state on the targeted token.
