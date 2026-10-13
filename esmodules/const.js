@@ -42,6 +42,7 @@ export const SLUGS = {
   perception: "perception",
   scout: "scout",
   scoutDedication: "scout-dedication",
+  sneakAdept: "sneak-adept",
   stealth: "stealth",
   stealthy: `${MODULE_ID}-stealth`,
 };

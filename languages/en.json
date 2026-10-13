@@ -172,7 +172,8 @@
       "retain": "Success retains undetected status"
     },
     "sneak": {
-      "observed": "Prerequisite: hidden or undetected condition"
+      "observed": "Prerequisite: hidden or undetected condition",
+      "sneakAdept": "Sneak Adept"
     },
     "seek": {
       "was": "Was {stealth}"

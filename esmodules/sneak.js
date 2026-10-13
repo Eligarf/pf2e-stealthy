@@ -8,6 +8,7 @@ import {
   SUCCESS,
   FAILURE,
   CRITICAL_FAILURE,
+  SLUGS,
 } from "./const.js";
 import { renderTargetList, renderSummary } from "./render-status.js";
 import { cachedSettings } from "./settings.js";
@@ -28,12 +29,19 @@ function resolveSneak(origin, check) {
   const stealth = getStealthinessTo(origin, check.tokenDoc.id);
   check.was = stealth;
   if (stealth > OBSERVED) {
+    let dos = check.degreeOfSuccess;
+    if (
+      check.degreeOfSuccess === FAILURE &&
+      origin.tokenDoc.actor.items.some(
+        (i) => i.system.slug === SLUGS.sneakAdept,
+      )
+    ) {
+      (check.tooltips ??= []).push({ format: `${MODULE_ID}.sneak.sneakAdept` });
+      dos = SUCCESS;
+    }
+
     check.stealth =
-      check.degreeOfSuccess >= SUCCESS
-        ? UNDETECTED
-        : check.degreeOfSuccess > CRITICAL_FAILURE
-          ? HIDDEN
-          : OBSERVED;
+      dos >= SUCCESS ? UNDETECTED : dos > CRITICAL_FAILURE ? HIDDEN : OBSERVED;
   } else {
     check.stealth = OBSERVED;
     (check.tooltips ??= []).push({ format: `${MODULE_ID}.sneak.observed` });
