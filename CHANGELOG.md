@@ -1,3 +1,7 @@
+# 0.5.0
+
+- Stealthy attackers push an ephemeral off-guard condition on targets as appropriate to that target's visibility of the attacker
+
 # 0.4.1
 
 - Added some explanation text to the card when Point Out doesn't otherwise do anything

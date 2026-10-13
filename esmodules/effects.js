@@ -1,5 +1,5 @@
 import {
-  CONDITION_IDS,
+  ITEM_IDS,
   CONDITION_PACKS,
   HIDDEN,
   MODULE_ID,
@@ -69,11 +69,12 @@ export function getStealthinessTo(origin, targetId) {
 
 function buildRulesFromFlags(flags, stealthBaseline) {
   const rules = [];
+  let offGuardPredicate = [];
   for (let stealth = HIDDEN; stealth <= stealthBaseline; ++stealth) {
     const stealthLabel = STEALTH_LABELS[stealth];
     rules.push({
       key: "GrantItem",
-      uuid: `Compendium.${CONDITION_PACKS[game.system.id]}.Item.${CONDITION_IDS[stealthLabel]}`,
+      uuid: `Compendium.${CONDITION_PACKS[game.system.id]}.Item.${ITEM_IDS[stealthLabel]}`,
       predicate: [{ gte: ["parent.badge.value", stealth] }],
       reevaluateOnUpdate: true,
       inMemoryOnly: true,
@@ -81,7 +82,7 @@ function buildRulesFromFlags(flags, stealthBaseline) {
 
     const exceptions = flags[stealthLabel]?.except || [];
     if (exceptions.length > 0) {
-      rules.push({
+      const re = {
         key: "RollOption",
         domain: "all",
         option: `self:condition:${stealthLabel}`,
@@ -95,9 +96,26 @@ function buildRulesFromFlags(flags, stealthBaseline) {
               }
             : `target:signature:${flags.detectors[exceptions[0]].signature}`,
         ],
-      });
+      };
+      rules.push(re);
+      if (stealth === HIDDEN) offGuardPredicate = re.predicate;
     }
   }
+
+  if (rules.length > 0)
+    rules.push({
+      key: "EphemeralEffect",
+      ...(offGuardPredicate.length > 0
+        ? { predicate: [{ not: offGuardPredicate[0] }] }
+        : {}),
+      selectors: [
+        "strike-attack-roll",
+        "spell-attack-roll",
+        "strike-damage",
+        "attack-spell-damage",
+      ],
+      uuid: `Compendium.${CONDITION_PACKS[game.system.id]}.Item.${ITEM_IDS.offGuard}`,
+    });
   return rules;
 }
 

@@ -12,9 +12,10 @@ export const REFRESH_OPTIONS = {
   refreshOcclusion: true,
 };
 
-export const CONDITION_IDS = {
-  observed: "1wQY3JYyhMYeeV2G",
+export const ITEM_IDS = {
   hidden: "iU0fEDdBp3rXpTMC",
+  observed: "1wQY3JYyhMYeeV2G",
+  offGuard: "AJh5ex99aV6VTggg",
   undetected: "VRSef5y1LmL2Hkjf",
 };
 
