@@ -52,13 +52,18 @@ export async function preparePointOutData(message, userId, actingToken) {
   // ... and if they are stealthy
   const stealthy = getStealthyEffect(subject);
   const stealthBaseline = getStealthBaseline(stealthy);
-  if (stealthBaseline !== UNDETECTED) return message.update(update);
+  if (stealthBaseline !== UNDETECTED) {
+    pointOut.message = `${MODULE_ID}.pointOut.notStealthy`;
+    return message.update(update);
+  }
 
   // ... and if we are a detector
   const flags = stealthy?.flags?.[MODULE_ID];
   const detectors = flags?.undetected || {};
-  if (!detectors?.except?.includes(actingToken.id))
+  if (!detectors?.except?.includes(actingToken.id)) {
+    pointOut.message = `${MODULE_ID}.pointOut.undetected`;
     return message.update(update);
+  }
 
   // ... and if we have allies to point them out to
   const { minionTokens, eidolonTokens } = findCompanionsOnCanvas();
@@ -73,7 +78,10 @@ export async function preparePointOutData(message, userId, actingToken) {
         t.actor?.system?.details?.alliance === alliance &&
         !detectors?.except?.includes(t.id),
     );
-  if (!newDetectors.length) return message.update(update);
+  if (!newDetectors.length) {
+    pointOut.message = `${MODULE_ID}.pointOut.noAllies`;
+    return message.update(update);
+  }
 
   pointOut.newDetectors = newDetectors.map((t) => ({
     tokenId: t.id,
@@ -185,6 +193,7 @@ export function renderPointOutCard(message, html, data, flags) {
       <div class="${MODULE_ID}-subject" data-hover-id="${hoverId}">
         <div class="${MODULE_ID}-name">${subject}</div>
       </div>
+      <div data-visibility="gm">${pointOut.message ? localizeString(pointOut.message) : ""}</div>
     </div>`;
   const targetList = pointOut.newDetectors;
   if (targetList?.length) {

@@ -1,3 +1,7 @@
+# 0.4.1
+
+- Added some explanation text to the card when Point Out doesn't otherwise do anything
+
 # 0.4.0
 
 - Sneak Adept supported

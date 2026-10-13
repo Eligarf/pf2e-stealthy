@@ -50,9 +50,9 @@ The *Stealthy* effect uses a badge to track the baseline stealth of the actor, a
 
 ## Context Menu
 
-I have a context menu assigned in the key maps (there is probably a better way to do it but this keeps it out of the way). When pressed, it will list some relevant options based on what tokens were controlled/targeted/or both. If there are only controlled tokens or targeted tokens, the menu options will list the same and apply the actions accordingly - no need to switch which way you might be designating something. When both controlled and targeted tokens are present, the menus will present mirrored choices; you might want to clear stealth on the attacking token, or you might need to clear out a forgotten state on the targeted token.
+A context menu is triggered by '=' in the key maps (there is probably a better way to do it but this keeps it out of the way). When pressed, it will list some relevant options based on what tokens were controlled/targeted/or both. If there are only controlled tokens or targeted tokens, the menu options will list the same and apply the actions accordingly - no need to switch which way you might be designating something. When both controlled and targeted tokens are present, the menus will present mirrored choices; you might want to clear stealth on the attacking token, or you might need to clear out a forgotten state on the targeted token.
 
-The following is a list of the menu options that can appear when pressing the menu context key. In practice you will find some variations on some of the entries, but the jist of them are here.
+The following is a list of the menu options that can appear when pressing the menu context key. In practice you will find some variations on some of the entries, but the core of them are here.
 
 | Menu option | Prerequisites | Details |
 | ----------- | ------------- | ------- |

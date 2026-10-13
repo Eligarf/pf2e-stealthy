@@ -181,7 +181,10 @@
     "pointOut": {
       "subject": "Points out {name}",
       "to": "to {name}",
-      "hiddens": "Hidden to {count}"
+      "hiddens": "Hidden to {count}",
+      "notStealthy": "Target isn't stealthy",
+      "undetected": "Target is undetected by acting token",
+      "noAllies": "No allies need the target pointed out"
     },
     "edit": {
       "subject": "Editing stealth for {name}"
