@@ -23,8 +23,16 @@ globalThis.Hooks.once("ready", async () => {
   for (const token of canvas.tokens.controlled) {
     controlTokenHook(token, true);
   }
-  const iconPath = "icons/magic/perception/eye-tendrils-web-purple.webp";
-  eyeballTexture = await foundry.canvas.loadTexture(iconPath);
+
+  // SVG data from fa-eye turned into texture here
+  const color = "#dfdf00";
+  const svgString = `
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="256" height="256">
+    <path fill="${color}" d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.4 78.1-95.4 92.9-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.8-35.7-46.1-87.7-92.9-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.4c13.5 46.5 56.5 80.7 106.8 80.7c61.9 0 112-50.1 112-112c0-50.3-34.2-93.3-80.7-106.8c-6.6-1.9-13.5-2.9-20.4-3.2c-5.8-.2-9.2 6.2-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/>
+  </svg>
+`.trim();
+  const encodedIconTexture = `data:image/svg+xml;utf8,${encodeURIComponent(svgString)}`;
+  eyeballTexture = PIXI.Texture.from(encodedIconTexture);
 });
 
 export function refreshVisibilityCache() {

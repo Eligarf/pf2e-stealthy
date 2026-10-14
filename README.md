@@ -11,6 +11,10 @@
 
 A module for PF2e/SF2e in FoundryVTT that manages token-to-token hidden and undetected conditions, as well as initiative and action-related stealth checks during combat using chat cards. It can dynamically change the rendering of tokens based on the specific stealth relationship between the controlled token(s) and any tokens on the canvas that have the module's custom Stealth effect applied. It is essentially an replacement of and extension to the PF2e Avoid Notice module. 
 
+## Chat card examples
+
+![Avoidance Check](https://github.com/user-attachments/assets/109db87a-498a-4942-812e-e9fa7962a2f9) ![Initiative](https://github.com/user-attachments/assets/05de5522-a9b9-4952-8d8a-e6588770b92c) ![Hide](https://github.com/user-attachments/assets/bfc9ce59-58c2-4fc6-a6cc-01e01055ad3d) ![Sneak](https://github.com/user-attachments/assets/3b04766a-42f7-4113-a4d4-f705ffd60140) ![Seek](https://github.com/user-attachments/assets/4fc02469-0c4f-4212-8dc7-8d3d697ce67f) ![Point Out](https://github.com/user-attachments/assets/5823e900-0501-4e9f-95a9-60dfe11eb7fa)
+
 ## Module Tenets
 
 > [!CAUTION]
@@ -43,10 +47,6 @@ This module basically tracks which tokens should be granted an exception to the 
 When a creature takes a Hide or Sneak action, PF2e Stealthy will append a target list to the roll chat card listing each observing token, dc, and resulting stealth status for that observer. The GM can click on any results to change specific ones for whatever reason like missing cover or whatever, and the clicks the Apply Effects button to store that info into the *stealthy* effect. Once the actor is *stealthy*, the module's context menu will offer a choice to edit and present a new chat card where the GM can tweak stealth settings as needed. Seek checks work similarly, allowing the GM to modify the seek results prior to accepting the changes, and the Point Out action, if accepted, will set appropriate allied tokens to see the pointed out token as hidden.
 
 The *Stealthy* effect uses a badge to track the baseline stealth of the actor, and grants the hidden and undetected conditions based on the level of the badge. It uses signature predicates to conditionally disable the condition roll options it grants depending on the target of the roll.
-
-## Chat card examples
-
-![Avoidance Check](https://github.com/user-attachments/assets/109db87a-498a-4942-812e-e9fa7962a2f9) ![Initiative](https://github.com/user-attachments/assets/05de5522-a9b9-4952-8d8a-e6588770b92c) ![Hide](https://github.com/user-attachments/assets/bfc9ce59-58c2-4fc6-a6cc-01e01055ad3d) ![Sneak](https://github.com/user-attachments/assets/3b04766a-42f7-4113-a4d4-f705ffd60140) ![Seek](https://github.com/user-attachments/assets/4fc02469-0c4f-4212-8dc7-8d3d697ce67f) ![Point Out](https://github.com/user-attachments/assets/5823e900-0501-4e9f-95a9-60dfe11eb7fa)
 
 ## Context Menu
 

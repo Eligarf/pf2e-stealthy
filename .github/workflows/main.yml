@@ -112,9 +112,9 @@ jobs:
     needs: [build]
     if: ${{ github.event_name == 'release' && github.event.release.prerelease == false }}
 
-    steps:
-      - name: Release to Foundry VTT
-        uses: cs96and/FoundryVTT-release-package@v1
-        with:
-          package-token: ${{ secrets.FOUNDRY_PACKAGE_TOKEN }}
-          manifest-url: ${{ env.latest_manifest_url }}
+    # steps:
+    #   - name: Release to Foundry VTT
+    #     uses: cs96and/FoundryVTT-release-package@v1
+    #     with:
+    #       package-token: ${{ secrets.FOUNDRY_PACKAGE_TOKEN }}
+    #       manifest-url: ${{ env.latest_manifest_url }}

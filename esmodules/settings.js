@@ -112,7 +112,7 @@ export function setupSettings() {
     name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.showEyeballs}.name`),
     hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.showEyeballs}.hint`),
     scope: "world",
-    config: false,
+    config: true,
     type: Boolean,
     default: cachedSettings.showEyeballs,
     onChange: (newValue) => {
@@ -121,11 +121,10 @@ export function setupSettings() {
       refreshPerception();
     },
   });
-  cachedSettings.showEyeballs = false;
-  // cachedSettings.showEyeballs = game.settings.get(
-  //   MODULE_ID,
-  //   SETTINGS.showEyeballs,
-  // );
+  cachedSettings.showEyeballs = game.settings.get(
+    MODULE_ID,
+    SETTINGS.showEyeballs,
+  );
 
   game.settings.register(MODULE_ID, SETTINGS.collapseTargetList, {
     name: game.i18n.localize(
