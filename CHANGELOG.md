@@ -1,6 +1,6 @@
 # 0.5.1
 
-- Use fa-eye as the source for the eyeball texture instead of the system icon placeholder we had be using
+- Use fa-eye as the source for the visibility indicator instead of the system icon placeholder we had been using
 
 # 0.5.0
 

@@ -112,8 +112,10 @@ jobs:
     needs: [build]
     if: ${{ github.event_name == 'release' && github.event.release.prerelease == false }}
 
-    # steps:
-    #   - name: Release to Foundry VTT
+    steps:
+    - name: Skip Release (Not Ready)
+      run: echo "Release step is currently disabled."
+    # - name: Release to Foundry VTT
     #     uses: cs96and/FoundryVTT-release-package@v1
     #     with:
     #       package-token: ${{ secrets.FOUNDRY_PACKAGE_TOKEN }}
