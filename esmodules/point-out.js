@@ -88,8 +88,8 @@ export async function preparePointOutData(message, userId, actingToken) {
     name: t.name,
     stealth: HIDDEN,
     stealthLabel: STEALTH_LABELS[HIDDEN],
+    showApplyButton: true,
   }));
-  pointOut.showApplyButton = cachedSettings.useEffects;
   return message.update(update);
 }
 

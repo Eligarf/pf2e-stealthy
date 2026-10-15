@@ -46,7 +46,11 @@ This module basically tracks which tokens should be granted an exception to the 
 
 When a creature takes a Hide or Sneak action, PF2e Stealthy will append a target list to the roll chat card listing each observing token, dc, and resulting stealth status for that observer. The GM can click on any results to change specific ones for whatever reason like missing cover or whatever, and the clicks the Apply Effects button to store that info into the *stealthy* effect. Once the actor is *stealthy*, the module's context menu will offer a choice to edit and present a new chat card where the GM can tweak stealth settings as needed. Seek checks work similarly, allowing the GM to modify the seek results prior to accepting the changes, and the Point Out action, if accepted, will set appropriate allied tokens to see the pointed out token as hidden.
 
-The *Stealthy* effect uses a badge to track the baseline stealth of the actor, and grants the hidden and undetected conditions based on the level of the badge. It uses signature predicates to conditionally disable the condition roll options it grants depending on the target of the roll.
+The *Stealthy* effect uses a badge to track the baseline stealth of the actor, and grants the hidden and undetected conditions based on the level of the badge. It uses signature predicates to conditionally disable the condition roll options it grants depending on the target of the roll. If the vision hack is enabled, *stealthy* tokens will show on the GM canvas as with a thick cyan border if no tokens are controlled or if the *stealthy* token is undetected to all controlled tokens.
+
+![Vision Hack](https://github.com/user-attachments/assets/74c1074b-cb30-4ed1-9ed7-b4eb957d123e)
+
+This image shows the GM view when controlling a *stealthy* Merisiel. She is unobserved as a baseline, and can see the Ogre normally while she is undetected by it. The circled goblin is hidden to her, but the eyeball icon on the goblin shows that she is not undetected to it. She did not detect the two upper goblins, so they are outlined in cyan for the GM. She is undetected to the middle goblin, but not undetected to the upper goblin.
 
 ## Context Menu
 

@@ -208,9 +208,7 @@ globalThis.Hooks.once("init", () => {
     let tokenUpdates = [];
 
     // Adjust the avoider's condition
-    if (cachedSettings.useEffects) {
-      await applyInitiativeConditions(observations, tokenUpdates);
-    }
+    await applyInitiativeConditions(observations, tokenUpdates);
 
     // Reveal GM-hidden combatants so that their sneak results can control visibility
     // Do this last to avoid any flashes of observability

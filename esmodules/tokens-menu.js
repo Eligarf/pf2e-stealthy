@@ -24,71 +24,58 @@ export async function invokeTokensMenu({ selection }) {
   ];
   const combat = game?.combat;
 
-  if (cachedSettings.useEffects) {
-    const avoiders = selection.tokens.filter((token) =>
-      token.actor?.items?.some((i) => i.slug === SLUGS.stealthy),
-    );
+  const avoiders = selection.tokens.filter((token) =>
+    token.actor?.items?.some((i) => i.slug === SLUGS.stealthy),
+  );
 
-    if (avoiders.length > 0) {
+  if (avoiders.length > 0) {
+    choices.push({
+      key: "divider",
+      label: "------------------------",
+      section: 1,
+      disabled: true,
+    });
+    if (avoiders.length === 1 && combat.started) {
       choices.push({
-        key: "divider",
-        label: "------------------------",
-        section: 1,
-        disabled: true,
-      });
-      if (avoiders.length === 1 && combat.started) {
-        choices.push({
-          key: "edit-stealth",
-          label: game.i18n.localize(`${MODULE_ID}.menu.editStealth.label`),
-          hint:
-            selection.type === "controlled"
-              ? game.i18n.localize(
-                  `${MODULE_ID}.menu.editControlledStealth.hint`,
-                )
-              : game.i18n.localize(
-                  `${MODULE_ID}.menu.editTargetedStealth.hint`,
-                ),
-          section: 2,
-        });
-      }
-      choices.push({
-        key: "remove-stealth",
-        label: game.i18n.localize(`${MODULE_ID}.menu.removeStealth.label`),
+        key: "edit-stealth",
+        label: game.i18n.localize(`${MODULE_ID}.menu.editStealth.label`),
         hint:
           selection.type === "controlled"
-            ? game.i18n.localize(
-                `${MODULE_ID}.menu.removeControlledStealth.hint`,
-              )
-            : game.i18n.localize(
-                `${MODULE_ID}.menu.removeTargetedStealth.hint`,
-              ),
+            ? game.i18n.localize(`${MODULE_ID}.menu.editControlledStealth.hint`)
+            : game.i18n.localize(`${MODULE_ID}.menu.editTargetedStealth.hint`),
         section: 2,
       });
+    }
+    choices.push({
+      key: "remove-stealth",
+      label: game.i18n.localize(`${MODULE_ID}.menu.removeStealth.label`),
+      hint:
+        selection.type === "controlled"
+          ? game.i18n.localize(`${MODULE_ID}.menu.removeControlledStealth.hint`)
+          : game.i18n.localize(`${MODULE_ID}.menu.removeTargetedStealth.hint`),
+      section: 2,
+    });
 
-      const observed = avoiders.some((token) => {
-        const stealth = token.actor?.items?.find(
-          (i) => i.slug === SLUGS.stealthy,
-        );
-        const flags = stealth?.flags?.[MODULE_ID];
-        if (!flags) return false;
-        return (
-          flags.hidden?.except?.length > 0 ||
-          flags.undetected?.except?.length > 0
-        );
+    const observed = avoiders.some((token) => {
+      const stealth = token.actor?.items?.find(
+        (i) => i.slug === SLUGS.stealthy,
+      );
+      const flags = stealth?.flags?.[MODULE_ID];
+      if (!flags) return false;
+      return (
+        flags.hidden?.except?.length > 0 || flags.undetected?.except?.length > 0
+      );
+    });
+
+    if (observed) {
+      choices.push({
+        key: "undo-reveals",
+        label: game.i18n.localize(`${MODULE_ID}.menu.undoReveals.label`),
+        hint: localizeString(`${MODULE_ID}.menu.undoReveals.hint`, {
+          type: game.i18n.localize(`${MODULE_ID}.menu.type.${selection.type}`),
+        }),
+        section: 2,
       });
-
-      if (observed) {
-        choices.push({
-          key: "undo-reveals",
-          label: game.i18n.localize(`${MODULE_ID}.menu.undoReveals.label`),
-          hint: localizeString(`${MODULE_ID}.menu.undoReveals.hint`, {
-            type: game.i18n.localize(
-              `${MODULE_ID}.menu.type.${selection.type}`,
-            ),
-          }),
-          section: 2,
-        });
-      }
     }
   }
 

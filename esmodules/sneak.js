@@ -65,7 +65,7 @@ export async function prepareSneakData(message, userId, actingToken) {
           summary,
           targetList,
           allies,
-          showApplyButton: cachedSettings.useEffects,
+          showApplyButton: true,
         },
       },
     },

@@ -11,7 +11,6 @@ export const SETTINGS = {
   // General settings
   hideFromAllies: "hideFromAllies",
   requireActivity: "requireActivity",
-  useEffects: "useEffects",
   panZoomToCombat: "panZoomToCombat",
   showEyeballs: "showEyeballs",
   collapseTargetList: "collapseTargetList",
@@ -28,7 +27,6 @@ export const SETTINGS = {
 export let cachedSettings = {
   hideFromAllies: false,
   requireActivity: true,
-  useEffects: true,
   panZoomToCombat: true,
   showEyeballs: true,
   collapseTargetList: false,
@@ -53,25 +51,6 @@ export function setupSettings() {
     SETTINGS.panZoomToCombat,
   );
 
-  game.settings.register(MODULE_ID, SETTINGS.useEffects, {
-    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.useEffects}.name`),
-    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.useEffects}.hint`),
-    scope: "world",
-    config: true,
-    type: Boolean,
-    default: cachedSettings.useEffects,
-    onChange: (newValue) => {
-      cachedSettings.useEffects = newValue;
-      cachedSettings.visionHack = false;
-      if (!newValue) {
-        releaseVisibilityHooks();
-        refreshVisibilityCache();
-        refreshPerception();
-      }
-    },
-  });
-  cachedSettings.useEffects = game.settings.get(MODULE_ID, SETTINGS.useEffects);
-
   game.settings.register(MODULE_ID, SETTINGS.visionHack, {
     name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.visionHack}.name`),
     hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.visionHack}.hint`),
@@ -81,7 +60,7 @@ export function setupSettings() {
     default: cachedSettings.visionHack,
     onChange: (newValue) => {
       cachedSettings.visionHack = newValue;
-      if (newValue && cachedSettings.useEffects) {
+      if (newValue) {
         setupVisibilityHooks();
       } else {
         releaseVisibilityHooks();
@@ -198,15 +177,6 @@ const SETTING_GROUPS = [
 ];
 
 globalThis.Hooks.on("renderSettingsConfig", (_app, html, _data) => {
-  const visionHackName = `settings-config-${MODULE_ID}.${SETTINGS.visionHack}`;
-  const hackLabel = html.querySelector(`label[for="${visionHackName}"]`);
-  if (hackLabel) {
-    const group = hackLabel.closest(".form-group");
-    if (group) {
-      group.style.opacity = cachedSettings.useEffects ? "1.0" : "0.5";
-      group.style.pointerEvents = cachedSettings.useEffects ? "auto" : "none";
-    }
-  }
   for (const section of SETTING_GROUPS) {
     $("<div>")
       .addClass("form-group group-header")

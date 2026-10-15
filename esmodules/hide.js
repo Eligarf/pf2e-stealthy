@@ -51,7 +51,7 @@ export async function prepareHideData(message, userId, actingToken) {
           summary,
           targetList,
           allies,
-          showApplyButton: cachedSettings.useEffects,
+          showApplyButton: true,
         },
       },
     },

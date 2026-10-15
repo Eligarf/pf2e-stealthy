@@ -88,7 +88,7 @@ export async function prepareSeekData(message, userId, actingToken) {
         origin: actingToken.id,
         seek: {
           targetList,
-          showApplyButton: cachedSettings.useEffects,
+          showApplyButton: true,
         },
       },
     },

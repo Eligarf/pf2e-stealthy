@@ -1,5 +1,5 @@
-import { MODULE_ID, SLUGS } from "./const.js";
-import { debuglog } from "./utils.js";
+import { MODULE_ID, SLUGS, UNDETECTED } from "./const.js";
+import { debuglog, warnlog } from "./utils.js";
 import { createVisibilityCache } from "./cache.js";
 import { cachedSettings } from "./settings.js";
 
@@ -17,8 +17,7 @@ hooks.canvasReady = globalThis.Hooks.on("canvasReady", async () => {
 
 globalThis.Hooks.once("ready", async () => {
   debuglog(`appstate is ready`);
-  if (cachedSettings.useEffects && cachedSettings.visionHack)
-    setupVisibilityHooks();
+  if (cachedSettings.visionHack) setupVisibilityHooks();
   gmVisionCopy = game.pf2e.settings.gmVision;
   for (const token of canvas.tokens.controlled) {
     controlTokenHook(token, true);
@@ -26,11 +25,13 @@ globalThis.Hooks.once("ready", async () => {
 
   // SVG data from fa-eye turned into texture here
   const color = "#dfdf00";
+  const data =
+    "M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.4 78.1-95.4 92.9-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.8-35.7-46.1-87.7-92.9-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.4c13.5 46.5 56.5 80.7 106.8 80.7c61.9 0 112-50.1 112-112c0-50.3-34.2-93.3-80.7-106.8c-6.6-1.9-13.5-2.9-20.4-3.2c-5.8-.2-9.2 6.2-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z";
+
   const svgString = `
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="256" height="256">
-    <path fill="${color}" d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.4 78.1-95.4 92.9-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.8-35.7-46.1-87.7-92.9-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.4c13.5 46.5 56.5 80.7 106.8 80.7c61.9 0 112-50.1 112-112c0-50.3-34.2-93.3-80.7-106.8c-6.6-1.9-13.5-2.9-20.4-3.2c-5.8-.2-9.2 6.2-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/>
-  </svg>
-`.trim();
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="256" height="256">
+      <path fill="${color}" d="${data}"/>
+    </svg>`.trim();
   const encodedIconTexture = `data:image/svg+xml;utf8,${encodeURIComponent(svgString)}`;
   eyeballTexture = PIXI.Texture.from(encodedIconTexture);
 });
@@ -64,16 +65,14 @@ function applyMutation(token, mutation) {
   // );
   token.visible = true;
   if (!token.mesh) {
-    ui.notifications.warn(
-      `Token '${token.name}' has no mesh. This may cause visual issues.`,
-    );
+    warnlog(`Token '${token.name}' has no mesh. This may cause visual issues.`);
   } else {
     token.mesh.visible = true;
   }
   if (!token.detectionFilter) {
     token.detectionFilter = mutation.filter;
   } else if (token.detectionFilter !== mutation.filter) {
-    ui.notifications.warn(
+    warnlog(
       `Token '${token.name}' already has a detection filter. This may cause visual issues.`,
       {
         tokenFilter: token.detectionFilter,
@@ -85,61 +84,92 @@ function applyMutation(token, mutation) {
 
 function handleMutations(token, record, mutations) {
   // debuglog("handleMutations", { token, record, mutations });
-  for (let i = 0; i < mutations?.adds?.length; i++) {
-    const type = mutations.adds[i];
-    if (type === "hidden") {
-      record.mutations.hidden = { filter: token.detectionFilter };
-      token.detectionFilter = null;
-    } else if (type === "undetected") {
-      const filter =
-        foundry.canvas.rendering.filters.OutlineOverlayFilter.create({
-          wave: true,
-        });
-      filter.thickness = 1;
-      record.mutations.undetected = { filter };
-      applyMutation(token, record.mutations.undetected);
-    }
-  }
+  // First remove things
   for (let i = 0; i < mutations?.removes?.length; i++) {
     const type = mutations.removes[i];
-    if (type === "hidden") {
-      token.detectionFilter = record.mutations.hidden.filter;
-      delete record.mutations.hidden;
-    } else if (type === "undetected") {
-      token.visible = false;
-      if (!token.mesh) {
-        ui.notifications.warn(
-          `Token '${token.name}' has no mesh. This may cause visual issues.`,
-        );
-      } else {
-        token.mesh.visible = false;
+    switch (type) {
+      case "hidden":
+        token.detectionFilter = record.mutations.hidden.filter;
+        delete record.mutations.hidden;
+        break;
+      case "undetected":
+      case "gmVision":
+        token.visible = false;
+        if (!token.mesh) {
+          warnlog(
+            `Token '${token.name}' has no mesh. This may cause visual issues.`,
+          );
+        } else {
+          token.mesh.visible = false;
+        }
+        if (
+          token.detectionFilter &&
+          token.detectionFilter !== record.mutations[type].filter
+        ) {
+          warnlog(
+            `Token '${token.name}' has a different detection filter than expected. This may cause visual issues.`,
+            {
+              tokenFilter: token.detectionFilter,
+              mutationFilter: record.mutations[type].filter,
+            },
+          );
+        } else token.detectionFilter = null;
+        record.mutations[type].filter = null;
+        delete record.mutations[type];
+        break;
+    }
+  }
+
+  // Then add things
+  for (let i = 0; i < mutations?.adds?.length; i++) {
+    const type = mutations.adds[i];
+    switch (type) {
+      // Hidden things are just visible with no filter
+      case "hidden":
+        record.mutations.hidden = { filter: token.detectionFilter };
+        token.detectionFilter = null;
+        break;
+
+      // Undetected things look like hidden things
+      case "undetected": {
+        const filter =
+          foundry.canvas.rendering.filters.OutlineOverlayFilter.create({
+            wave: true,
+          });
+
+        // Thickness is set afterwards because weird 2-d array stuff in uniforms
+        filter.thickness = 1;
+        record.mutations.undetected = { filter };
+        applyMutation(token, record.mutations.undetected);
+        break;
       }
-      if (
-        token.detectionFilter &&
-        token.detectionFilter !== record.mutations.undetected.filter
-      ) {
-        ui.notifications.warn(
-          `Token '${token.name}' has a different detection filter than expected. This may cause visual issues.`,
-          {
-            tokenFilter: token.detectionFilter,
-            undetectedFilter: record.mutations.undetected.filter,
-          },
-        );
-      } else token.detectionFilter = null;
-      record.mutations.undetected.filter = null;
-      delete record.mutations.undetected;
+
+      // gmVision should use a differently colored hidden
+      case "gmVision": {
+        const filter =
+          foundry.canvas.rendering.filters.OutlineOverlayFilter.create({
+            wave: true,
+            outlineColor: [0.5, 1.0, 1.0, 1.0],
+          });
+        record.mutations.gmVision = { filter };
+        applyMutation(token, record.mutations.gmVision);
+        break;
+      }
     }
   }
 }
 
-function recordObservation(token, key, override) {
+function recordObservation(token, visibility, override) {
   const record = cache.getOrCreate(token);
   const snapshot = cache.duplicate(record.snapshot);
-  if (!(key in snapshot)) snapshot[key] = { except: new Set() };
-  const state = snapshot[key];
-  const observers = new Set(override.except);
-  const detectors = observers.intersection(observingTokenIds);
-  state.except = state.except.union(detectors);
+  if (!(visibility in snapshot)) snapshot[visibility] = { except: new Set() };
+  const state = snapshot[visibility];
+  if (override) {
+    const observers = new Set(override.except);
+    const detectors = observers.intersection(observingTokenIds);
+    state.except = state.except.union(detectors);
+  }
+  state.never = !override;
   const mutations = cache.update(record, snapshot);
   if (!mutations) return;
   handleMutations(token, record, mutations);
@@ -232,20 +262,33 @@ function refreshTokenHook(token, _options) {
   const stealth = actor?.items.find((i) => i.slug === SLUGS.stealthy);
   if (!stealth) return;
   const states = stealth.flags[MODULE_ID];
-  if (!states) return false;
-  for (const [key, s] of Object.entries(states)) {
-    if (s.except?.some((id) => observingTokenIds.has(id))) {
-      recordObservation(token, key, s);
+  let spotted = false;
+  for (const [visibility, state] of Object.entries(states)) {
+    if (state.except?.some((id) => observingTokenIds.has(id))) {
+      spotted = true;
+      recordObservation(token, visibility, state);
     }
+  }
+  if (
+    game.user.isGM &&
+    !spotted &&
+    stealth.system?.badge?.value === UNDETECTED
+  ) {
+    recordObservation(token, "gmVision", null);
   }
 
   // our mutations get zotted out every time, so we need to restore them here
   const record = cache.get(token);
   if (!record) return;
   const undetected = record?.mutations?.undetected;
-  if (undetected) applyMutation(token, undetected);
+  if (undetected) return applyMutation(token, undetected);
   const hidden = record?.mutations?.hidden;
-  if (hidden) token.detectionFilter = null;
+  if (hidden) {
+    token.detectionFilter = null;
+    return;
+  }
+  const gmVision = record?.mutations?.gmVision;
+  if (gmVision) return applyMutation(token, gmVision);
 }
 
 function createItemHook(item, options, userId) {

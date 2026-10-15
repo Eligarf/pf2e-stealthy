@@ -18,6 +18,10 @@ export function debuglog(format, ...args) {
   if (level === "debug") console.debug(...colorizeOutput(format, ...args));
 }
 
+export function warnlog(format, ...args) {
+  console.warn(...colorizeOutput(format, ...args));
+}
+
 export function breakdownRoll(roll) {
   const dice = roll?.dice;
   const rawRoll = dice.length > 0 ? dice[0].total : Number(roll?.options?.dice);

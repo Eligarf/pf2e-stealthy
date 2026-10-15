@@ -48,7 +48,7 @@ export async function editStealth(actingToken) {
           originName: actingToken.name,
           targetList,
           allies: origin.allies,
-          showApplyButton: cachedSettings.useEffects,
+          showApplyButton: true,
         },
       },
     },
