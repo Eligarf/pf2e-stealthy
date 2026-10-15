@@ -1,3 +1,7 @@
+# 0.6.0
+
+- Vision Hack now shows undetected characters to GM
+
 # 0.5.1
 
 - Use fa-eye as the source for the visibility indicator instead of the system icon placeholder we had been using
