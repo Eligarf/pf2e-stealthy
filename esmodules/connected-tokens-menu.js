@@ -1,13 +1,9 @@
-import { AvoidNoticePopupMenu } from "./menu.js";
 import { MODULE_ID, SLUGS } from "./const.js";
 import { clearActorStealth } from "./stealth.js";
 import { revealAvoidersTo, undoRevealsOf } from "./effects.js";
-import { refreshEverybody } from "./socket.js";
 import { debuglog, iterateTokensAndParties } from "./utils.js";
 
-export async function invokeConnectedTokensMenu({ controlled, targeted }) {
-  debuglog("invokeConnectedTokensMenu", { selected: controlled, targeted });
-
+export function fillConnectedTokensMenu({ controlled, targeted }) {
   const controlledAvoidingTokens = controlled.tokens.filter((t) => {
     const actor = t?.actor;
     return actor?.items?.some((item) => item.system.slug === SLUGS.stealthy);
@@ -18,22 +14,9 @@ export async function invokeConnectedTokensMenu({ controlled, targeted }) {
   });
   let controlledObservingTokens = [];
 
-  let choices = [
-    {
-      key: "refresh",
-      label: game.i18n.localize(`${MODULE_ID}.menu.refresh.label`),
-      hint: `${MODULE_ID}.menu.refresh.hint`,
-      section: 0,
-    },
-  ];
+  let choices = [];
 
   if (controlledAvoidingTokens.length > 0) {
-    choices.push({
-      key: "divider",
-      label: "------------------------",
-      section: 1,
-      disabled: true,
-    });
     controlledObservingTokens = controlledAvoidingTokens.filter((c) => {
       const avoider = c?.actor;
       const stealthy = avoider?.items?.find((i) => i.slug === SLUGS.stealthy);
@@ -51,6 +34,13 @@ export async function invokeConnectedTokensMenu({ controlled, targeted }) {
         ),
         hint: `${MODULE_ID}.menu.undoControlledRevealsToTargeted.hint`,
         section: 2,
+        refresh: true,
+        onClick: async () => {
+          return undoRevealsOf({
+            avoiders: controlledAvoidingTokens,
+            observers: targeted.tokens,
+          });
+        },
       });
     }
 
@@ -62,6 +52,13 @@ export async function invokeConnectedTokensMenu({ controlled, targeted }) {
         ),
         hint: `${MODULE_ID}.menu.revealControlledToTargeted.hint`,
         section: 2,
+        refresh: true,
+        onClick: async () => {
+          return revealAvoidersTo({
+            avoiders: controlledAvoidingTokens,
+            observers: targeted.tokens,
+          });
+        },
       },
       {
         key: "remove-controlled-stealth",
@@ -70,18 +67,30 @@ export async function invokeConnectedTokensMenu({ controlled, targeted }) {
         ),
         hint: `${MODULE_ID}.menu.removeControlledStealth.hint`,
         section: 2,
+        refresh: true,
+        onClick: async () => {
+          return iterateTokensAndParties(
+            controlled.tokens,
+            async (combatant) => {
+              return clearActorStealth({
+                actor: combatant?.actor ?? combatant,
+              });
+            },
+          );
+        },
       },
     );
   }
 
   if (targetedAvoidingTokens.length > 0) {
-    choices.push(
-      {
+    if (choices.length)
+      choices.push({
         key: "divider",
         label: "------------------------",
         section: 3,
-        disabled: true,
-      },
+      });
+
+    choices.push(
       {
         key: "reveal-targeted",
         label: game.i18n.localize(
@@ -89,6 +98,13 @@ export async function invokeConnectedTokensMenu({ controlled, targeted }) {
         ),
         hint: `${MODULE_ID}.menu.revealTargetedToControlled.hint`,
         section: 4,
+        refresh: true,
+        onClick: async () => {
+          return revealAvoidersTo({
+            avoiders: targetedAvoidingTokens,
+            observers: controlled.tokens,
+          });
+        },
       },
       {
         key: "remove-targeted-stealth",
@@ -97,65 +113,19 @@ export async function invokeConnectedTokensMenu({ controlled, targeted }) {
         ),
         hint: `${MODULE_ID}.menu.removeTargetedStealth.hint`,
         section: 4,
+        refresh: true,
+        onClick: async () => {
+          return iterateTokensAndParties(targeted.tokens, async (combatant) => {
+            return clearActorStealth({ actor: combatant?.actor ?? combatant });
+          });
+        },
       },
     );
   }
+  if (!choices.length) return null;
 
-  choices.sort((a, b) =>
-    a.section === b.section
-      ? a.label.localeCompare(b.label)
-      : a.section - b.section,
+  choices.sort(
+    (a, b) => a.section - b.section || a.label.localeCompare(b.label),
   );
-  const choice = await AvoidNoticePopupMenu.show(
-    `${MODULE_ID}.menu.connectedTokens`,
-    choices,
-  );
-
-  switch (choice?.key) {
-    case "refresh":
-      break;
-    case "remove-controlled-stealth":
-      debuglog("remove-controlled-stealth");
-      await iterateTokensAndParties(controlled.tokens, async (combatant) => {
-        return clearActorStealth({ actor: combatant?.actor ?? combatant });
-      });
-      break;
-    case "remove-targeted-stealth":
-      debuglog("remove-targeted-stealth");
-      await iterateTokensAndParties(targeted.tokens, async (combatant) => {
-        return clearActorStealth({ actor: combatant?.actor ?? combatant });
-      });
-      break;
-    case "reveal-controlled":
-      debuglog("reveal-controlled");
-      await revealAvoidersTo({
-        avoiders: controlledAvoidingTokens,
-        observers: targeted.tokens,
-      });
-      break;
-    case "reveal-targeted":
-      debuglog("reveal-targeted");
-      await revealAvoidersTo({
-        avoiders: targetedAvoidingTokens,
-        observers: controlled.tokens,
-      });
-      break;
-    case "undo-controlled-reveals":
-      debuglog("undo-controlled-reveals");
-      await undoRevealsOf({
-        avoiders: controlledAvoidingTokens,
-        observers: targeted.tokens,
-      });
-      break;
-    case "undo-targeted-reveals":
-      debuglog("undo-targeted-reveals");
-      await undoRevealsOf({
-        avoiders: targetedAvoidingTokens,
-        observers: controlled.tokens,
-      });
-      break;
-    default:
-      return;
-  }
-  refreshEverybody();
+  return { title: `${MODULE_ID}.menu.connectedTokens`, choices };
 }

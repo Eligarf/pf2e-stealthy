@@ -1,7 +1,7 @@
 {
   "id": "pf2e-stealthy",
   "title": "PF2e Stealthy",
-  "description": "Manages PF2e/SF2e token-paired initiative and action-related stealth checks during combat using chat cards",
+  "description": "PF2e/SF2e module that manages token-to-token hidden and undetected conditions, as well as initiative and action-related stealth checks during combat using chat cards",
   "authors": [
     {
       "name": "Rule",

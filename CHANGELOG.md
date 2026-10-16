@@ -1,3 +1,7 @@
+# 0.7.0
+
+- menu improvements
+
 # 0.6.0
 
 - Vision Hack now shows undetected characters to GM

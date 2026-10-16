@@ -164,9 +164,8 @@ export function setupKeybindings() {
     name: `${MODULE_ID}.${SETTINGS.menu}.bindings.name`,
     hint: `${MODULE_ID}.${SETTINGS.menu}.bindings.hint`,
     editable: [{ key: "Equal", modifiers: [] }],
-    onDown: async () => {
-      if (!game.user.isGM) return;
-      invokeMenu();
+    onDown: async (event) => {
+      if (game.user.isGM) return invokeMenu(event);
     },
   });
 }

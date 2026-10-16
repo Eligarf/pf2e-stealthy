@@ -1,14 +1,17 @@
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
-import { MODULE_ID, SLUGS } from "./const.js";
-import { invokeNoTokensMenu } from "./no-tokens-menu.js";
-import { invokeTokensMenu } from "./tokens-menu.js";
-import { invokeConnectedTokensMenu } from "./connected-tokens-menu.js";
+import { MODULE_ID } from "./const.js";
+import { fillNoTokensMenu } from "./no-tokens-menu.js";
+import { fillTokensMenu } from "./tokens-menu.js";
+import { fillConnectedTokensMenu } from "./connected-tokens-menu.js";
+import { debuglog, localizeString } from "./utils.js";
+import { refreshEverybody } from "./socket.js";
 
 export class AvoidNoticePopupMenu extends HandlebarsApplicationMixin(
   ApplicationV2,
 ) {
   constructor(options = {}) {
     super(options);
+    this.coordinates = { x: options.x ?? 0, y: options.y ?? 0 };
     this.options.window.title = options.title;
     this._resolve = null;
     this._onPointerDown = this._onPointerDown.bind(this);
@@ -46,6 +49,17 @@ export class AvoidNoticePopupMenu extends HandlebarsApplicationMixin(
 
   _onRender(context, options) {
     super._onRender(context, options);
+
+    requestAnimationFrame(() => {
+      if (!this.element) return;
+      this.element.style.position = "fixed";
+      this.element.style.top = `${this.coordinates.y}px`;
+      this.element.style.left = `${this.coordinates.x}px`;
+      this.element.style.bottom = "auto";
+      this.element.style.right = "auto";
+      this.element.style.zIndex = "10000";
+    });
+
     document.addEventListener("pointerdown", this._onPointerDown, {
       capture: true,
     });
@@ -67,9 +81,18 @@ export class AvoidNoticePopupMenu extends HandlebarsApplicationMixin(
     this.close();
   }
 
-  static async show(title = "Choose an option", choices = null) {
+  static async show(
+    title = "Choose an option",
+    globalPosition,
+    choices = null,
+  ) {
     return new Promise((resolve) => {
-      const app = new AvoidNoticePopupMenu({ title, choices });
+      const app = new AvoidNoticePopupMenu({
+        title,
+        choices,
+        x: globalPosition.x,
+        y: globalPosition.y,
+      });
       app._resolve = resolve;
       app.render(true);
     });
@@ -82,8 +105,8 @@ function summarizeDispositions(tokens) {
   return uniqueDispositions;
 }
 
-export function invokeMenu() {
-  if (!canvas?.ready) return;
+export async function invokeMenu(event) {
+  if (!canvas?.ready) return true;
 
   const controlledTokens = canvas.tokens.controlled;
   let controlled = null;
@@ -109,21 +132,49 @@ export function invokeMenu() {
 
   // Three basic scenarios to pick between here. If no tokens are selected, then we
   // are doing some full-scene operation.
+  let config;
   if (!controlled && !targeted) {
-    invokeNoTokensMenu();
-    return;
+    config = fillNoTokensMenu();
   }
 
   // If we have both types, then we will be doing connected operations
-  if (controlled && targeted) {
-    invokeConnectedTokensMenu({
+  else if (controlled && targeted) {
+    config = fillConnectedTokensMenu({
       controlled,
       targeted,
     });
-    return;
   }
 
   // Otherwise, no need to distiguish between selected and targeted, we can just use whichever one is present.
-  const selection = controlled || targeted;
-  invokeTokensMenu({ selection });
+  else {
+    const selection = controlled || targeted;
+    config = fillTokensMenu({ selection });
+  }
+  if (!config) {
+    ui.notifications.info(
+      localizeString(`${MODULE_ID}.notifications.noToDos`, {
+        controlled: `${controlledTokens.length}`,
+        targeted: `${targetedTokens.length}`,
+      }),
+    );
+    return true;
+  }
+
+  const mouseCanvasCoords = game.canvas.mousePosition;
+  if (!mouseCanvasCoords) return true;
+  const position = canvas.clientCoordinatesFromCanvas(mouseCanvasCoords);
+  const selected = await AvoidNoticePopupMenu.show(
+    config.title,
+    position,
+    config.choices,
+  );
+
+  if (!selected) return true;
+  const choice = config.choices.find((c) => c.key === selected.key);
+  debuglog(`${config.title} choice`, choice);
+  if (!choice) return true;
+  await choice.onClick();
+  if (choice.refresh) refreshEverybody();
+
+  return true;
 }

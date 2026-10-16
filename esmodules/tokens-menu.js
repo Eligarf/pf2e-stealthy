@@ -1,27 +1,16 @@
-import { AvoidNoticePopupMenu } from "./menu.js";
 import { prepareAmbush, clearAmbush, clearActorStealth } from "./stealth.js";
 import { MODULE_ID, SLUGS } from "./const.js";
 import { undoRevealsOf } from "./effects.js";
 import { avoidanceCheck } from "./avoidance-check.js";
-import { refreshEverybody } from "./socket.js";
-import { cachedSettings } from "./settings.js";
 import { debuglog, iterateTokensAndParties, localizeString } from "./utils.js";
 import { editStealth } from "./edit.js";
 
-export async function invokeTokensMenu({ selection }) {
-  debuglog("invokeTokensMenu", { selection });
+export function fillTokensMenu({ selection }) {
   const title = localizeString(`${MODULE_ID}.menu.tokensSelected`, {
     type: selection.type,
   });
 
-  let choices = [
-    {
-      key: "refresh",
-      label: game.i18n.localize(`${MODULE_ID}.menu.refresh.label`),
-      hint: `${MODULE_ID}.menu.refresh.hint`,
-      section: 0,
-    },
-  ];
+  let choices = [];
   const combat = game?.combat;
 
   const avoiders = selection.tokens.filter((token) =>
@@ -33,7 +22,6 @@ export async function invokeTokensMenu({ selection }) {
       key: "divider",
       label: "------------------------",
       section: 1,
-      disabled: true,
     });
     if (avoiders.length === 1 && combat.started) {
       choices.push({
@@ -44,6 +32,9 @@ export async function invokeTokensMenu({ selection }) {
             ? game.i18n.localize(`${MODULE_ID}.menu.editControlledStealth.hint`)
             : game.i18n.localize(`${MODULE_ID}.menu.editTargetedStealth.hint`),
         section: 2,
+        onClick: async () => {
+          return editStealth(selection.tokens[0]);
+        },
       });
     }
     choices.push({
@@ -54,6 +45,11 @@ export async function invokeTokensMenu({ selection }) {
           ? game.i18n.localize(`${MODULE_ID}.menu.removeControlledStealth.hint`)
           : game.i18n.localize(`${MODULE_ID}.menu.removeTargetedStealth.hint`),
       section: 2,
+      onClick: async () => {
+        return iterateTokensAndParties(selection.tokens, async (combatant) => {
+          return clearActorStealth({ actor: combatant?.actor ?? combatant });
+        });
+      },
     });
 
     const observed = avoiders.some((token) => {
@@ -75,6 +71,10 @@ export async function invokeTokensMenu({ selection }) {
           type: game.i18n.localize(`${MODULE_ID}.menu.type.${selection.type}`),
         }),
         section: 2,
+        refresh: true,
+        onClick: async () => {
+          await undoRevealsOf({ avoiders: selection.tokens });
+        },
       });
     }
   }
@@ -95,6 +95,9 @@ export async function invokeTokensMenu({ selection }) {
           type: game.i18n.localize(`${MODULE_ID}.menu.type.${selection.type}`),
         }),
         section: 0,
+        onClick: async () => {
+          return prepareAmbush(selection.tokens);
+        },
       });
     }
     if (
@@ -112,6 +115,9 @@ export async function invokeTokensMenu({ selection }) {
           type: game.i18n.localize(`${MODULE_ID}.menu.type.${selection.type}`),
         }),
         section: 0,
+        onClick: async () => {
+          return clearAmbush(selection.tokens);
+        },
       });
     }
   }
@@ -124,40 +130,14 @@ export async function invokeTokensMenu({ selection }) {
         type: game.i18n.localize(`${MODULE_ID}.menu.type.${selection.type}`),
       }),
       section: 0,
+      onClick: async () => {
+        return avoidanceCheck(selection.tokens);
+      },
     });
   }
 
-  choices.sort((a, b) =>
-    a.section === b.section
-      ? a.label.localeCompare(b.label)
-      : a.section - b.section,
+  choices.sort(
+    (a, b) => a.section - b.section || a.label.localeCompare(b.label),
   );
-  const choice = await AvoidNoticePopupMenu.show(title, choices);
-
-  switch (choice?.key) {
-    case "refresh":
-      return refreshEverybody();
-    case "prepare-ambush":
-      debuglog("prepare-ambush", selection.tokens);
-      return prepareAmbush(selection.tokens);
-    case "clear-ambush":
-      debuglog("clear-ambush", selection.tokens);
-      return clearAmbush(selection.tokens);
-    case "edit-stealth":
-      debuglog("edit-stealth", selection.tokens);
-      return editStealth(selection.tokens[0]);
-    case "remove-stealth":
-      debuglog("remove-stealth", selection.tokens);
-      await iterateTokensAndParties(selection.tokens, async (combatant) => {
-        return clearActorStealth({ actor: combatant?.actor ?? combatant });
-      });
-      return refreshEverybody();
-    case "avoidance-check":
-      debuglog("avoidance-check", selection.tokens);
-      return avoidanceCheck(selection.tokens);
-    case "undo-reveals":
-      debuglog("undo-reveals", selection.tokens);
-      undoRevealsOf({ avoiders: selection.tokens });
-      return refreshEverybody();
-  }
+  return { title, choices };
 }

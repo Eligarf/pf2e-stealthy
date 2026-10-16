@@ -37,7 +37,8 @@
     },
     "notifications": {
       "noSocketLib": "PF2e Stealthy needs socketlib module to be active in order to pan/zoom to combat. Please activate it.",
-      "target1": "Point Out action requires a single token to be targeted"
+      "target1": "Point Out action requires a single token to be targeted",
+      "noToDos": "No relevant actions for PF2e Stealthy for this context: {controlled} controlled token(s), {targeted} targeted token(s)"
     },
     "schema": {
       "name": "Schema Version",
@@ -136,6 +137,7 @@
       },
       "declump": {
         "label": "Declump Initiative",
+        "disabledLabel": "Declump Initiative (Requires combat to have started)",
         "hint": "Preserve initiative order but spread out all initiatives"
       },
       "endOfList": "end of list so I don't have to mess with commas"
