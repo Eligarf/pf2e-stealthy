@@ -33,7 +33,7 @@ export function fillConnectedTokensMenu({ controlled, targeted }) {
           `${MODULE_ID}.menu.undoControlledRevealsToTargeted.label`,
         ),
         hint: `${MODULE_ID}.menu.undoControlledRevealsToTargeted.hint`,
-        section: 2,
+        group: 2,
         refresh: true,
         onClick: async () => {
           return undoRevealsOf({
@@ -51,7 +51,7 @@ export function fillConnectedTokensMenu({ controlled, targeted }) {
           `${MODULE_ID}.menu.revealControlledToTargeted.label`,
         ),
         hint: `${MODULE_ID}.menu.revealControlledToTargeted.hint`,
-        section: 2,
+        group: 2,
         refresh: true,
         onClick: async () => {
           return revealAvoidersTo({
@@ -66,7 +66,7 @@ export function fillConnectedTokensMenu({ controlled, targeted }) {
           `${MODULE_ID}.menu.removeControlledStealth.label`,
         ),
         hint: `${MODULE_ID}.menu.removeControlledStealth.hint`,
-        section: 2,
+        group: 2,
         refresh: true,
         onClick: async () => {
           return iterateTokensAndParties(
@@ -83,12 +83,12 @@ export function fillConnectedTokensMenu({ controlled, targeted }) {
   }
 
   if (targetedAvoidingTokens.length > 0) {
-    if (choices.length)
+    if (choices.length) {
       choices.push({
-        key: "divider",
-        label: "------------------------",
-        section: 3,
+        isDivider: true,
+        group: 3,
       });
+    }
 
     choices.push(
       {
@@ -97,7 +97,7 @@ export function fillConnectedTokensMenu({ controlled, targeted }) {
           `${MODULE_ID}.menu.revealTargetedToControlled.label`,
         ),
         hint: `${MODULE_ID}.menu.revealTargetedToControlled.hint`,
-        section: 4,
+        group: 4,
         refresh: true,
         onClick: async () => {
           return revealAvoidersTo({
@@ -112,7 +112,7 @@ export function fillConnectedTokensMenu({ controlled, targeted }) {
           `${MODULE_ID}.menu.removeTargetedStealth.label`,
         ),
         hint: `${MODULE_ID}.menu.removeTargetedStealth.hint`,
-        section: 4,
+        group: 4,
         refresh: true,
         onClick: async () => {
           return iterateTokensAndParties(targeted.tokens, async (combatant) => {
@@ -124,8 +124,6 @@ export function fillConnectedTokensMenu({ controlled, targeted }) {
   }
   if (!choices.length) return null;
 
-  choices.sort(
-    (a, b) => a.section - b.section || a.label.localeCompare(b.label),
-  );
+  choices.sort((a, b) => a.group - b.group || a.label.localeCompare(b.label));
   return { title: `${MODULE_ID}.menu.connectedTokens`, choices };
 }

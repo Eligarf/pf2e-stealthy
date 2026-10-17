@@ -119,7 +119,6 @@
   padding: 4px 8px;
   background: rgba(0, 0, 0, 0.03);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  /* font-size: var(--font-size-12, 12px); */
 }
 
 .pf2e-stealthy-noticable:nth-child(even),
@@ -154,8 +153,6 @@
   border-radius: 3px;
 }
 
-/* non-interactive result */
-
 .pf2e-stealthy-result[data-interactive="false"] {
   cursor: default;
   user-select: text;
@@ -164,8 +161,6 @@
   border: none;
   padding: 0;
 }
-
-/* interactive result */
 
 .pf2e-stealthy-result[data-interactive="true"] {
   cursor: pointer;
@@ -254,4 +249,66 @@ button.pf2e-stealthy-button:disabled {
 
 .pf2e-stealthy-alert i.fa-triangle-exclamation {
   font-weight: 500;
+}
+
+/* context menu */
+
+#pf2e-stealthy-context-menu {
+  position: fixed;
+  z-index: 10000;
+  display: block;
+  min-width: 180px;
+  background: #191813;
+  border: 1px solid #7a7971;
+  border-radius: 4px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
+  padding: 4px 0;
+  font-family: var(--font-primary, Signika, sans-serif);
+  color: #f0f0e0;
+}
+
+#pf2e-stealthy-context-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#pf2e-stealthy-context-menu .context-divider {
+  height: 1px;
+  background: #434038;
+  margin: 4px 8px;
+}
+
+#pf2e-stealthy-context-menu .pf2e-stealthy-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: #f0f0e0;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+#pf2e-stealthy-context-menu .pf2e-stealthy-menu-item i {
+  margin-right: 8px;
+  font-size: 10px;
+  color: #c2b280;
+}
+
+#pf2e-stealthy-context-menu .pf2e-stealthy-menu-item.disabled {
+  cursor: not-allowed;
+}
+
+#pf2e-stealthy-context-menu .pf2e-stealthy-menu-item.disabled span,
+#pf2e-stealthy-context-menu .pf2e-stealthy-menu-item.disabled i {
+  color: #7a7971;
+}
+
+#pf2e-stealthy-context-menu .pf2e-stealthy-menu-item.disabled:hover {
+  background: rgba(255, 255, 255, 0.05)
+  cursor: default;
+}
+
+#pf2e-stealthy-context-menu .pf2e-stealthy-menu-item.disabled:hover span {
+  color: #9a9991;
 }

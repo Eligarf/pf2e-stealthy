@@ -9,7 +9,7 @@
 
 # PF2e Stealthy
 
-A module for PF2e/SF2e in FoundryVTT that manages token-to-token hidden and undetected conditions, as well as initiative and action-related stealth checks during combat using chat cards. It can dynamically change the rendering of tokens based on the specific stealth relationship between the controlled token(s) and any tokens on the canvas that have the module's custom Stealth effect applied. It is essentially an replacement of and extension to the PF2e Avoid Notice module. 
+A light-weight module for PF2e/SF2e in FoundryVTT that manages token-to-token hidden and undetected conditions, as well as initiative and action-related stealth checks during combat using chat cards. It can dynamically change the rendering of tokens based on the specific stealth relationship between the controlled token(s) and any tokens on the canvas that have the module's custom Stealth effect applied. It is essentially an replacement of and extension to the PF2e Avoid Notice module. 
 
 ## Chat card examples
 
@@ -19,12 +19,12 @@ A module for PF2e/SF2e in FoundryVTT that manages token-to-token hidden and unde
 
 > [!CAUTION]
 > ![Not a vision system](https://github.com/user-attachments/assets/75c79e62-cc31-4334-86b6-c13d9ab0f311)
-> PF2e Stealthy is not and will not be a general vision solution. It is likely that there many edge cases between stealth-based hidden and other sources of hidden or undetected - most of these will be considered out-of-scope. !
+> PF2e Stealthy is not and will not be a general vision solution. It is likely that there many edge cases between stealth-based hidden and other sources of hidden or undetected - most of these will be considered out-of-scope.
 
 > [!NOTE]
 > For brevity, I'll define *Stealthy* to be the module's generated effect and a *Stealthy* token or actor as one which has the *Stealthy* effect.
 
-PF2e Stealth:
+PF2e Stealthy:
 - is a light-weight and predictable stealth manager.
 - uses the *Stealthy* effect which controls the hidden and undetected conditions based on the results of stealth or perception checks. These are straightforward effects plainly visible to the GM and use standard REs.
 - is for tactical combat stealth only, and *stealthy* effects are only valid during initiative and encounter mode.
