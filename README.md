@@ -18,23 +18,26 @@ A module for PF2e/SF2e in FoundryVTT that manages token-to-token hidden and unde
 ## Module Tenets
 
 > [!CAUTION]
-> ![Not a vision system](https://github.com/user-attachments/assets/75c79e62-cc31-4334-86b6-c13d9ab0f311)PF2e Stealthy is not and will not be a general vision solution. It is likely that there many edge cases between stealth-based hidden and other sources of hidden or undetected - most of these will be considered out-of-scope. !
+> ![Not a vision system](https://github.com/user-attachments/assets/75c79e62-cc31-4334-86b6-c13d9ab0f311)
+> PF2e Stealthy is not and will not be a general vision solution. It is likely that there many edge cases between stealth-based hidden and other sources of hidden or undetected - most of these will be considered out-of-scope. !
+
 > [!NOTE]
 > For brevity, I'll define *Stealthy* to be the module's generated effect and a *Stealthy* token or actor as one which has the *Stealthy* effect.
 
 PF2e Stealth:
-- uses the *Stealthy* effect which control the hidden and undetected conditions based on the results of stealth or perception checks. These are straightforward effects plainly visible to the GM and use standard REs.
+- is a light-weight and predictable stealth manager.
+- uses the *Stealthy* effect which controls the hidden and undetected conditions based on the results of stealth or perception checks. These are straightforward effects plainly visible to the GM and use standard REs.
 - is for tactical combat stealth only, and *stealthy* effects are only valid during initiative and encounter mode.
 - uses chat cards as its primary interface.
 - requires no prep on non-*stealthy* tokens. All data is carried on the *stealthy* actors.
-- does not police actions or states for cover or validity and simple does the mechanics since the GM is free to adjust results before they are applied.
+- does not police actions or states for cover or validity and simply does the mechanics since the GM is free to adjust results before they are applied.
 
 ## Exploration Mode
 
 > [!CAUTION]
 > Implementing any tactical exploration features during encounter mode is out-of-scope for PF2e Stealthy. GMs wishing to do more tactical exploration probably should look elsewhere for vision/stealth support.
 
-As explained in GM Core, exploration mode is hand-wavey by its very nature, so this module assumes that the party token is a valid choice to focus on during exploration mode in Foundry. An 'Avoidance Check' is available on PF2e Stealthy's context menu that manages having any selected party, character, and monster tokens do Avoid Notice rolls so the GM can determine whether or not there is to be an encounter. Selected Party tokens will generate stealth roll requests for any PCs using Avoid Notice even if they aren't on the map yet, and if the GM determines there will be an encounter based on the results, PCs can be deposited from the party token, positioned on the map in some way that makes sense to everyone, and then *stealthy* characters will use the Avoidance Check results as their initiative rolls.
+As explained in the Core rulebook, exploration mode is hand-wavey by its very nature, so this module assumes that the party token is a valid choice to focus on during exploration mode in Foundry. An 'Avoidance Check' is available on PF2e Stealthy's context menu that manages having any selected party, character, and monster tokens do Avoid Notice rolls so the GM can determine whether or not there is to be an encounter. Selected Party tokens will generate stealth roll requests for any PCs using Avoid Notice even if they aren't on the map yet, and if the GM determines there will be an encounter based on the results, PCs can be deposited from the party token, positioned on the map in some way that makes sense to everyone, and then *stealthy* characters will use the Avoidance Check results as their initiative rolls.
 
 ## Combat Mode
 

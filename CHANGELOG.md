@@ -1,3 +1,7 @@
+# 0.7.1
+
+- disabled menu items are grayed out
+
 # 0.7.0
 
 - menu improvements
