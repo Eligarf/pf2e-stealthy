@@ -18,7 +18,7 @@ A module for PF2e/SF2e in FoundryVTT that manages token-to-token hidden and unde
 ## Module Tenets
 
 > [!CAUTION]
-> [Not a vision system](https://github.com/user-attachments/assets/75c79e62-cc31-4334-86b6-c13d9ab0f311)PF2e Stealthy is not and will not be a general vision solution. It is likely that there many edge cases between stealth-based hidden and other sources of hidden or undetected - most of these will be considered out-of-scope. !
+> ![Not a vision system](https://github.com/user-attachments/assets/75c79e62-cc31-4334-86b6-c13d9ab0f311)PF2e Stealthy is not and will not be a general vision solution. It is likely that there many edge cases between stealth-based hidden and other sources of hidden or undetected - most of these will be considered out-of-scope. !
 > [!NOTE]
 > For brevity, I'll define *Stealthy* to be the module's generated effect and a *Stealthy* token or actor as one which has the *Stealthy* effect.
 

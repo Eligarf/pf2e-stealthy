@@ -47,8 +47,22 @@ export class AvoidNoticePopupMenu extends HandlebarsApplicationMixin(
     }
   }
 
-  _onRender(context, options) {
-    super._onRender(context, options);
+  async _onRender(context, options) {
+    await super._onRender(context, options);
+
+    const choices = this.element.querySelectorAll(".popup-menu [data-key]");
+    choices.forEach((element) => {
+      const key = element.dataset.key;
+      const choice = this.options.choices.find((c) => c.key === key);
+      if (choice.disabled) {
+        element.classList.add("disabled");
+        element.style.pointerEvents = "none";
+        element.style.opacity = "0.5";
+        element.removeAttribute("href");
+        element.setAttribute("aria-disabled", "true");
+        element.tabIndex = -1; // Removes it from keyboard tab-navigation order;
+      }
+    });
 
     requestAnimationFrame(() => {
       if (!this.element) return;
