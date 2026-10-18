@@ -94,7 +94,7 @@ class StealthyContextMenu {
         e.stopPropagation();
         const index = item.getAttribute("data-index");
         menu.remove();
-        choices[index].onclick();
+        choices[index].onClick();
       });
     });
 
