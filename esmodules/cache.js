@@ -68,7 +68,7 @@ export function createVisibilityCache() {
     },
 
     removeObserver(token, callback) {
-      debuglog(`removing observer '${token.name}'`);
+      // debuglog(`removing observer '${token.name}'`);
       for (const [_tokenId, record] of [...store]) {
         const snapshot = this.duplicate(record?.snapshot);
         for (const type in snapshot) {
@@ -82,7 +82,7 @@ export function createVisibilityCache() {
     },
 
     removeAvoider(token, callback) {
-      debuglog(`removing avoider '${token.name}'`, { token, callback });
+      // debuglog(`removing avoider '${token.name}'`, { token, callback });
       const record = store.get(token.id);
       const delta = this.update(record, {});
       if (delta) callback(record.token, record, delta);

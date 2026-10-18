@@ -33,7 +33,7 @@ export function prepareTargetList(sortedChecks) {
 
 export function renderSummary(targetList, _context) {
   const summary = summarizeTargetList(targetList);
-  let content = `<div class="${MODULE_ID}-summary">`;
+  let content = `<div class="${MODULE_ID}-summary" data-visibility="gm">`;
   if (summary[OBSERVED]) {
     const observation = localizeString(`${MODULE_ID}.avoidanceCheck.observed`, {
       observed: summary[OBSERVED],

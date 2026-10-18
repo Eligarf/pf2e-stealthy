@@ -1,3 +1,12 @@
+# 0.8.2
+
+- Put GM visibility restriction on target list summaries
+- Disable gm-viewed undetected hack until we figure out edge cases
+
+# 0.8.1
+
+- Fix onClick case error
+
 # 0.8.0
 
 - better context menu

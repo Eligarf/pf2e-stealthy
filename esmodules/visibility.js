@@ -269,13 +269,13 @@ function refreshTokenHook(token, _options) {
       recordObservation(token, visibility, state);
     }
   }
-  if (
-    game.user.isGM &&
-    !spotted &&
-    stealth.system?.badge?.value === UNDETECTED
-  ) {
-    recordObservation(token, "gmVision", null);
-  }
+  // if (
+  //   game.user.isGM &&
+  //   !spotted &&
+  //   stealth.system?.badge?.value === UNDETECTED
+  // ) {
+  //   recordObservation(token, "gmVision", null);
+  // }
 
   // our mutations get zotted out every time, so we need to restore them here
   const record = cache.get(token);
@@ -291,35 +291,35 @@ function refreshTokenHook(token, _options) {
   if (gmVision) return applyMutation(token, gmVision);
 }
 
-function createItemHook(item, options, userId) {
-  if (item?.system?.slug !== SLUGS.stealthy) return;
-  const actor = options.parent;
-  debuglog(`'${actor?.name}' stealth effect created`, {
-    item,
-    options,
-    userId,
-  });
-}
+// function createItemHook(item, options, userId) {
+//   if (item?.system?.slug !== SLUGS.stealthy) return;
+//   const actor = options.parent;
+//   debuglog(`'${actor?.name}' stealth effect created`, {
+//     item,
+//     options,
+//     userId,
+//   });
+// }
 
-function deleteItemHook(item, options, userId) {
-  if (item?.system?.slug !== SLUGS.stealthy) return;
-  debuglog(`stealth effect deleted`, {
-    item,
-    options,
-    userId,
-  });
-}
+// function deleteItemHook(item, options, userId) {
+//   if (item?.system?.slug !== SLUGS.stealthy) return;
+//   debuglog(`stealth effect deleted`, {
+//     item,
+//     options,
+//     userId,
+//   });
+// }
 
-function createTokenHook(tokenDoc, data, options, userId) {
-  debuglog(`'${tokenDoc.name}' created`, { tokenDoc, data, options, userId });
-}
+// function createTokenHook(tokenDoc, data, options, userId) {
+//   debuglog(`'${tokenDoc.name}' created`, { tokenDoc, data, options, userId });
+// }
 
-function updateTokenHook(tokenDoc, data, options, userId) {
-  debuglog(`'${tokenDoc.name}' updated`, { tokenDoc, data, options, userId });
-}
+// function updateTokenHook(tokenDoc, data, options, userId) {
+//   debuglog(`'${tokenDoc.name}' updated`, { tokenDoc, data, options, userId });
+// }
 
-function deleteTokenHook(tokenDoc, options, userId) {
-  debuglog(`'${tokenDoc.name}' deleted`, { tokenDoc, options, userId });
+function deleteTokenHook(tokenDoc, _options, _userId) {
+  // debuglog(`'${tokenDoc.name}' deleted`, { tokenDoc, _options, _userId });
   const stealth = tokenDoc?.actor?.items.find((i) => i.slug === SLUGS.stealthy);
   if (!stealth) return;
   cache.removeAvoider(tokenDoc, handleMutations);
@@ -330,25 +330,25 @@ export function setupVisibilityHooks() {
     hooks.controlToken = globalThis.Hooks.on("controlToken", controlTokenHook);
   if (!hooks?.refreshToken)
     hooks.refreshToken = globalThis.Hooks.on("refreshToken", refreshTokenHook);
-  if (!hooks?.createItem)
-    hooks.createItem = globalThis.Hooks.on("createItem", createItemHook);
-  if (!hooks?.deleteItem)
-    hooks.deleteItem = globalThis.Hooks.on("deleteItem", deleteItemHook);
-  if (!hooks?.updateToken)
-    hooks.updateToken = globalThis.Hooks.on("updateToken", updateTokenHook);
-  if (!hooks?.createToken)
-    hooks.createToken = globalThis.Hooks.on("createToken", createTokenHook);
   if (!hooks?.deleteToken)
     hooks.deleteToken = globalThis.Hooks.on("deleteToken", deleteTokenHook);
+  // if (!hooks?.createItem)
+  //   hooks.createItem = globalThis.Hooks.on("createItem", createItemHook);
+  // if (!hooks?.deleteItem)
+  //   hooks.deleteItem = globalThis.Hooks.on("deleteItem", deleteItemHook);
+  // if (!hooks?.updateToken)
+  //   hooks.updateToken = globalThis.Hooks.on("updateToken", updateTokenHook);
+  // if (!hooks?.createToken)
+  //   hooks.createToken = globalThis.Hooks.on("createToken", createTokenHook);
 }
 
 export function releaseVisibilityHooks() {
   globalThis.Hooks.off("deleteToken", deleteTokenHook);
-  globalThis.Hooks.off("createToken", createTokenHook);
-  globalThis.Hooks.off("updateToken", updateTokenHook);
-  globalThis.Hooks.off("deleteItem", deleteItemHook);
-  globalThis.Hooks.off("createItem", createItemHook);
   globalThis.Hooks.off("refreshToken", refreshTokenHook);
   globalThis.Hooks.off("controlToken", controlTokenHook);
+  // globalThis.Hooks.off("createToken", createTokenHook);
+  // globalThis.Hooks.off("updateToken", updateTokenHook);
+  // globalThis.Hooks.off("deleteItem", deleteItemHook);
+  // globalThis.Hooks.off("createItem", createItemHook);
   hooks = {};
 }

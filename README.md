@@ -52,7 +52,7 @@ The *Stealthy* effect uses a badge to track the baseline stealth of the actor, a
 
 ![Vision Hack](https://github.com/user-attachments/assets/74c1074b-cb30-4ed1-9ed7-b4eb957d123e)
 
-This image shows the GM view when controlling a *stealthy* Merisiel. She is unobserved as a baseline, and can see the Ogre normally while she is undetected by it. The circled goblin is hidden to her, but the eyeball icon on the goblin shows that she is not undetected to it. She did not detect the two upper goblins, so they are outlined in cyan for the GM. She is undetected to the middle goblin, but not undetected to the upper goblin.
+This image shows the GM view when controlling a *stealthy* Merisiel. She is undetected as a baseline, and can see the Ogre normally while she is undetected by it. The circled goblin is hidden to her, but the eyeball icon on the goblin shows that she is not undetected to it. She did not detect the two upper goblins, so they are outlined in cyan for the GM. She is undetected to the middle goblin, but not undetected to the upper goblin.
 
 ## Context Menu
 
