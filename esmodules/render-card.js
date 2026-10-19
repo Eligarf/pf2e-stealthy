@@ -98,12 +98,12 @@ async function clickHandler(message, event, flags, clickIds) {
 globalThis.Hooks.on("renderChatMessageHTML", (message, html, data) => {
   const flags = message.flags[MODULE_ID];
   if (!flags) return;
-  debuglog("renderChatMessageHTML (render-card)", {
-    message,
-    html,
-    data,
-    flags,
-  });
+  // debuglog("renderChatMessageHTML (render-card)", {
+  //   message,
+  //   html,
+  //   data,
+  //   flags,
+  // });
 
   let interactionContext = null;
   function guts() {

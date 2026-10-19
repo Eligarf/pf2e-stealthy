@@ -5,7 +5,6 @@ import { cachedSettings } from "./settings.js";
 let hooks = {};
 let observingTokenIds = new Set();
 let revealedToTokenIds = new Set();
-// let gmVisionCopy = undefined;
 let tokenIdsWithEyeballs = new Set();
 let eyeballTexture = null;
 
@@ -13,10 +12,11 @@ hooks.canvasReady = globalThis.Hooks.on("canvasReady", async () => {
   debuglog(`Canvas is ready`);
 });
 
+let filterMap = new WeakMap();
+
 globalThis.Hooks.once("ready", async () => {
   debuglog(`appstate is ready`);
   if (cachedSettings.visionHack) setupVisibilityHooks();
-  // gmVisionCopy = game.pf2e.settings.gmVision;
   for (const token of canvas.tokens.controlled) {
     controlTokenHook(token, true);
   }
@@ -92,6 +92,11 @@ function controlTokenHook(token, controlled) {
     observingTokenIds.delete(token.id);
   } else {
     observingTokenIds.add(token.id);
+    const tokenDoc = token.document || token;
+    if (filterMap.has(tokenDoc)) {
+      debuglog(`==> '${token.name}' might need to restore filter`);
+      // filterMap.delete(token.document || token);
+    }
   }
   if (!game.user.isGM) return;
   canvas.perception.initialize();
@@ -109,8 +114,6 @@ function controlTokenHook(token, controlled) {
   }
 }
 
-const filterMap = new WeakMap();
-
 function refreshTokenHook(token, options) {
   if (!options.refreshVisibility) return;
 
@@ -119,16 +122,8 @@ function refreshTokenHook(token, options) {
     showEyeball({ token, isVisible: isRevealed });
   }
 
-  if (game.pf2e.settings.gmVision) {
-    // if (gmVisionCopy) return;
-    // gmVisionCopy = true;
-    return;
-  }
-  // gmVisionCopy = false;
-
-  if (observingTokenIds.has(token.id) || token.document.hidden) {
-    return;
-  }
+  if (game.pf2e.settings.gmVision) return;
+  if (observingTokenIds.has(token.id) || token.document.hidden) return;
 
   const actor = token?.actor;
   if (!actor) return;
@@ -149,9 +144,10 @@ function refreshTokenHook(token, options) {
   }
   if (spottedAt === baseline) {
     if (baseline !== UNDETECTED || !game.user.isGM) {
-      const filter = filterMap.get(token);
+      const tokenDoc = token.document || token;
+      const filter = filterMap.get(tokenDoc);
       if (!filter) return;
-      filterMap.delete(token);
+      filterMap.delete(tokenDoc);
       // debuglog(`'${token.name}' wants to dump filter`, {
       //   filter,
       //   tokenFilter: token.detectionFilter,
@@ -185,13 +181,13 @@ function refreshTokenHook(token, options) {
     filter.thickness = 1;
     token.detectionFilter = filter;
   } else if (baseline === HIDDEN) {
-    filterMap.set(token, token.detectionFilter);
+    filterMap.set(token.document || token, token.detectionFilter);
     token.detectionFilter = null;
   }
 }
 
-function deleteTokenHook(token, _options, _userId) {
-  filterMap.delete(token);
+function deleteTokenHook(tokenDoc, _options, _userId) {
+  filterMap.delete(tokenDoc);
 }
 
 export function setupVisibilityHooks() {

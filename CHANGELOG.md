@@ -1,6 +1,11 @@
+# 0.9.1
+
+- filterMap keys on token documents, not tokens
+
 # 0.9.0
 
 - New caching strategy
+- Re-enable GM-only undetected filter
 
 # 0.8.2
 
