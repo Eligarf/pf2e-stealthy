@@ -1,3 +1,7 @@
+# 0.9.0
+
+- New caching strategy
+
 # 0.8.2
 
 - Put GM visibility restriction on target list summaries

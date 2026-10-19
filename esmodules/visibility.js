@@ -1,14 +1,12 @@
-import { MODULE_ID, SLUGS, UNDETECTED } from "./const.js";
+import { MODULE_ID, SLUGS, HIDDEN, UNDETECTED, OBSERVED } from "./const.js";
 import { debuglog, warnlog } from "./utils.js";
-import { createVisibilityCache } from "./cache.js";
 import { cachedSettings } from "./settings.js";
 
 let hooks = {};
 let observingTokenIds = new Set();
 let revealedToTokenIds = new Set();
-let gmVisionCopy = undefined;
+// let gmVisionCopy = undefined;
 let tokenIdsWithEyeballs = new Set();
-const cache = createVisibilityCache();
 let eyeballTexture = null;
 
 hooks.canvasReady = globalThis.Hooks.on("canvasReady", async () => {
@@ -18,7 +16,7 @@ hooks.canvasReady = globalThis.Hooks.on("canvasReady", async () => {
 globalThis.Hooks.once("ready", async () => {
   debuglog(`appstate is ready`);
   if (cachedSettings.visionHack) setupVisibilityHooks();
-  gmVisionCopy = game.pf2e.settings.gmVision;
+  // gmVisionCopy = game.pf2e.settings.gmVision;
   for (const token of canvas.tokens.controlled) {
     controlTokenHook(token, true);
   }
@@ -38,7 +36,6 @@ globalThis.Hooks.once("ready", async () => {
 
 export function refreshVisibilityCache() {
   debuglog(`refreshVisibilityCache`);
-  cache.clear(handleMutations);
   revealedToTokenIds.clear();
   for (const token of canvas.tokens.placeables) {
     if (tokenIdsWithEyeballs.has(token.id)) {
@@ -47,7 +44,7 @@ export function refreshVisibilityCache() {
   }
 }
 
-function findObservations(token) {
+function findDetections(token) {
   const actor = token?.actor;
   const stealth = actor?.items.find((i) => i.slug === SLUGS.stealthy);
   if (!stealth) return null;
@@ -57,122 +54,6 @@ function findObservations(token) {
     baselineStealth: stealth.system.badge.value,
     detectors: flags.detectors || {},
   };
-}
-
-function applyMutation(token, mutation) {
-  // debuglog(
-  //   `token.visible=${token.visible} mesh.visible=${token?.mesh?.visible} detectionFilter=${token.detectionFilter ? "exists" : "null"}`,
-  // );
-  token.visible = true;
-  if (!token.mesh) {
-    warnlog(`Token '${token.name}' has no mesh. This may cause visual issues.`);
-  } else {
-    token.mesh.visible = true;
-  }
-  if (!token.detectionFilter) {
-    token.detectionFilter = mutation.filter;
-  } else if (token.detectionFilter !== mutation.filter) {
-    warnlog(
-      `Token '${token.name}' already has a detection filter. This may cause visual issues.`,
-      {
-        tokenFilter: token.detectionFilter,
-        undetectedFilter: mutation.filter,
-      },
-    );
-  }
-}
-
-function handleMutations(token, record, mutations) {
-  // debuglog("handleMutations", { token, record, mutations });
-  // First remove things
-  for (let i = 0; i < mutations?.removes?.length; i++) {
-    const type = mutations.removes[i];
-    switch (type) {
-      case "hidden":
-        token.detectionFilter = record.mutations.hidden.filter;
-        delete record.mutations.hidden;
-        break;
-      case "undetected":
-      case "gmVision":
-        token.visible = false;
-        if (!token.mesh) {
-          warnlog(
-            `Token '${token.name}' has no mesh. This may cause visual issues.`,
-          );
-        } else {
-          token.mesh.visible = false;
-        }
-        if (
-          token.detectionFilter &&
-          token.detectionFilter !== record.mutations[type].filter
-        ) {
-          warnlog(
-            `Token '${token.name}' has a different detection filter than expected. This may cause visual issues.`,
-            {
-              tokenFilter: token.detectionFilter,
-              mutationFilter: record.mutations[type].filter,
-            },
-          );
-        } else token.detectionFilter = null;
-        record.mutations[type].filter = null;
-        delete record.mutations[type];
-        break;
-    }
-  }
-
-  // Then add things
-  for (let i = 0; i < mutations?.adds?.length; i++) {
-    const type = mutations.adds[i];
-    switch (type) {
-      // Hidden things are just visible with no filter
-      case "hidden":
-        record.mutations.hidden = { filter: token.detectionFilter };
-        token.detectionFilter = null;
-        break;
-
-      // Undetected things look like hidden things
-      case "undetected": {
-        const filter =
-          foundry.canvas.rendering.filters.OutlineOverlayFilter.create({
-            wave: true,
-          });
-
-        // Thickness is set afterwards because weird 2-d array stuff in uniforms
-        filter.thickness = 1;
-        record.mutations.undetected = { filter };
-        applyMutation(token, record.mutations.undetected);
-        break;
-      }
-
-      // gmVision should use a differently colored hidden
-      case "gmVision": {
-        const filter =
-          foundry.canvas.rendering.filters.OutlineOverlayFilter.create({
-            wave: true,
-            outlineColor: [0.5, 1.0, 1.0, 1.0],
-          });
-        record.mutations.gmVision = { filter };
-        applyMutation(token, record.mutations.gmVision);
-        break;
-      }
-    }
-  }
-}
-
-function recordObservation(token, visibility, override) {
-  const record = cache.getOrCreate(token);
-  const snapshot = cache.duplicate(record.snapshot);
-  if (!(visibility in snapshot)) snapshot[visibility] = { except: new Set() };
-  const state = snapshot[visibility];
-  if (override) {
-    const observers = new Set(override.except);
-    const detectors = observers.intersection(observingTokenIds);
-    state.except = state.except.union(detectors);
-  }
-  state.never = !override;
-  const mutations = cache.update(record, snapshot);
-  if (!mutations) return;
-  handleMutations(token, record, mutations);
 }
 
 function showEyeball({ token, isVisible }) {
@@ -196,11 +77,11 @@ function showEyeball({ token, isVisible }) {
   }
 }
 
-function findObservers(token) {
-  const observations = findObservations(token);
-  if (!observations) return;
-  const detectors = Object.entries(observations.detectors)
-    .filter(([_, o]) => o.stealth < observations.baselineStealth)
+function findDetectors(token) {
+  const detections = findDetections(token);
+  if (!detections) return;
+  const detectors = Object.entries(detections.detectors)
+    .filter(([_, o]) => o.stealth < detections.baselineStealth)
     .map(([id, _]) => id);
   return new Set(detectors);
 }
@@ -209,51 +90,43 @@ function controlTokenHook(token, controlled) {
   debuglog(`'${token.name}' controlled: ${controlled}`, { token, controlled });
   if (!controlled) {
     observingTokenIds.delete(token.id);
-    cache.removeObserver(token, handleMutations);
   } else {
     observingTokenIds.add(token.id);
-    if (cache.has(token)) {
-      cache.removeAvoider(token, handleMutations);
-    }
   }
   if (!game.user.isGM) return;
+  canvas.perception.initialize();
 
   if (controlled) {
-    const observers = findObservers(token);
-    if (observers) revealedToTokenIds = revealedToTokenIds.union(observers);
+    const detectors = findDetectors(token);
+    if (detectors) revealedToTokenIds = revealedToTokenIds.union(detectors);
   } else {
     revealedToTokenIds.clear();
     for (const id of observingTokenIds) {
       const token = canvas.tokens.get(id);
-      const observers = findObservers(token);
-      if (observers) revealedToTokenIds = revealedToTokenIds.union(observers);
+      const detectors = findDetectors(token);
+      if (detectors) revealedToTokenIds = revealedToTokenIds.union(detectors);
     }
   }
 }
 
-function refreshTokenHook(token, _options) {
-  // debuglog(
-  //   `'${token.name}' refreshed (hidden=${token.document.hidden} visible=${token.visible} filter=${token.detectionFilter ? "exists" : "null"})`,
-  //   {
-  //     token,
-  //     observingTokenIds,
-  //   },
-  // );
+const filterMap = new WeakMap();
+
+function refreshTokenHook(token, options) {
+  if (!options.refreshVisibility) return;
+
   if (game.user.isGM && cachedSettings.showEyeballs) {
     const isRevealed = revealedToTokenIds.has(token.id);
     showEyeball({ token, isVisible: isRevealed });
   }
 
   if (game.pf2e.settings.gmVision) {
-    if (gmVisionCopy) return;
-    gmVisionCopy = true;
-    cache.clear(handleMutations);
+    // if (gmVisionCopy) return;
+    // gmVisionCopy = true;
     return;
   }
-  gmVisionCopy = false;
+  // gmVisionCopy = false;
 
   if (observingTokenIds.has(token.id) || token.document.hidden) {
-    if (cache.has(token)) cache.removeAvoider(token, handleMutations);
     return;
   }
 
@@ -261,68 +134,64 @@ function refreshTokenHook(token, _options) {
   if (!actor) return;
   const stealth = actor?.items.find((i) => i.slug === SLUGS.stealthy);
   if (!stealth) return;
-  const states = stealth.flags[MODULE_ID];
-  let spotted = false;
-  for (const [visibility, state] of Object.entries(states)) {
-    if (state.except?.some((id) => observingTokenIds.has(id))) {
-      spotted = true;
-      recordObservation(token, visibility, state);
-    }
-  }
-  // if (
-  //   game.user.isGM &&
-  //   !spotted &&
-  //   stealth.system?.badge?.value === UNDETECTED
-  // ) {
-  //   recordObservation(token, "gmVision", null);
-  // }
+  const baseline = stealth.system?.badge?.value;
+  const detectors = stealth.flags[MODULE_ID]?.detectors || {};
+  const spottedAt = Object.entries(detectors).reduce(
+    (acc, [id, d]) =>
+      observingTokenIds.has(id) && d.stealth < acc ? d.stealth : acc,
+    baseline,
+  );
 
-  // our mutations get zotted out every time, so we need to restore them here
-  const record = cache.get(token);
-  if (!record) return;
-  const undetected = record?.mutations?.undetected;
-  if (undetected) return applyMutation(token, undetected);
-  const hidden = record?.mutations?.hidden;
-  if (hidden) {
-    token.detectionFilter = null;
+  if (spottedAt === OBSERVED && baseline === UNDETECTED) {
+    token.visible = true;
+    token.mesh.visible = true;
     return;
   }
-  const gmVision = record?.mutations?.gmVision;
-  if (gmVision) return applyMutation(token, gmVision);
+  if (spottedAt === baseline) {
+    if (baseline !== UNDETECTED || !game.user.isGM) {
+      const filter = filterMap.get(token);
+      if (!filter) return;
+      filterMap.delete(token);
+      // debuglog(`'${token.name}' wants to dump filter`, {
+      //   filter,
+      //   tokenFilter: token.detectionFilter,
+      // });
+      if (!token.detectionFilter) token.detectionFilter = filter;
+      return;
+    }
+
+    token.visible = true;
+    token.mesh.visible = true;
+
+    const filter = foundry.canvas.rendering.filters.OutlineOverlayFilter.create(
+      {
+        wave: true,
+        outlineColor: [0.5, 1.0, 1.0, 1.0],
+      },
+    );
+    token.detectionFilter = filter;
+  }
+
+  if (spottedAt === HIDDEN) {
+    // debuglog(`==> '${token.name}' wants undetected -> hidden`);
+    token.visible = true;
+    token.mesh.visible = true;
+
+    const filter = foundry.canvas.rendering.filters.OutlineOverlayFilter.create(
+      {
+        wave: true,
+      },
+    );
+    filter.thickness = 1;
+    token.detectionFilter = filter;
+  } else if (baseline === HIDDEN) {
+    filterMap.set(token, token.detectionFilter);
+    token.detectionFilter = null;
+  }
 }
 
-// function createItemHook(item, options, userId) {
-//   if (item?.system?.slug !== SLUGS.stealthy) return;
-//   const actor = options.parent;
-//   debuglog(`'${actor?.name}' stealth effect created`, {
-//     item,
-//     options,
-//     userId,
-//   });
-// }
-
-// function deleteItemHook(item, options, userId) {
-//   if (item?.system?.slug !== SLUGS.stealthy) return;
-//   debuglog(`stealth effect deleted`, {
-//     item,
-//     options,
-//     userId,
-//   });
-// }
-
-// function createTokenHook(tokenDoc, data, options, userId) {
-//   debuglog(`'${tokenDoc.name}' created`, { tokenDoc, data, options, userId });
-// }
-
-// function updateTokenHook(tokenDoc, data, options, userId) {
-//   debuglog(`'${tokenDoc.name}' updated`, { tokenDoc, data, options, userId });
-// }
-
-function deleteTokenHook(tokenDoc, _options, _userId) {
-  // debuglog(`'${tokenDoc.name}' deleted`, { tokenDoc, _options, _userId });
-  const stealth = tokenDoc?.actor?.items.find((i) => i.slug === SLUGS.stealthy);
-  if (!stealth) return;
-  cache.removeAvoider(tokenDoc, handleMutations);
+function deleteTokenHook(token, _options, _userId) {
+  filterMap.delete(token);
 }
 
 export function setupVisibilityHooks() {
@@ -332,23 +201,11 @@ export function setupVisibilityHooks() {
     hooks.refreshToken = globalThis.Hooks.on("refreshToken", refreshTokenHook);
   if (!hooks?.deleteToken)
     hooks.deleteToken = globalThis.Hooks.on("deleteToken", deleteTokenHook);
-  // if (!hooks?.createItem)
-  //   hooks.createItem = globalThis.Hooks.on("createItem", createItemHook);
-  // if (!hooks?.deleteItem)
-  //   hooks.deleteItem = globalThis.Hooks.on("deleteItem", deleteItemHook);
-  // if (!hooks?.updateToken)
-  //   hooks.updateToken = globalThis.Hooks.on("updateToken", updateTokenHook);
-  // if (!hooks?.createToken)
-  //   hooks.createToken = globalThis.Hooks.on("createToken", createTokenHook);
 }
 
 export function releaseVisibilityHooks() {
   globalThis.Hooks.off("deleteToken", deleteTokenHook);
   globalThis.Hooks.off("refreshToken", refreshTokenHook);
   globalThis.Hooks.off("controlToken", controlTokenHook);
-  // globalThis.Hooks.off("createToken", createTokenHook);
-  // globalThis.Hooks.off("updateToken", updateTokenHook);
-  // globalThis.Hooks.off("deleteItem", deleteItemHook);
-  // globalThis.Hooks.off("createItem", createItemHook);
   hooks = {};
 }
