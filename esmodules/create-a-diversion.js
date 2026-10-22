@@ -64,9 +64,9 @@ export async function prepareCreateADiversionData(
   return message.update(update);
 }
 
-export function renderCreateADiversionCard(_message, html, _data, flags) {
+export async function renderCreateADiversionCard(_message, html, _data, flags) {
   const context = { interactive: flags.showApplyButton };
-  const content = renderTargetList(
+  const content = await renderTargetList(
     flags.createADiversion?.targetList,
     "seek summary",
     context,

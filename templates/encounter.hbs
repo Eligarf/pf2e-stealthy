@@ -1,0 +1,20 @@
+<div class="{{moduleId}}-encounter" data-visibility="gm">
+  {{#if missing}}
+    <div class="{{moduleId}}-alert">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span class="{{moduleId}}-missing">{{missing}}</span>
+      </div>
+    </div>
+  {{/if}}
+  {{#if clickId}}
+    <button
+      class="{{moduleId}}-button"
+      data-click-id="{{clickId}}"
+      data-visibility="gm"
+      title="{{localize title}}"
+    >
+      {{localize create}}
+    </button>
+  {{/if}}
+</div>
+

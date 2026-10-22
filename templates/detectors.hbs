@@ -1,0 +1,20 @@
+<details
+  {{#unless collapsed}}open{{/unless}}
+  class="{{moduleId}}-detectors"
+  data-visibility="gm"
+>
+<summary>{{summary}}</summary>
+  {{#each targetList}}
+    <div class="{{@root.moduleId}}-target" data-hover-id="{{hoverId}}">
+      <div
+        class="{{@root.moduleId}}-result"
+        {{#if clickId}}data-click-id="{{clickId}}"{{/if}}
+        data-interactive="{{@root.interactive}}"
+      >
+        <span>{{localize label}}</span>
+      </div>
+      <div class="{{@root.moduleId}}-name">{{to}}</div>
+    </div>
+  {{/each}}
+</details>
+

@@ -1,0 +1,24 @@
+<div class="{{moduleId}}-edit">
+  <div class="{{moduleId}}-subject" data-hover-id="{{hoverId}}">
+    <div class="{{moduleId}}-name">{{subject}}</div>
+  </div>
+</div>
+<details
+  {{#unless collapsed}}open{{/unless}}
+  class="{{moduleId}}-target-list"
+  data-visibility="gm"
+>
+<summary>{{{summary}}}</summary>
+  {{#each targetList}}
+    <div class="{{@root.moduleId}}-target" data-hover-id="{{hoverId}}">
+      <div class="{{@root.moduleId}}-name">{{vs}}</div>
+      <div
+        class="{{@root.moduleId}}-result"
+        {{#if clickId}}data-click-id="{{clickId}}"{{/if}}
+        data-interactive="{{@root.interactive}}"
+      >
+        <span class="degree-of-success {{dos}}">{{localize label}}</span>
+      </div>
+    </div>
+  {{/each}}
+</details>

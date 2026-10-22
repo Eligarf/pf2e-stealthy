@@ -1,0 +1,31 @@
+<details
+  {{#unless collapsed}}open{{/unless}}
+  class="{{moduleId}}-target-list"
+  data-visibility="gm"
+>
+<summary>{{{summary}}}</summary>
+  {{#each targetList}}
+    <div class="{{@root.moduleId}}-target" data-hover-id="{{hoverId}}">
+      <div class="{{@root.moduleId}}-name">{{vs}}</div>
+      <div
+        class="{{@root.moduleId}}-result"
+        {{#if clickId}}data-click-id="{{clickId}}"{{/if}}
+        data-interactive="{{@root.interactive}}"
+      >
+        <span class="degree-of-success {{dos}}">{{localize label}}</span>
+      </div>
+      <div class="{{@root.moduleId}}-dc"
+        {{#if tooltips}}
+          data-tooltip="<div>
+            {{#each tooltips}}
+              {{#unless @first}}<br>{{/unless}}{{this}}
+            {{/each}}
+          </div>"
+        {{/if}}
+        >
+        <span class="degree-of-success {{dos}}">{{dc}}</span>
+        {{#if tooltips}}<i class="fas fa-info-circle"></i>{{/if}}
+      </div>
+    </div>
+  {{/each}}
+</details>

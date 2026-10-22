@@ -31,102 +31,102 @@ export function prepareTargetList(sortedChecks) {
   });
 }
 
-export function renderSummary(targetList, _context) {
+export async function renderSummary(targetList, _context) {
   const summary = summarizeTargetList(targetList);
-  let content = `<div class="${MODULE_ID}-summary" data-visibility="gm">`;
-  if (summary[OBSERVED]) {
-    const observation = localizeString(`${MODULE_ID}.avoidanceCheck.observed`, {
-      observed: summary[OBSERVED],
-    });
-    content += `<span class="${MODULE_ID}-observed">${observation}</span>`;
-  }
-  if (summary[HIDDEN]) {
-    const observation = localizeString(`${MODULE_ID}.avoidanceCheck.hidden`, {
-      hidden: summary[HIDDEN],
-    });
-    content += `<span class="${MODULE_ID}-hidden">${observation}</span>`;
-  }
-  if (summary[UNDETECTED]) {
-    const observation = localizeString(
-      `${MODULE_ID}.avoidanceCheck.undetected`,
-      {
-        undetected: summary[UNDETECTED],
-      },
-    );
-    content += `<span class="${MODULE_ID}-undetected">${observation}</span>`;
-  }
-  content += "</div>";
-  return content;
+  const templateData = {
+    moduleId: MODULE_ID,
+    ...(summary[OBSERVED]
+      ? {
+          observedLabel: localizeString(
+            `${MODULE_ID}.avoidanceCheck.observed`,
+            {
+              count: summary[OBSERVED],
+            },
+          ),
+        }
+      : {}),
+    ...(summary[HIDDEN]
+      ? {
+          observedLabel: localizeString(`${MODULE_ID}.avoidanceCheck.hidden`, {
+            count: summary[HIDDEN],
+          }),
+        }
+      : {}),
+    ...(summary[UNDETECTED]
+      ? {
+          observedLabel: localizeString(
+            `${MODULE_ID}.avoidanceCheck.undetected`,
+            {
+              count: summary[UNDETECTED],
+            },
+          ),
+        }
+      : {}),
+  };
+  return foundry.applications.handlebars.renderTemplate(
+    `modules/${MODULE_ID}/templates/summary.hbs`,
+    templateData,
+  );
 }
 
-export function renderTargetList(targetList, summary, context) {
-  let content = `
-    <details ${context.collapsed ? "" : "open"} data-visibility="gm" class="${MODULE_ID}-target-list">
-      <summary>${summary}</summary>`;
-
+export async function renderTargetList(targetList, summary, context) {
   const interactive = context.interactive ?? false;
-  for (const target of targetList) {
-    const hoverId = foundry.utils.randomID();
-    (context["hoverIds"] ??= {})[hoverId] = target.tokenId;
-    const vs = localizeString(`${MODULE_ID}.initiative.vs`, {
-      name: target.name,
-    });
-    let resultTag;
-    if (interactive) {
-      let clickId = foundry.utils.randomID();
-      (context["clickIds"] ??= {})[clickId] = async (message, event, flags) => {
-        return context.onStatusClick(message, event, flags, target.tokenId);
+  const templateData = {
+    moduleId: MODULE_ID,
+    ...(context.collapsed ? { collapsed: true } : {}),
+    interactive: interactive ? "true" : "false",
+    summary,
+    targetList: targetList.map((target) => {
+      const hoverId = foundry.utils.randomID();
+      (context["hoverIds"] ??= {})[hoverId] = target.tokenId;
+      let clickId;
+      if (interactive) {
+        clickId = foundry.utils.randomID();
+        (context["clickIds"] ??= {})[clickId] = async (
+          message,
+          event,
+          flags,
+        ) => {
+          return context.onStatusClick(message, event, flags, target.tokenId);
+        };
+      }
+
+      const result = {
+        hoverId,
+        vs: localizeString(`${MODULE_ID}.initiative.vs`, {
+          name: target.name,
+        }),
+        dos: DOS_KEYS[target.degreeOfSuccess],
+        label: LOCALIZATION_KEYS[target.stealthLabel],
+        dc: target.dc,
       };
-      resultTag = `
-      <div class="${MODULE_ID}-result" data-click-id="${clickId}" data-interactive="true">`;
-    } else {
-      resultTag = `
-      <div class="${MODULE_ID}-result" data-interactive="false">`;
-    }
 
-    let tooltip = "";
-    if (target.tooltips?.length > 0) {
-      tooltip =
-        `data-tooltip="<div>` +
-        target.tooltips.reduce(
-          (str, t) =>
-            str +
-            (str.length ? "<br>" : "") +
-            localizeString(
-              t.format,
-              t.interpolations?.length > 0
-                ? Object.fromEntries(
-                    Object.entries(t.interpolations).map((n, i) => [
-                      n,
-                      game.i18n.localize(i),
-                    ]),
-                  )
-                : {},
-            ),
-          "",
-        ) +
-        `</div>"`;
-    }
+      if (clickId) result.clickId = clickId;
+      if (target.tooltips?.length > 0) {
+        result.tooltips = target.tooltips.map((t) =>
+          localizeString(
+            t.format,
+            t.interpolations?.length > 0
+              ? Object.fromEntries(
+                  Object.entries(t.interpolations).map(([k, v]) => [
+                    k,
+                    game.i18n.localize(v),
+                  ]),
+                )
+              : {},
+          ),
+        );
+      }
 
-    content += `
-      <div class="${MODULE_ID}-target" data-hover-id="${hoverId}">
-        <div class="${MODULE_ID}-name">${vs}</div>
-        ${resultTag}
-          <span class="degree-of-success ${DOS_KEYS[target.degreeOfSuccess]}">
-            ${game.i18n.localize(LOCALIZATION_KEYS[target.stealthLabel])}
-          </span>
-        </div>
-        <div class="${MODULE_ID}-dc" ${tooltip}>
-          <span class="degree-of-success ${DOS_KEYS[target.degreeOfSuccess]}">
-            DC ${target.dc}
-          </span>
-          ${tooltip.length ? '<i class="fas fa-info-circle"></i>' : ""}
-        </div>
-      </div>`;
-  }
-  content += `
-    </details>`;
-  return content;
+      return result;
+    }),
+  };
+
+  // debuglog("templateData", templateData);
+  return foundry.applications.handlebars.renderTemplate(
+    `modules/${MODULE_ID}/templates/target-list.hbs`,
+    templateData,
+  );
 }
 
 export async function updateInitiativeCards(observations) {
@@ -162,7 +162,7 @@ export async function updateInitiativeCards(observations) {
   }
 }
 
-export function renderInitiativeCard(_message, html, _data, flags) {
+export async function renderInitiativeCard(_message, html, _data, flags) {
   const initiative = flags.initiative;
   const context = {
     interactive: false,
@@ -188,8 +188,8 @@ export function renderInitiativeCard(_message, html, _data, flags) {
       },
     );
     content = `<div class="${MODULE_ID}-init-activity">${activity}</div>`;
-    const summary = renderSummary(initiative.targetList, context);
-    content += renderTargetList(initiative.targetList, summary, context);
+    const summary = await renderSummary(initiative.targetList, context);
+    content += await renderTargetList(initiative.targetList, summary, context);
   }
   html.insertAdjacentHTML("beforeend", content);
   return context;

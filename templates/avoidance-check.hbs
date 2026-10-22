@@ -1,0 +1,81 @@
+<div class="{{moduleId}}-avoidance-check">
+  <h3>{{localize title}}</h3>
+  {{#if enemyIds}}
+    <div class="{{moduleId}}-enemies" data-visibility="gm">
+      {{#if noticableEnemies}}
+        <div class="{{@root.moduleId}}-noticable-enemies">
+          {{localize observedEnemies}}
+          <div class="{{@root.moduleId}}-noticables">
+            {{#each noticableEnemies}}
+              <div class="{{@root.moduleId}}-noticable">
+                <div class="{{@root.moduleId}}-name" data-hover-id="{{hoverId}}">{{name}}</div>
+              </div>
+            {{/each}}
+          </div>
+        </div>
+      {{/if}}
+      {{#if enemyAvoiders }}
+        <div class="{{@root.moduleId}}-enemy-avoiders">
+          {{#each enemyAvoiders}}
+            {{#unless @first}}<hr>{{/unless}}
+            <div
+              class="{{@root.moduleId}}-avoider"
+              data-combatant-id="{{tokenId}}"
+              data-hover-id="{{hoverId}}"
+            >
+              <div class="{{@root.moduleId}}-description">
+                <div class="{{@root.moduleId}}-name">{{name}}</div>
+                <span>{{localize label}}</span>
+                <div class="{{@root.moduleId}}-roll">{{skillResult}}</div>
+              </div>
+              {{{targetList}}}
+            </div>
+          {{/each}}
+        </div>
+      {{/if}}
+    </div>
+  {{/if}}
+  {{#if friendlyIds}}
+    <div class="{{moduleId}}-friendlies">
+      {{#if noticableFriendlies}}
+        <div class="{{moduleId}}-noticable-friendlies">
+          {{localize observedFriendlies}}
+          <div class="{{moduleId}}-noticables">
+            {{#each noticableFriendlies}}
+              <div class="{{@root.moduleId}}-noticable">
+                <div class="{{@root.moduleId}}-name" data-hover-id="{{hoverId}}">{{name}}</div>
+              </div>
+            {{/each}}
+          </div>
+        </div>
+      {{/if}}
+      {{#if friendlyAvoiders}}
+        <div class="{{@root.moduleId}}-friendly-avoiders">
+          {{#each friendlyAvoiders}}
+            {{#unless @first}}<hr>{{/unless}}
+            <div
+              class="{{@root.moduleId}}-avoider"
+              data-combatant-id="${tokenId}"
+              data-hover-id="${hoverId}"
+            >
+              <div class="{{@root.moduleId}}-description">
+                <div class="{{@root.moduleId}}-name">{{name}}</div>
+                <span>{{localize label}}</span>
+                {{#if result}}
+                  <div class="{{@root.moduleId}}-roll" data-visibility="gm">{{result}}</div>
+                {{else}}
+                  <i class="fa-solid fa-dice-d20" data-click-id="{{clickId}}"></i>
+                {{/if}}
+              </div>
+              {{#if targetList}}
+                <div class="{{@root.moduleId}}-player-results" data-visibility="gm">
+                  {{{targetList}}}
+                </div>
+              {{/if}}
+            </div>
+          {{/each}}
+        </div>
+      {{/if}}
+    </div>
+  {{/if}}
+</div>

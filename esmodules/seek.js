@@ -1,4 +1,4 @@
-import { debuglog, localizeString, getToken, breakdownRoll } from "./utils.js";
+import { debuglog, getToken, breakdownRoll } from "./utils.js";
 import {
   MODULE_ID,
   STEALTH_LABELS,
@@ -13,7 +13,6 @@ import {
   prepareTargetList,
 } from "./render-status.js";
 import { findCompanionsOnCanvas, findPossibleTargets } from "./combat.js";
-import { cachedSettings } from "./settings.js";
 import { resolveSeekCheck } from "./observation-logic.js";
 import { getStealthinessTo, setStealthinessTo } from "./effects.js";
 
@@ -125,7 +124,7 @@ async function onSeekStatusClick(message, _event, flags, targetId) {
   return message.update(update);
 }
 
-export function renderSeekCard(message, html, data, flags) {
+export async function renderSeekCard(message, html, data, flags) {
   debuglog("renderSeekCard", { message, html, data, flags });
   const seek = flags.seek;
   const targetList = seek.targetList;
@@ -136,17 +135,23 @@ export function renderSeekCard(message, html, data, flags) {
     onStatusClick: onSeekStatusClick,
     change: targetList.some((t) => t.stealth !== t.was),
   };
-  const summary = renderSummary(targetList, context);
-  let content = renderTargetList(targetList, summary, context);
+  const summary = await renderSummary(targetList, context);
+  let content = await renderTargetList(targetList, summary, context);
   if (context.interactive) {
     const clickId = foundry.utils.randomID();
     (context["clickIds"] ??= {})[clickId] = applySeekEffects;
-    content += `
-      <div class="${MODULE_ID}-seek">
-        <button class="${MODULE_ID}-button" data-click-id="${clickId}" data-visibility="gm" ${context.change ? "" : "disabled"}>
-          ${localizeString(`${MODULE_ID}.effects.${context.change ? "apply" : "noChange"}`)}
-        </button>
-      </div>`;
+
+    const templateData = {
+      action: "seek",
+      moduleId: MODULE_ID,
+      clickId,
+      label: `${MODULE_ID}.effects.${context.change ? "apply" : "noChange"}`,
+      ...(context.change ? { change: true } : {}),
+    };
+    content += await foundry.applications.handlebars.renderTemplate(
+      `modules/${MODULE_ID}/templates/button.hbs`,
+      templateData,
+    );
   }
   html.insertAdjacentHTML("beforeend", content);
   return context;

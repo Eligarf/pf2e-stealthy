@@ -6,8 +6,7 @@ import {
   LOCALIZATION_KEYS,
   DOS_KEYS,
 } from "./const.js";
-import { renderTargetList, renderSummary } from "./render-status.js";
-import { cachedSettings } from "./settings.js";
+import { renderSummary } from "./render-status.js";
 import { adaptStealthyToObservers, getStealthinessTo } from "./effects.js";
 import { findCompanionsOnCanvas, findPossibleTargets } from "./combat.js";
 
@@ -104,7 +103,7 @@ async function onEditStatusClick(message, _event, flags, targetId) {
   return message.update(update);
 }
 
-export function renderEditCard(_message, html, _data, flags) {
+export async function renderEditCard(_message, html, _data, flags) {
   debuglog("renderEditCard", { _message, html, _data, flags });
   const edit = flags.edit;
   const targetList = edit.targetList;
@@ -118,55 +117,79 @@ export function renderEditCard(_message, html, _data, flags) {
     hoverIds: { [hoverId]: edit.originId },
   };
 
-  let content = `
-    <div class="${MODULE_ID}-edit">
-      <div class="${MODULE_ID}-subject" data-hover-id="${hoverId}">
-        <div class="${MODULE_ID}-name">${localizeString(`${MODULE_ID}.edit.subject`, { name: edit.originName })}</div>
-      </div>
-    </div>
-    <details ${context.collapsed ? "" : "open"} data-visibility="gm" class="${MODULE_ID}-target-list">
-      <summary>${renderSummary(targetList, context)}</summary>`;
-
   const interactive = context.interactive ?? false;
-  for (const target of targetList) {
-    const hoverId = foundry.utils.randomID();
-    context.hoverIds[hoverId] = target.tokenId;
-    const vs = localizeString(`${MODULE_ID}.initiative.vs`, {
-      name: target.name,
-    });
-    let resultTag;
-    if (interactive) {
-      let clickId = foundry.utils.randomID();
-      (context["clickIds"] ??= {})[clickId] = async (message, event, flags) => {
-        return context.onStatusClick(message, event, flags, target.tokenId);
+  const templateData = {
+    moduleId: MODULE_ID,
+    hoverId,
+    interactive,
+    subject: localizeString(`${MODULE_ID}.edit.subject`, {
+      name: edit.originName,
+    }),
+    summary: await renderSummary(targetList, context),
+    targetList: targetList.map((target) => {
+      const hoverId = foundry.utils.randomID();
+      (context["hoverIds"] ??= {})[hoverId] = target.tokenId;
+      let clickId;
+      if (interactive) {
+        clickId = foundry.utils.randomID();
+        (context["clickIds"] ??= {})[clickId] = async (
+          message,
+          event,
+          flags,
+        ) => {
+          return context.onStatusClick(message, event, flags, target.tokenId);
+        };
+      }
+
+      const result = {
+        hoverId,
+        vs: localizeString(`${MODULE_ID}.initiative.vs`, {
+          name: target.name,
+        }),
+        dos: DOS_KEYS[target.stealth],
+        label: LOCALIZATION_KEYS[target.stealthLabel],
       };
-      resultTag = `
-      <div class="${MODULE_ID}-result" data-click-id="${clickId}" data-interactive="true">`;
-    } else {
-      resultTag = `
-      <div class="${MODULE_ID}-result" data-interactive="false">`;
-    }
-    content += `
-      <div class="${MODULE_ID}-target" data-hover-id="${hoverId}">
-        <div class="${MODULE_ID}-name">${vs}</div>
-        ${resultTag}
-          <span class="degree-of-success ${DOS_KEYS[target.stealth]}">
-            ${game.i18n.localize(LOCALIZATION_KEYS[target.stealthLabel])}
-          </span>
-        </div>
-      </div>`;
-  }
-  content += `
-    </details>`;
+
+      if (clickId) result.clickId = clickId;
+      if (target.tooltips?.length > 0) {
+        result.tooltips = target.tooltips.map((t) =>
+          localizeString(
+            t.format,
+            t.interpolations?.length > 0
+              ? Object.fromEntries(
+                  Object.entries(t.interpolations).map(([k, v]) => [
+                    k,
+                    game.i18n.localize(v),
+                  ]),
+                )
+              : {},
+          ),
+        );
+      }
+
+      return result;
+    }),
+  };
+
+  let content = await foundry.applications.handlebars.renderTemplate(
+    `modules/${MODULE_ID}/templates/edit.hbs`,
+    templateData,
+  );
+
   if (context.interactive) {
     const clickId = foundry.utils.randomID();
     (context["clickIds"] ??= {})[clickId] = applyEditEffects;
-    content += `
-      <div class="${MODULE_ID}-edit">
-        <button class="${MODULE_ID}-button" data-click-id="${clickId}" data-visibility="gm" ${context.change ? "" : "disabled"}>
-          ${localizeString(`${MODULE_ID}.effects.${context.change ? "apply" : "noChange"}`)}
-        </button>
-      </div>`;
+    const templateData = {
+      action: "edit",
+      moduleId: MODULE_ID,
+      clickId,
+      label: `${MODULE_ID}.effects.${context.change ? "apply" : "noChange"}`,
+      ...(context.change ? { change: true } : {}),
+    };
+    content += await foundry.applications.handlebars.renderTemplate(
+      `modules/${MODULE_ID}/templates/button.hbs`,
+      templateData,
+    );
   }
   html.insertAdjacentHTML("beforeend", content);
   return context;

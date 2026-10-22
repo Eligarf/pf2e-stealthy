@@ -19,6 +19,7 @@ A light-weight module for PF2e/SF2e in FoundryVTT that manages token-to-token hi
 
 > [!CAUTION]
 > ![Not a vision system](https://github.com/user-attachments/assets/75c79e62-cc31-4334-86b6-c13d9ab0f311)
+>
 > PF2e Stealthy is not and will not be a general vision solution. It is likely that there many edge cases between stealth-based hidden and other sources of hidden or undetected - most of these will be considered out-of-scope.
 
 > [!NOTE]
@@ -50,9 +51,9 @@ When a creature takes a Hide or Sneak action, PF2e Stealthy will append a target
 
 The *Stealthy* effect uses a badge to track the baseline stealth of the actor, and grants the hidden and undetected conditions based on the level of the badge. It uses signature predicates to conditionally disable the condition roll options it grants depending on the target of the roll. If the vision hack is enabled, *stealthy* tokens will show on the GM canvas as with a thick cyan border if no tokens are controlled or if the *stealthy* token is undetected to all controlled tokens.
 
-![Vision Hack](https://github.com/user-attachments/assets/74c1074b-cb30-4ed1-9ed7-b4eb957d123e)
+![Vision Hack GM View](https://github.com/user-attachments/assets/0a6795e6-b144-4a9f-9cef-18c0f8ecdd18) ![Vision Hack Player View](https://github.com/user-attachments/assets/65f3ddde-0c95-4ea8-bf93-5913d8c4ff61)
 
-This image shows the GM view when controlling a *stealthy* Merisiel. She is undetected as a baseline, and can see the Ogre normally while she is undetected by it. The circled goblin is hidden to her, but the eyeball icon on the goblin shows that she is not undetected to it. She did not detect the two upper goblins, so they are outlined in cyan for the GM. She is undetected to the middle goblin, but not undetected to the upper goblin.
+These images show the GM view and player view when controlling a *stealthy* Merisiel. She is undetected as a baseline and can see an Ogre but not the goblin who is undetected by her, indicated to the GM by the cyan outline borders. The goblin had a critical success when seeking and Merisiel is now observed to it, indicated by the triangle exclamation. The goblin has also pointed out Merisiel to the Ogre, so Merisiel is now only hidden to the Ogre, indicated by the circle question mark. Merisiel is still undetected to any other tokens on the canvas.
 
 ## Context Menu
 

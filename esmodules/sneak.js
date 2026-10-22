@@ -11,7 +11,6 @@ import {
   SLUGS,
 } from "./const.js";
 import { renderTargetList, renderSummary } from "./render-status.js";
-import { cachedSettings } from "./settings.js";
 import { prepareStealthChecks } from "./action.js";
 import { adaptStealthyToObservers, getStealthinessTo } from "./effects.js";
 
@@ -120,7 +119,7 @@ async function onSneakStatusClick(message, _event, flags, targetId) {
   return message.update(update);
 }
 
-export function renderSneakCard(_message, html, _data, flags) {
+export async function renderSneakCard(_message, html, _data, flags) {
   const sneak = flags.sneak;
   const targetList = sneak.targetList;
   if (!targetList?.length) return {};
@@ -130,17 +129,22 @@ export function renderSneakCard(_message, html, _data, flags) {
     onStatusClick: onSneakStatusClick,
     change: targetList.some((t) => t.stealth !== t.was),
   };
-  const summary = renderSummary(targetList, context);
-  let content = renderTargetList(targetList, summary, context);
+  const summary = await renderSummary(targetList, context);
+  let content = await renderTargetList(targetList, summary, context);
   if (context.interactive) {
     const clickId = foundry.utils.randomID();
     (context["clickIds"] ??= {})[clickId] = applySneakEffects;
-    content += `
-      <div class="${MODULE_ID}-sneak">
-        <button class="${MODULE_ID}-button" data-click-id="${clickId}" data-visibility="gm" ${context.change ? "" : "disabled"}>
-          ${localizeString(`${MODULE_ID}.effects.${context.change ? "apply" : "noChange"}`)}
-        </button>
-      </div>`;
+    const templateData = {
+      action: "sneak",
+      moduleId: MODULE_ID,
+      clickId,
+      label: `${MODULE_ID}.effects.${context.change ? "apply" : "noChange"}`,
+      ...(context.change ? { change: true } : {}),
+    };
+    content += await foundry.applications.handlebars.renderTemplate(
+      `modules/${MODULE_ID}/templates/button.hbs`,
+      templateData,
+    );
   }
   html.insertAdjacentHTML("beforeend", content);
   return context;

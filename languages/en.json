@@ -24,8 +24,8 @@
       "error": "{actor} needs to use {action} if wanting to sneak at combat start."
     },
     "showEyeballs": {
-      "name": "Enable eyeball indicators",
-      "hint": "Display eyeballs on canvas tokens that ignore the controlled tokens' stealth-based hidden and/or undetected conditions"
+      "name": "Enable vision alerts",
+      "hint": "Display alerts on canvas tokens which have some visibility to controlled token's stealthy conditions."
     },
     "collapseTargetList": {
       "name": "Collapse initiative target lists",
@@ -38,7 +38,8 @@
     "notifications": {
       "noSocketLib": "PF2e Stealthy needs socketlib module to be active in order to pan/zoom to combat. Please activate it.",
       "target1": "Point Out action requires a single token to be targeted",
-      "noToDos": "No relevant actions for PF2e Stealthy for this context: {controlled} controlled token(s), {targeted} targeted token(s)"
+      "noToDos": "No relevant actions for PF2e Stealthy for this context: {controlled} controlled token(s), {targeted} targeted token(s)",
+      "avoidNotice": "'PF2e Stealthy' is a replacement of and extension to 'PF2e Avoid Notice'. Please disable 'PF2e Avoid Notice'"
     },
     "schema": {
       "name": "Schema Version",
@@ -157,9 +158,9 @@
       "title": "Avoidance Check",
       "secretTitle": "Secret Avoidance Check",
       "checkLabel": "Check result:",
-      "observed": "Observed: {observed}",
-      "hidden": "Hidden: {hidden}",
-      "undetected": "Undetected: {undetected}",
+      "observed": "Observed: {count}",
+      "hidden": "Hidden: {count}",
+      "undetected": "Undetected: {count}",
       "createEncounter": "Add All to Combat",
       "createEncounterTooltip": "Add all tokens in this card to the combat using the rolled stealth results as initiative, same as if clicking the 'Set as initiative' button in skill roll chat cards",
       "missingActors": "Please {clownCar} to the canvas before pressing the {createEncounter} button:",

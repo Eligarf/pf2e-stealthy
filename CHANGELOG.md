@@ -1,3 +1,8 @@
+# 0.10.0
+
+- Vision alerts now have two levels: triangle-exclamation for observed and circle-question for hidden. If enabled, these only appear on tokens to the GM when a controlled token has the stealthy condition and observing tokens they are in combat with have better visibility to the stealthy token than the stealth baseline ie observed vs hidden and observed/hidden vs undetected.
+- Move HTML generation to .hbs files
+
 # 0.9.1
 
 - filterMap keys on token documents, not tokens

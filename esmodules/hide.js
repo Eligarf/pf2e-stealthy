@@ -9,7 +9,6 @@ import {
   FAILURE,
 } from "./const.js";
 import { renderTargetList, renderSummary } from "./render-status.js";
-import { cachedSettings } from "./settings.js";
 import { prepareStealthChecks } from "./action.js";
 import {
   adaptStealthyToObservers,
@@ -111,7 +110,7 @@ async function onHideStatusClick(message, _event, flags, targetId) {
   return message.update(update);
 }
 
-export function renderHideCard(_message, html, _data, flags) {
+export async function renderHideCard(_message, html, _data, flags) {
   const hide = flags.hide;
   const targetList = hide.targetList;
   if (!targetList?.length) return {};
@@ -121,17 +120,23 @@ export function renderHideCard(_message, html, _data, flags) {
     onStatusClick: onHideStatusClick,
     change: targetList.some((t) => t.stealth !== t.was),
   };
-  const summary = renderSummary(targetList, context);
-  let content = renderTargetList(targetList, summary, context);
+  const summary = await renderSummary(targetList, context);
+  let content = await renderTargetList(targetList, summary, context);
   if (context.interactive) {
     const clickId = foundry.utils.randomID();
     (context["clickIds"] ??= {})[clickId] = applyHideEffects;
-    content += `
-      <div class="${MODULE_ID}-hide">
-        <button class="${MODULE_ID}-button" data-click-id="${clickId}" data-visibility="gm" ${context.change ? "" : "disabled"}>
-          ${localizeString(`${MODULE_ID}.effects.${context.change ? "apply" : "noChange"}`)}
-        </button>
-      </div>`;
+
+    const templateData = {
+      action: "hide",
+      moduleId: MODULE_ID,
+      clickId,
+      label: `${MODULE_ID}.effects.${context.change ? "apply" : "noChange"}`,
+      ...(context.change ? { change: true } : {}),
+    };
+    content += await foundry.applications.handlebars.renderTemplate(
+      `modules/${MODULE_ID}/templates/button.hbs`,
+      templateData,
+    );
   }
   html.insertAdjacentHTML("beforeend", content);
   return context;

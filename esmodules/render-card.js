@@ -95,7 +95,7 @@ async function clickHandler(message, event, flags, clickIds) {
   }
 }
 
-globalThis.Hooks.on("renderChatMessageHTML", (message, html, data) => {
+globalThis.Hooks.on("renderChatMessageHTML", async (message, html, data) => {
   const flags = message.flags[MODULE_ID];
   if (!flags) return;
   // debuglog("renderChatMessageHTML (render-card)", {
@@ -106,13 +106,18 @@ globalThis.Hooks.on("renderChatMessageHTML", (message, html, data) => {
   // });
 
   let interactionContext = null;
-  function guts() {
+  async function guts() {
     switch (flags.card) {
       case "initiative":
-        interactionContext = renderInitiativeCard(message, html, data, flags);
+        interactionContext = await renderInitiativeCard(
+          message,
+          html,
+          data,
+          flags,
+        );
         break;
       case "avoidance-check":
-        interactionContext = renderAvoidanceCheckCard(
+        interactionContext = await renderAvoidanceCheckCard(
           message,
           html,
           data,
@@ -120,19 +125,24 @@ globalThis.Hooks.on("renderChatMessageHTML", (message, html, data) => {
         );
         break;
       case "hide":
-        interactionContext = renderHideCard(message, html, data, flags);
+        interactionContext = await renderHideCard(message, html, data, flags);
         break;
       case "sneak":
-        interactionContext = renderSneakCard(message, html, data, flags);
+        interactionContext = await renderSneakCard(message, html, data, flags);
         break;
       case "seek":
-        interactionContext = renderSeekCard(message, html, data, flags);
+        interactionContext = await renderSeekCard(message, html, data, flags);
         break;
       case "pointOut":
-        interactionContext = renderPointOutCard(message, html, data, flags);
+        interactionContext = await renderPointOutCard(
+          message,
+          html,
+          data,
+          flags,
+        );
         break;
       case "edit":
-        interactionContext = renderEditCard(message, html, data, flags);
+        interactionContext = await renderEditCard(message, html, data, flags);
         break;
       // case "create-a-diversion":
       //   interactionContext = renderCreateADiversionCard(
@@ -170,10 +180,10 @@ globalThis.Hooks.on("renderChatMessageHTML", (message, html, data) => {
   }
 
   if (canvas.ready) {
-    guts();
+    return guts();
   } else {
-    Hooks.once("canvasReady", () => {
-      guts();
+    Hooks.once("canvasReady", async () => {
+      return guts();
     });
   }
 });

@@ -26,6 +26,11 @@ globalThis.Hooks.once("ready", () => {
       game.i18n.localize(`${MODULE_ID}.notifications.noSocketLib`),
     );
   }
+  if (game.modules.get("pf2e-avoid-notice")?.active ?? false) {
+    ui.notifications.warn(
+      game.i18n.localize(`${MODULE_ID}.notifications.avoidNotice`),
+    );
+  }
 });
 
 globalThis.Hooks.once("setup", () => {
