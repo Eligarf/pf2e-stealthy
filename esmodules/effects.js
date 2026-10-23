@@ -41,7 +41,7 @@ export function isAvoider(tokenOrActor) {
 }
 
 export function getStealthyEffect(token) {
-  const actor = token.actor;
+  const actor = token?.actor;
   return actor?.items?.find((item) => item.system.slug === SLUGS.stealthy);
 }
 

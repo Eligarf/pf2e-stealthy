@@ -8,6 +8,7 @@ import { renderHideCard } from "./hide.js";
 import { renderSeekCard } from "./seek.js";
 import { renderPointOutCard } from "./point-out.js";
 import { renderEditCard } from "./edit.js";
+import { renderActionCard } from "./action.js";
 
 function attachHoverId(html, el, hoverIds) {
   const hoverId = el.dataset.hoverId;
@@ -143,6 +144,9 @@ globalThis.Hooks.on("renderChatMessageHTML", async (message, html, data) => {
         break;
       case "edit":
         interactionContext = await renderEditCard(message, html, data, flags);
+        break;
+      case "action":
+        interactionContext = await renderActionCard(message, html, data, flags);
         break;
       // case "create-a-diversion":
       //   interactionContext = renderCreateADiversionCard(

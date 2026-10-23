@@ -41,6 +41,7 @@
 .pf2e-stealthy-edit,
 .pf2e-stealthy-designated,
 .pf2e-stealthy-detectors,
+.pf2e-stealthy-action,
 .pf2e-stealthy-avoider {
   width: 100%;
   display: flex;
@@ -187,11 +188,7 @@
 /* Button structure */
 
 button.pf2e-stealthy-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   gap: 0.5rem;
-  width: 100%;
   height: 28px;
   border-radius: 3px;
   box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.5);

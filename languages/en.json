@@ -188,6 +188,10 @@
     "edit": {
       "subject": "Editing stealth for {name}"
     },
+    "endStealth": {
+      "beforeLabel": "End Stealth before action",
+      "afterLabel": "End Stealth after action"
+    },
     "badge": {
       "observed": "OBS",
       "hidden": "HDN",

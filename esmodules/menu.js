@@ -2,10 +2,13 @@ import { MODULE_ID } from "./const.js";
 import { fillNoTokensMenu } from "./no-tokens-menu.js";
 import { fillTokensMenu } from "./tokens-menu.js";
 import { fillConnectedTokensMenu } from "./connected-tokens-menu.js";
-import { debuglog, localizeString } from "./utils.js";
+import { warnlog, debuglog, localizeString } from "./utils.js";
 
 function getChoices() {
-  if (!canvas?.ready) return true;
+  if (!canvas?.ready) {
+    warnlog("getChoices has no canvas");
+    return true;
+  }
 
   const controlledTokens = canvas.tokens.controlled;
   let controlled = null;
