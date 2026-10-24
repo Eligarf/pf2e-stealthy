@@ -41,6 +41,7 @@
 .pf2e-stealthy-edit,
 .pf2e-stealthy-designated,
 .pf2e-stealthy-detectors,
+.pf2e-stealthy-end-stealth,
 .pf2e-stealthy-action,
 .pf2e-stealthy-avoider {
   width: 100%;
@@ -218,6 +219,57 @@ button.pf2e-stealthy-button:disabled {
   box-shadow: none;
   opacity: 0.6;
 }
+
+/* Split button structure */
+
+button.pf2e-stealthy-split-button {
+  margin: 0 !important;
+  border-radius: 0;
+  border: 1px solid #7a7975;
+}
+
+button.pf2e-stealthy-split-button .primary-side {
+  flex: 1;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+button.pf2e-stealthy-split-button .secondary-side {
+  flex: 0 0 32px;
+  border-left: none;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  background: #4b4a44;
+  color: #ff9f00;
+}
+
+button.pf2e-stealthy-split-button .secondary-side:hover {
+  background: #5c5b55;
+  color: #ffb84d;
+}
+
+/* button.pf2e-stealthy-split-button:hover { */
+/*   background: var(--button-hover-background-color); */
+/*   color: var(--button-hover-text-color); */
+/*   border-color: var(--tertiary); */
+/*   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); */
+/* } */
+/**/
+/* button.pf2e-stealthy-split-button:active { */
+/*   background: var(--primary); */
+/*   color: var(--text-light); */
+/*   transform: scale(0.95); */
+/*   background: rgba(0, 0, 0, 0.12); */
+/* } */
+/**/
+/* button.pf2e-stealthy-split-button:disabled { */
+/*   background: var(--color-light-4); */
+/*   color: var(--color-dark-6); */
+/*   border-color: var(--color-light-5); */
+/*   cursor: not-allowed; */
+/*   box-shadow: none; */
+/*   opacity: 0.6; */
+/* } */
 
 /* missing PCs alert */
 

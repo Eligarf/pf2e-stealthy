@@ -84,7 +84,7 @@ export function attachHoverIds(html, hoverIds) {
 }
 
 async function clickHandler(message, event, flags, clickIds) {
-  debuglog("clickHandler", { message, event, flags, clickIds });
+  // debuglog("clickHandler", { message, event, flags, clickIds });
   const element = event.target.closest(`[data-click-id]`);
   if (element) {
     event.preventDefault();
@@ -107,6 +107,26 @@ globalThis.Hooks.on("renderChatMessageHTML", async (message, html, data) => {
   // });
 
   let interactionContext = null;
+
+  async function doAttachments() {
+    if (!interactionContext) return;
+    if (interactionContext.clickIds) {
+      html.addEventListener(
+        "click",
+        async (event) =>
+          await clickHandler(
+            message,
+            event,
+            flags,
+            interactionContext.clickIds,
+          ),
+      );
+    }
+    if (interactionContext.hoverIds) {
+      attachHoverIds(html, interactionContext.hoverIds);
+    }
+  }
+
   async function guts() {
     switch (flags.card) {
       case "initiative":
@@ -145,9 +165,6 @@ globalThis.Hooks.on("renderChatMessageHTML", async (message, html, data) => {
       case "edit":
         interactionContext = await renderEditCard(message, html, data, flags);
         break;
-      case "action":
-        interactionContext = await renderActionCard(message, html, data, flags);
-        break;
       // case "create-a-diversion":
       //   interactionContext = renderCreateADiversionCard(
       //     message,
@@ -156,30 +173,12 @@ globalThis.Hooks.on("renderChatMessageHTML", async (message, html, data) => {
       //     flags,
       //   );
       //   break;
-      default:
-        debuglog(`Unknown card type '${flags.card}'`, {
-          message,
-          html,
-          data,
-          flags,
-        });
     }
-    if (!interactionContext) return;
+    doAttachments();
 
-    if (interactionContext.clickIds) {
-      html.addEventListener(
-        "click",
-        async (event) =>
-          await clickHandler(
-            message,
-            event,
-            flags,
-            interactionContext.clickIds,
-          ),
-      );
-    }
-    if (interactionContext.hoverIds) {
-      attachHoverIds(html, interactionContext.hoverIds);
+    if (flags.endStealth) {
+      interactionContext = await renderActionCard(message, html, data, flags);
+      doAttachments();
     }
   }
 

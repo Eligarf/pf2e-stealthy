@@ -31,7 +31,7 @@ PF2e Stealthy:
 - is for tactical combat stealth only, and *stealthy* effects are only valid during initiative and encounter mode.
 - uses chat cards as its primary interface.
 - requires no prep on non-*stealthy* tokens. All data is carried on the *stealthy* actors.
-- does not police actions or states for cover or validity and simply does the mechanics since the GM is free to adjust results before they are applied.
+- does not verify actions or states for cover or validity and simply does the mechanics as the GM is free to adjust results before they are applied.
 
 ## Exploration Mode
 
@@ -50,6 +50,8 @@ This module basically tracks which tokens should be granted an exception to the 
 When a creature takes a Hide or Sneak action, PF2e Stealthy will append a target list to the roll chat card listing each observing token, dc, and resulting stealth status for that observer. The GM can click on any results to change specific ones for whatever reason like missing cover or whatever, and the clicks the Apply Effects button to store that info into the *stealthy* effect. Once the actor is *stealthy*, the module's context menu will offer a choice to edit and present a new chat card where the GM can tweak stealth settings as needed. Seek checks work similarly, allowing the GM to modify the seek results prior to accepting the changes, and the Point Out action, if accepted, will set appropriate allied tokens to see the pointed out token as hidden.
 
 The *Stealthy* effect uses a badge to track the baseline stealth of the actor, and grants the hidden and undetected conditions based on the level of the badge. It uses signature predicates to conditionally disable the condition roll options it grants depending on the target of the roll. If the vision hack is enabled, *stealthy* tokens will show on the GM canvas as with a thick cyan border if no tokens are controlled or if the *stealthy* token is undetected to all controlled tokens.
+
+An 'End stealth' button will be generated on any detected action chat card created by a *stealthy* actor other than Hide, Sneak, or Step allowing the GM to easily delete the effect before or after the action. The button will generally say 'End stealth before action' unless it detects a strike, in which case it will say 'End stealth after action' as a reminder.
 
 ![Vision Hack GM View](https://github.com/user-attachments/assets/0a6795e6-b144-4a9f-9cef-18c0f8ecdd18) ![Vision Hack Player View](https://github.com/user-attachments/assets/65f3ddde-0c95-4ea8-bf93-5913d8c4ff61)
 

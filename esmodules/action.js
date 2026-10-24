@@ -1,4 +1,4 @@
-import { MODULE_ID } from "./const.js";
+import { HIDDEN, MODULE_ID, UNDETECTED } from "./const.js";
 import { debuglog, breakdownRoll } from "./utils.js";
 import { prepareSeekData } from "./seek.js";
 import { prepareHideData } from "./hide.js";
@@ -9,17 +9,20 @@ import { findCompanionsOnCanvas, findPossibleTargets } from "./combat.js";
 import { resolveStealthChecks } from "./observation-logic.js";
 import { prepareTargetList } from "./render-status.js";
 import { findBaseCoverBonus } from "./cover.js";
-import { getStealthyEffect } from "./effects.js";
+import {
+  getStealthyEffect,
+  getStealthBaseline,
+  reduceStealthBaseline,
+} from "./effects.js";
 import { clearActorStealth } from "./stealth.js";
 
 let pointOutText;
-let rkRegex;
+let flavorRegex;
+let contentRegex;
 globalThis.Hooks.once("ready", () => {
   pointOutText = `<strong>${game.i18n.localize("PF2E.Actions.PointOut.Title")}</strong>`;
-  const localizedRK = game.i18n.localize("PF2E.Actions.RecallKnowledge.Title");
-  const escapedRK = localizedRK.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const regexText = `<strong>\\s*${escapedRK}\\s*</strong>`;
-  rkRegex = new RegExp(regexText);
+  flavorRegex = /<h4 class="action"/;
+  contentRegex = /<div class="pf2e chat-card action-card"/;
 });
 
 export function prepareStealthChecks({ message, actingToken, resolver }) {
@@ -53,34 +56,50 @@ export function prepareStealthChecks({ message, actingToken, resolver }) {
 
 async function applyEndStealth(message, _event, flags) {
   if (!game.user.isGM) return;
-  const action = flags.action;
+  const endStealth = flags.endStealth;
   const token = message.token;
   await clearActorStealth({ actor: token.actor });
-  action.showEndButton = false;
+  endStealth.showEndButton = false;
+  return message.update({ flags: { [MODULE_ID]: flags } });
+}
+
+async function applyReduceStealth(message, _event, flags) {
+  if (!game.user.isGM) return;
+  const endStealth = flags.endStealth;
+  const token = message.token;
+  await reduceStealthBaseline(token, HIDDEN);
+  endStealth.showEndButton = false;
   return message.update({ flags: { [MODULE_ID]: flags } });
 }
 
 export async function renderActionCard(message, html, _data, flags) {
-  const action = flags.action;
-  debuglog("renderActionCard", { message, _data, flags, action });
+  const endStealth = flags.endStealth;
   const context = {
-    after: action.after,
-    interactive: action.showEndButton,
+    after: endStealth.after,
+    interactive: endStealth.showEndButton,
   };
   const stealthy = getStealthyEffect(message.token);
   if (stealthy && context.interactive) {
-    const clickId = foundry.utils.randomID();
-    (context["clickIds"] ??= {})[clickId] = applyEndStealth;
+    const primaryClickId = foundry.utils.randomID();
+    (context["clickIds"] ??= {})[primaryClickId] = applyEndStealth;
 
     const templateData = {
-      action: "action",
       moduleId: MODULE_ID,
-      clickId,
-      label: `${MODULE_ID}.endStealth.${action.after ? "afterLabel" : "beforeLabel"}`,
+      primaryClickId: primaryClickId,
+      primaryLabel: `${MODULE_ID}.endStealth.${endStealth.after ? "afterLabel" : "beforeLabel"}`,
       change: true,
     };
+    if (getStealthBaseline(stealthy) === UNDETECTED) {
+      const secondaryClickId = foundry.utils.randomID();
+      context.clickIds[secondaryClickId] = applyReduceStealth;
+      templateData.secondaryClickId = secondaryClickId;
+      templateData.secondaryLabel = `${MODULE_ID}.endStealth.hiddenInstead`;
+      templateData.secondaryTooltip = game.i18n.localize(
+        `${MODULE_ID}.endStealth.hiddenTooltip`,
+      );
+    }
     const content = await foundry.applications.handlebars.renderTemplate(
-      `modules/${MODULE_ID}/templates/button.hbs`,
+      `modules/${MODULE_ID}/templates/split-button.hbs`,
       templateData,
     );
     const contentBlock = html.querySelector("div.message-content");
@@ -97,47 +116,64 @@ Hooks.on("createChatMessage", async (message, _options, userId) => {
   if (!combat) return;
   const flags = message.flags[game.system.id];
   if (!flags) return;
-  debuglog("createChatMessage (action)", { message, _options, userId, flags });
+  // debuglog("createChatMessage (action)", { message, _options, userId, flags });
 
   const actingToken = message.token;
   const context = flags.context;
-  let action = null;
+  let action = 0;
   let rollOptions;
   if (context) {
     rollOptions = context.options || [];
     if (rollOptions.includes("action:seek")) {
-      action = true;
-      await prepareSeekData(message, userId, actingToken);
+      // Something nasty crawls in if I try and put both buttons on this right now
+      // action = -1;
+      // await prepareSeekData(message, userId, actingToken);
+      return await prepareSeekData(message, userId, actingToken);
+
+      // Hide/Sneak/Step are okay actions under stealth
     } else if (rollOptions.includes("action:hide")) {
       return prepareHideData(message, userId, actingToken);
     } else if (rollOptions.includes("action:sneak")) {
       return prepareSneakData(message, userId, actingToken);
-      // } else if (options.includes("action:create-a-diversion")) {
-      //   return prepareCreateADiversionData(message, userId, actingToken);
-    } else if (rollOptions.includes("action:step")) return; // step preserves stealth
-  }
-  if (!action && pointOutText && message.flavor?.includes(pointOutText)) {
-    action = true;
-    await preparePointOutData(message, userId, actingToken);
-  }
-  const stealthy = getStealthyEffect(actingToken);
-  if (!stealthy) return;
-  if (!action && rollOptions) {
-    action = rollOptions.some((o) => o.startsWith("action:"));
-  }
-  if (!action && rkRegex && rkRegex.test(message.flavor)) {
-    action = true;
+    } else if (rollOptions.includes("action:step")) return;
+
+    // } else if (options.includes("action:create-a-diversion")) {
+    //   return prepareCreateADiversionData(message, userId, actingToken);
   }
 
-  // If we get here, then we need add the 'End Stealth' button
+  // Gotta try and find the point out action specifically
+  if (!action && pointOutText && message.flavor?.includes(pointOutText)) {
+    action = -1;
+    await preparePointOutData(message, userId, actingToken);
+  }
+
+  // If you aren't stealthy, no worries
+  const stealthy = getStealthyEffect(actingToken);
+  if (!stealthy) return;
+
+  // Check roll options first, then flavor text, then content
+  // Maybe else-if in the future...
+  if (!action && rollOptions) {
+    const actions = rollOptions.filter((o) => o.startsWith("action:"));
+    if (actions.length > 0) {
+      action = actions.some((o) => o.startsWith("action:strike")) ? 1 : -1;
+    }
+  }
+  if (!action && flavorRegex && flavorRegex.test(message.flavor)) {
+    action = -1;
+  }
+  if (!action && contentRegex && contentRegex.test(message.content)) {
+    action = -1;
+  }
+
+  // A naughty action for stealth. add bye-bye button
   if (action) {
     const update = {
       flags: {
         [MODULE_ID]: {
-          card: "action",
-          action: {
+          endStealth: {
             showEndButton: true,
-            after: action ? rollOptions?.includes("action:strike") : false,
+            after: action > 0,
           },
         },
       },

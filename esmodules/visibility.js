@@ -158,11 +158,20 @@ function controlTokenHook(token, controlled) {
 function refreshTokenHook(token, options) {
   if (!options.refreshVisibility) return;
 
-  if (game.user.isGM && cachedSettings.showEyeballs) {
+  if (game.user.isGM && cachedSettings.alerts) {
     const isRevealed = token.id in revealedToTokenIds;
     if (!isRevealed) {
       showAlert({ token, stealth: UNDETECTED });
     } else {
+      if (!cachedSettings.hideFromAllies) {
+        const us = token.actor?.system?.details?.alliance;
+        const notUs = Object.keys(observingTokenIds).some((id) => {
+          const token = canvas.tokens.get(id);
+          const them = token.actor?.system?.details?.alliance;
+          return them !== us;
+        });
+        if (!notUs) return;
+      }
       const stealth = revealedToTokenIds[token.id];
       showAlert({ token, stealth });
     }

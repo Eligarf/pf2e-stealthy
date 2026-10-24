@@ -12,7 +12,7 @@ export const SETTINGS = {
   hideFromAllies: "hideFromAllies",
   requireActivity: "requireActivity",
   panZoomToCombat: "panZoomToCombat",
-  showEyeballs: "showEyeballs",
+  alerts: "showEyeballs",
   collapseTargetList: "collapseTargetList",
   visionHack: "visionHack",
 
@@ -28,7 +28,7 @@ export let cachedSettings = {
   hideFromAllies: false,
   requireActivity: true,
   panZoomToCombat: true,
-  showEyeballs: true,
+  alerts: true,
   collapseTargetList: false,
   visionHack: true,
   logLevel: "none",
@@ -87,23 +87,20 @@ export function setupSettings() {
     SETTINGS.requireActivity,
   );
 
-  game.settings.register(MODULE_ID, SETTINGS.showEyeballs, {
-    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.showEyeballs}.name`),
-    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.showEyeballs}.hint`),
+  game.settings.register(MODULE_ID, SETTINGS.alerts, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.alerts}.name`),
+    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.alerts}.hint`),
     scope: "world",
     config: true,
     type: Boolean,
-    default: cachedSettings.showEyeballs,
+    default: cachedSettings.alerts,
     onChange: (newValue) => {
-      cachedSettings.showEyeballs = newValue;
+      cachedSettings.alerts = newValue;
       refreshVisibilityCache();
       refreshPerception();
     },
   });
-  cachedSettings.showEyeballs = game.settings.get(
-    MODULE_ID,
-    SETTINGS.showEyeballs,
-  );
+  cachedSettings.alerts = game.settings.get(MODULE_ID, SETTINGS.alerts);
 
   game.settings.register(MODULE_ID, SETTINGS.collapseTargetList, {
     name: game.i18n.localize(

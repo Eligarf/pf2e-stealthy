@@ -1,3 +1,9 @@
+## 0.11.1
+
+- Don't show vision alerts for allies
+- Added better regexs to catch more actions that end stealth
+- Disable end-stealth button on seek for now because issues
+
 ## 0.11.0
 
 - Add an 'End Stealth' button to the chat card of any action (other than step, hide, or sneak) taken by a stealthy character.

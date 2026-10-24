@@ -49,6 +49,23 @@ export function getStealthBaseline(stealth) {
   return stealth?.system?.badge?.value || OBSERVED;
 }
 
+export async function reduceStealthBaseline(token, baseline) {
+  const actor = token?.actor;
+  const stealth = actor?.items?.find(
+    (item) => item.system.slug === SLUGS.stealthy,
+  );
+  if (!stealth) return;
+  const oldBaseline = stealth.system?.badge?.value || 0;
+  if (oldBaseline > baseline)
+    return stealth.update({
+      system: {
+        badge: {
+          value: baseline,
+        },
+      },
+    });
+}
+
 export function getStealthinessTo(origin, targetId) {
   const actor = origin.actor || origin.tokenDoc.actor;
   const stealthy = actor?.items?.find(
@@ -331,11 +348,11 @@ export async function adaptStealthyToObservers({
   baselineStealth,
   detectors,
 }) {
-  debuglog("adaptStealthEffectToObservers", {
-    actor,
-    baselineStealth,
-    detectors,
-  });
+  // debuglog("adaptStealthEffectToObservers", {
+  //   actor,
+  //   baselineStealth,
+  //   detectors,
+  // });
   const stealths = buildStealthSets(detectors, baselineStealth);
   const { flags, rules } = buildFlagsAndRules(
     stealths,
