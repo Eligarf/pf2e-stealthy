@@ -1,3 +1,8 @@
+## 0.11.2
+
+- new minified unity build
+- got split button working
+
 ## 0.11.1
 
 - Don't show vision alerts for allies

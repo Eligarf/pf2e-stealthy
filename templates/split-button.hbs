@@ -4,22 +4,18 @@
     class="{{moduleId}}-split-button primary-side"
     data-click-id="{{primaryClickId}}"
     {{#unless change}}disabled{{/unless}}
-    {{#if primaryTooltip}}
-      title="{{primaryTooltip}}"
-    {{/if}}
+    {{#if primaryTooltip}}title="{{primaryTooltip}}"{{/if}}
   >
-    <i class="fas fa-eye"></i> {{localize primaryLabel}}
+    {{localize primaryLabel}}
   </button>
   {{#if secondaryClickId}}
     <button
       type="button"
       class="{{moduleId}}-split-button secondary-side"
       data-click-id="{{secondaryClickId}}"
-      {{#if secondaryTooltip}}
-        title="{{secondaryTooltip}}"
-      {{/if}}
+      {{#if secondaryTooltip}}title="{{secondaryTooltip}}"{{/if}}
     >
-      <i class="fas fa-eye-slash"></i> {{localize secondaryLabel}}
+      {{localize secondaryLabel}}
     </button>
   {{/if}}
 </div>

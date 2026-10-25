@@ -51,7 +51,7 @@ When a creature takes a Hide or Sneak action, PF2e Stealthy will append a target
 
 The *Stealthy* effect uses a badge to track the baseline stealth of the actor, and grants the hidden and undetected conditions based on the level of the badge. It uses signature predicates to conditionally disable the condition roll options it grants depending on the target of the roll. If the vision hack is enabled, *stealthy* tokens will show on the GM canvas as with a thick cyan border if no tokens are controlled or if the *stealthy* token is undetected to all controlled tokens.
 
-An 'End stealth' button will be generated on any detected action chat card created by a *stealthy* actor other than Hide, Sneak, or Step allowing the GM to easily delete the effect before or after the action. The button will generally say 'End stealth before action' unless it detects a strike, in which case it will say 'End stealth after action' as a reminder.
+An 'End stealth' button will be generated on any detected action chat card created by a *stealthy* actor other than Hide, Sneak, or Step allowing the GM to easily delete the effect before or after the action. The button will say 'End stealth before action' unless it detects a strike, in which case it will say 'End stealth after action' as a reminder. If the character is undetected, it will offer an additional option to just drop stealth to hidden instead.
 
 ![Vision Hack GM View](https://github.com/user-attachments/assets/0a6795e6-b144-4a9f-9cef-18c0f8ecdd18) ![Vision Hack Player View](https://github.com/user-attachments/assets/65f3ddde-0c95-4ea8-bf93-5913d8c4ff61)
 

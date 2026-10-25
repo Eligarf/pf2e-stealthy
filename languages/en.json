@@ -189,10 +189,10 @@
       "subject": "Editing stealth for {name}"
     },
     "endStealth": {
-      "beforeLabel": "End Stealth Before",
-      "afterLabel": "End Stealth After",
-      "hiddenInstead": "Reduce Stealth",
-      "hiddenTooltip": "Reduce undetected stealth to hidden"
+      "beforeLabel": "End Stealth before Action",
+      "afterLabel": "End Stealth after Action",
+      "hiddenInstead": "or reduce to hidden",
+      "hiddenTooltip": "Reduce undetected stealth to hidden instead of removing stealth entirely"
     },
     "badge": {
       "observed": "OBS",
