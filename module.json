@@ -42,13 +42,8 @@
       }
     ]
   },
-  "esmodules": [
-    "esmodules/main.js",
-    "esmodules/combat.js",
-    "esmodules/action.js",
-    "esmodules/render-card.js"
-  ],
-  "styles": ["styles/style.css"],
+  "esmodules": ["dist/main.min.js"],
+  "styles": ["dist/style.min.css"],
   "languages": [
     {
       "lang": "en",

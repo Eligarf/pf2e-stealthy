@@ -31,10 +31,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: replace js and css files with minified ones
-        uses: nizarmah/auto-minify@v3
-        with:
-          overwrite: true
-          js_engine: "uglify-js"
+        run: |
+          npx esbuild src/main.js --bundle --minify --outfile=dist/main.min.js --sourcemap
+          npx esbuild src/style.css --minify --outfile=dist/style.min.css
 
       # Extracted version fallback: parses release tags or generates a fake test version string
       - name: Extract tag version number
@@ -74,8 +73,7 @@ jobs:
           LICENSE \
           CHANGELOG.md \
           languages/ \
-          esmodules/ \
-          styles/ \
+          dist/ \
           templates/
 
       # Create a release for this specific version (Only runs on actual releases)

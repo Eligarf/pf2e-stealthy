@@ -9,7 +9,7 @@ import {
 import { debuglog, warnlog } from "./utils.js";
 import { cachedSettings } from "./settings.js";
 
-const hooks = {};
+let hooks = {};
 const observingTokenIds = {};
 let revealedToTokenIds = {};
 const tokenIdsWithAlerts = {};

@@ -1,6 +1,7 @@
 ## 0.11.1
 
 - Don't show vision alerts for allies
+- Add a reduce-to-hidden button for actions when undetected
 - Added better regexs to catch more actions that end stealth
 - Disable end-stealth button on seek for now because issues
 

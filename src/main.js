@@ -3,6 +3,10 @@ import { SETTINGS, setupSettings, setupKeybindings } from "./settings.js";
 import { cachedSettings } from "./settings.js";
 import { log } from "./utils.js";
 
+import "./combat.js";
+import "./action.js";
+import "./render-card.js";
+
 globalThis.Hooks.once("init", () => {
   setupKeybindings();
 });
