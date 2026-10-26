@@ -19,21 +19,24 @@ export async function findInitiativeCard(combatant) {
   return messages.length ? game.messages.get(messages.pop()._id) : null;
 }
 
-export async function applyInitiativeConditions(observations, tokenUpdates) {
-  debuglog("applyInitiativeConditions", { observations, tokenUpdates });
+export async function applyInitiativeConditions(encounter, observations) {
   const baselineStealth = UNDETECTED;
-  for (const avoiderId in observations) {
-    const { avoider, observers, allies } = observations[avoiderId];
-    debuglog("applyInitiativeConditions", { avoider, observers, allies });
+  for (const id in observations) {
+    const { observers, allies } = observations[id];
+    const combatant = encounter.combatants.get(id);
     const detectors = Object.fromEntries(
-      Object.entries(observers)
-        .filter(([_, o]) => o.check.stealth < baselineStealth)
-        .map(([id, o]) => {
+      observers
+        .filter((o) => {
+          const check = o.check ?? o;
+          return check.stealth < baselineStealth;
+        })
+        .map((o) => {
+          const check = o.check ?? o;
           return [
-            id,
+            check.targetId,
             {
-              stealth: o.check.stealth,
-              signature: o.check.tokenDoc.actor?.signature,
+              stealth: check.stealth,
+              signature: getToken(check.targetId)?.actor?.signature,
             },
           ];
         })
@@ -48,7 +51,7 @@ export async function applyInitiativeConditions(observations, tokenUpdates) {
         ),
     );
     await adaptStealthyToObservers({
-      actor: avoider.tokenDoc.actor,
+      actor: combatant.actor,
       baselineStealth,
       detectors,
     });

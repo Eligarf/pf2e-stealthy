@@ -29,25 +29,35 @@
     },
     "collapseTargetList": {
       "name": "Collapse initiative target lists",
-      "hint": "Initially collapse target lists when adding them to initiative chat cards"
+      "hint": "Initially collapse target lists when adding them to initiative chat cards."
     },
     "hideFromAllies": {
       "name": "Party stealth affects party members",
       "hint": "If enabled, party member stealth effect can affect other party members. This checkbox doesn't apply to neutral or opposing tokens."
     },
+    "keepDeadOut": {
+      "name": "Prevent dead NPCs from joining combat",
+      "hint": "If enabled, NPCs with the dead condition will not be added to the combat. This helps sometimes when restarting an encounter."
+    },
+    "vetCombatStart": {
+      "name": "Use Combat Start dialog with stealth",
+      "hint": "If enabled and Combat is started with some combatants that use stealth, a dialog will present that allows the GM to adjust any stealth settings before Foundry's Combat Start machinery starts up"
+    },
     "notifications": {
       "noSocketLib": "PF2e Stealthy needs socketlib module to be active in order to pan/zoom to combat. Please activate it.",
       "target1": "Point Out action requires a single token to be targeted",
       "noToDos": "No relevant actions for PF2e Stealthy for this context: {controlled} controlled token(s), {targeted} targeted token(s)",
-      "avoidNotice": "'PF2e Stealthy' is a replacement of and extension to 'PF2e Avoid Notice'. Please disable 'PF2e Avoid Notice'"
+      "avoidNotice": "'PF2e Stealthy' is a replacement of and extension to 'PF2e Avoid Notice'. Please disable 'PF2e Avoid Notice'",
+      "keepDeadOut": "Dead or defeated NPCs are rejected from combat"
     },
     "schema": {
       "name": "Schema Version",
-      "hint": "Set this to a previous version to force a data migration from the specified version to the current version"
+      "hint": "Set this to a previous version to force a data migration from the specified version to the current version."
     },
     "config": {
-      "general": "General Options",
-      "misfits": "Misfit Features",
+      "initiative": "Combat & Initiative UI",
+      "stealth": "Stealth Mechanics",
+      "vision": "Vision & Awareness UI",
       "debug": "Debug Options"
     },
     "menu": {

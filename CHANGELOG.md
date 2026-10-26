@@ -1,5 +1,10 @@
 ## pending
 
+## 1.1.0
+
+- Add opt-out setting that prevents dead NPCs from being added to combat
+- Make a hole for future combat start shenanigans
+
 ## 1.0.0
 
 - Released to foundry

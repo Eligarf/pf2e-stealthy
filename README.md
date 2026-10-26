@@ -9,7 +9,7 @@
 
 # PF2e Stealthy
 
-A light-weight module for PF2e/SF2e in FoundryVTT that manages token-to-token hidden and undetected conditions, as well as initiative and action-related stealth checks during combat using chat cards. It can dynamically change the rendering of tokens based on the specific stealth relationship between the controlled token(s) and any tokens on the canvas that have the module's custom Stealth effect applied. It is essentially an replacement of and extension to the PF2e Avoid Notice module. 
+A light-weight module for PF2e/SF2e in FoundryVTT that manages token-to-token hidden and undetected conditions, as well as initiative and action-related stealth checks during combat using chat cards. It can dynamically change the rendering of tokens based on the specific stealth relationship between the controlled token(s) and any tokens on the canvas that have the module's custom Stealth effect applied. It is essentially an replacement of and extension to the [PF2e Avoid Notice](https://foundryvtt.com/packages/pf2e-avoid-notice) module. 
 
 ## Chat card examples
 

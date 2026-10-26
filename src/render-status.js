@@ -14,18 +14,12 @@ import { summarizeTargetList } from "./observation-logic.js";
 export function prepareTargetList(sortedChecks) {
   return sortedChecks.map((o) => {
     const check = o.check ?? o;
-    const tokenId = check.tokenDoc.id;
+    const tokenId = check.targetId || check.tokenDoc.id;
     const entry = {
-      dc: check.dc,
-      degreeOfSuccess: check.degreeOfSuccess,
-      delta: check.delta,
-      deltaStr: check.deltaStr,
-      name: check.name,
-      tokenId: tokenId,
-      stealth: check.stealth,
-      ...(check.was && { was: check.was }),
-      stealthLabel: check.stealthLabel,
-      ...(check.tooltips?.length > 0 && { tooltips: check.tooltips }),
+      ...Object.fromEntries(
+        Object.entries(check).filter(([k, _]) => k !== "tokenDoc"),
+      ),
+      targetId: tokenId,
     };
     return entry;
   });
@@ -129,20 +123,20 @@ export async function renderTargetList(targetList, summary, context) {
   );
 }
 
-export async function updateInitiativeCards(observations) {
-  for (const avoiderId in observations) {
-    const { avoider, observers, allies } = observations[avoiderId];
+export async function updateInitiativeCards(encounter, observations) {
+  for (const id in observations) {
+    const { observers, allies } = observations[id];
 
     const sortedChecks = Object.values(observers).sort(
-      (a, b) =>
-        b.check.dc - a.check.dc || a.check.name.localeCompare(b.check.name),
+      (a, b) => b.dc - a.dc || a.name.localeCompare(b.name),
     );
 
     const targetList = prepareTargetList(sortedChecks);
 
-    const initiativeMessage = await findInitiativeCard(avoider.combatant);
+    const combatant = encounter.combatants.get(id);
+    const initiativeMessage = await findInitiativeCard(combatant);
     if (!initiativeMessage) {
-      debuglog("No initiative message found for", { avoider });
+      debuglog("No initiative message found for", { combatant });
       continue;
     }
     const update = {
@@ -150,7 +144,7 @@ export async function updateInitiativeCards(observations) {
         [MODULE_ID]: {
           card: "initiative",
           initiative: {
-            name: avoider.tokenDoc.name,
+            name: combatant.name,
             activity: "PF2E.TravelSpeed.ExplorationActivities.AvoidNotice",
             targetList: targetList,
             allies,

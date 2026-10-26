@@ -15,6 +15,8 @@ export const SETTINGS = {
   alerts: "showEyeballs",
   collapseTargetList: "collapseTargetList",
   visionHack: "visionHack",
+  keepDeadOut: "keepDeadOut",
+  vetCombatStart: "vetCombatStart",
 
   // Advanced settings
   logLevel: "logLevel",
@@ -31,10 +33,32 @@ export let cachedSettings = {
   alerts: true,
   collapseTargetList: false,
   visionHack: true,
+  keepDeadOut: true,
+  vetCombatStart: false,
   logLevel: "none",
 };
 
 export function setupSettings() {
+  game.settings.register(MODULE_ID, SETTINGS.collapseTargetList, {
+    name: game.i18n.localize(
+      `${MODULE_ID}.${SETTINGS.collapseTargetList}.name`,
+    ),
+    hint: game.i18n.localize(
+      `${MODULE_ID}.${SETTINGS.collapseTargetList}.hint`,
+    ),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: cachedSettings.collapseTargetList,
+    onChange: (newValue) => {
+      cachedSettings.collapseTargetList = newValue;
+    },
+  });
+  cachedSettings.collapseTargetList = game.settings.get(
+    MODULE_ID,
+    SETTINGS.collapseTargetList,
+  );
+
   game.settings.register(MODULE_ID, SETTINGS.panZoomToCombat, {
     name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.panZoomToCombat}.name`),
     hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.panZoomToCombat}.hint`),
@@ -51,25 +75,53 @@ export function setupSettings() {
     SETTINGS.panZoomToCombat,
   );
 
-  game.settings.register(MODULE_ID, SETTINGS.visionHack, {
-    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.visionHack}.name`),
-    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.visionHack}.hint`),
+  game.settings.register(MODULE_ID, SETTINGS.keepDeadOut, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.keepDeadOut}.name`),
+    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.keepDeadOut}.hint`),
     scope: "world",
     config: true,
     type: Boolean,
-    default: cachedSettings.visionHack,
+    default: cachedSettings.keepDeadOut,
     onChange: (newValue) => {
-      cachedSettings.visionHack = newValue;
-      if (newValue) {
-        setupVisibilityHooks();
-      } else {
-        releaseVisibilityHooks();
-      }
-      refreshVisibilityCache();
-      refreshPerception();
+      cachedSettings.keepDeadOut = newValue;
     },
   });
-  cachedSettings.visionHack = game.settings.get(MODULE_ID, SETTINGS.visionHack);
+  cachedSettings.keepDeadOut = game.settings.get(
+    MODULE_ID,
+    SETTINGS.keepDeadOut,
+  );
+
+  game.settings.register(MODULE_ID, SETTINGS.vetCombatStart, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.vetCombatStart}.name`),
+    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.vetCombatStart}.hint`),
+    scope: "world",
+    config: false,
+    type: Boolean,
+    default: cachedSettings.vetCombatStart,
+    onChange: (newValue) => {
+      cachedSettings.vetCombatStart = newValue;
+    },
+  });
+  cachedSettings.vetCombatStart = game.settings.get(
+    MODULE_ID,
+    SETTINGS.vetCombatStart,
+  );
+
+  game.settings.register(MODULE_ID, SETTINGS.hideFromAllies, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.hideFromAllies}.name`),
+    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.hideFromAllies}.hint`),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: cachedSettings.hideFromAllies,
+    onChange: (newValue) => {
+      cachedSettings.hideFromAllies = newValue;
+    },
+  });
+  cachedSettings.hideFromAllies = game.settings.get(
+    MODULE_ID,
+    SETTINGS.hideFromAllies,
+  );
 
   game.settings.register(MODULE_ID, SETTINGS.requireActivity, {
     name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.requireActivity}.name`),
@@ -102,41 +154,25 @@ export function setupSettings() {
   });
   cachedSettings.alerts = game.settings.get(MODULE_ID, SETTINGS.alerts);
 
-  game.settings.register(MODULE_ID, SETTINGS.collapseTargetList, {
-    name: game.i18n.localize(
-      `${MODULE_ID}.${SETTINGS.collapseTargetList}.name`,
-    ),
-    hint: game.i18n.localize(
-      `${MODULE_ID}.${SETTINGS.collapseTargetList}.hint`,
-    ),
+  game.settings.register(MODULE_ID, SETTINGS.visionHack, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.visionHack}.name`),
+    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.visionHack}.hint`),
     scope: "world",
     config: true,
     type: Boolean,
-    default: cachedSettings.collapseTargetList,
+    default: cachedSettings.visionHack,
     onChange: (newValue) => {
-      cachedSettings.collapseTargetList = newValue;
+      cachedSettings.visionHack = newValue;
+      if (newValue) {
+        setupVisibilityHooks();
+      } else {
+        releaseVisibilityHooks();
+      }
+      refreshVisibilityCache();
+      refreshPerception();
     },
   });
-  cachedSettings.collapseTargetList = game.settings.get(
-    MODULE_ID,
-    SETTINGS.collapseTargetList,
-  );
-
-  game.settings.register(MODULE_ID, SETTINGS.hideFromAllies, {
-    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.hideFromAllies}.name`),
-    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.hideFromAllies}.hint`),
-    scope: "world",
-    config: true,
-    type: Boolean,
-    default: cachedSettings.hideFromAllies,
-    onChange: (newValue) => {
-      cachedSettings.hideFromAllies = newValue;
-    },
-  });
-  cachedSettings.hideFromAllies = game.settings.get(
-    MODULE_ID,
-    SETTINGS.hideFromAllies,
-  );
+  cachedSettings.visionHack = game.settings.get(MODULE_ID, SETTINGS.visionHack);
 
   game.settings.register(MODULE_ID, SETTINGS.logLevel, {
     name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.logLevel}.name`),
@@ -168,7 +204,9 @@ export function setupKeybindings() {
 }
 
 const SETTING_GROUPS = [
-  { label: "general", before: SETTINGS.panZoomToCombat },
+  { label: "initiative", before: SETTINGS.collapseTargetList },
+  { label: "stealth", before: SETTINGS.hideFromAllies },
+  { label: "vision", before: SETTINGS.alerts },
   { label: "debug", before: SETTINGS.logLevel },
 ];
 
