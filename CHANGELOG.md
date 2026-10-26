@@ -1,3 +1,9 @@
+## pending
+
+## 1.0.0
+
+- Released to foundry
+
 ## 0.11.2
 
 - new minified unity build
