@@ -77,6 +77,7 @@ async function applySneakEffects(message, _event, flags) {
   const sneak = flags.sneak;
   const detectors = Object.fromEntries(
     sneak.targetList
+      .filter((t) => t.stealth < UNDETECTED)
       .map((t) => [
         t.tokenId,
         {

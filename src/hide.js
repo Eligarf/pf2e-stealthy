@@ -67,6 +67,7 @@ async function applyHideEffects(message, _event, flags) {
   const hide = flags.hide;
   const detectors = Object.fromEntries(
     hide.targetList
+      .filter((t) => t.stealth < baselineStealth)
       .map((t) => [
         t.tokenId,
         {

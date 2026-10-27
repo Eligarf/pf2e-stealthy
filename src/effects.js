@@ -363,17 +363,18 @@ export async function adaptStealthyToObservers({
     (item) => item.system.slug === SLUGS.stealthy,
   );
   if (effect) {
-    return effect.update({
+    const update = {
       flags: {
-        [MODULE_ID]: flags,
+        [MODULE_ID]: _replace(flags),
       },
       system: {
         badge: {
           value: baselineStealth,
         },
-        rules: rules,
+        rules: _replace(rules),
       },
-    });
+    };
+    return effect.update(update);
   }
   return createStealthEffect(actor, rules, flags, baselineStealth);
 }

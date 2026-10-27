@@ -1,5 +1,9 @@
 ## pending
 
+## 1.1.2
+
+- filter unnecessary detectors if GM edits results from hide/sneak actions
+
 ## 1.1.1
 
 - Fix stream-crossing of targetId and tokenId
