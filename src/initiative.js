@@ -33,10 +33,10 @@ export async function applyInitiativeConditions(encounter, observations) {
         .map((o) => {
           const check = o.check ?? o;
           return [
-            check.targetId,
+            check.tokenId,
             {
               stealth: check.stealth,
-              signature: getToken(check.targetId)?.actor?.signature,
+              signature: getToken(check.tokenId)?.actor?.signature,
             },
           ];
         })

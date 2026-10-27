@@ -1,5 +1,9 @@
 ## pending
 
+## 1.1.1
+
+- Fix stream-crossing of targetId and tokenId
+
 ## 1.1.0
 
 - Add opt-out setting that prevents dead NPCs from being added to combat

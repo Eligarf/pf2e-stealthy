@@ -6,7 +6,7 @@ export function resolveStealthCheck({ origin, target, resolver }) {
   let check = {
     dc: target.actor.system.perception.dc,
     name: target.name,
-    targetId: target.id,
+    tokenId: target.id,
     tokenDoc: target,
   };
 

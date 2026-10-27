@@ -14,12 +14,12 @@ import { summarizeTargetList } from "./observation-logic.js";
 export function prepareTargetList(sortedChecks) {
   return sortedChecks.map((o) => {
     const check = o.check ?? o;
-    const tokenId = check.targetId || check.tokenDoc.id;
+    const tokenId = check.tokenId || check.tokenDoc.id;
     const entry = {
       ...Object.fromEntries(
         Object.entries(check).filter(([k, _]) => k !== "tokenDoc"),
       ),
-      targetId: tokenId,
+      tokenId,
     };
     return entry;
   });
