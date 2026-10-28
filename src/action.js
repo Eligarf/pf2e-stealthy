@@ -1,5 +1,5 @@
 import { HIDDEN, MODULE_ID, UNDETECTED } from "./const.js";
-import { debuglog, breakdownRoll } from "./utils.js";
+import { debuglog, breakdownRoll, renderTemplateAndEnrich } from "./utils.js";
 import { prepareSeekData } from "./seek.js";
 import { prepareHideData } from "./hide.js";
 import { prepareSneakData } from "./sneak.js";
@@ -73,6 +73,7 @@ async function applyReduceStealth(message, _event, flags) {
 }
 
 export async function renderActionCard(message, html, _data, flags) {
+  if (!game.user.isGM) return;
   const endStealth = flags.endStealth;
   const context = {
     after: endStealth.after,
@@ -98,7 +99,7 @@ export async function renderActionCard(message, html, _data, flags) {
         `${MODULE_ID}.endStealth.hiddenTooltip`,
       );
     }
-    const content = await foundry.applications.handlebars.renderTemplate(
+    const content = await renderTemplateAndEnrich(
       `modules/${MODULE_ID}/templates/split-button.hbs`,
       templateData,
     );
@@ -112,6 +113,7 @@ export async function renderActionCard(message, html, _data, flags) {
 }
 
 Hooks.on("createChatMessage", async (message, _options, userId) => {
+  if (game.userId !== userId) return;
   const combat = game?.combat;
   if (!combat) return;
   const flags = message.flags[game.system.id];
@@ -142,9 +144,17 @@ Hooks.on("createChatMessage", async (message, _options, userId) => {
   }
 
   // Gotta try and find the point out action specifically
-  if (!action && pointOutText && message.flavor?.includes(pointOutText)) {
-    action = -1;
-    await preparePointOutData(message, userId, actingToken);
+  if (!action && flags.origin?.rollOptions) {
+    if (flags.origin.rollOptions.includes("origin:item:point-out")) {
+      action = -1;
+      await preparePointOutData(message, userId, actingToken);
+    }
+  }
+  if (!action) {
+    if (pointOutText && message.flavor?.includes(pointOutText)) {
+      action = -1;
+      await preparePointOutData(message, userId, actingToken);
+    }
   }
 
   // If you aren't stealthy, no worries

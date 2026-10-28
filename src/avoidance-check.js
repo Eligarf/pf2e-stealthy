@@ -15,6 +15,7 @@ import {
   debuglog,
   iterateTokensAndParties,
   localizeString,
+  renderTemplateAndEnrich,
 } from "./utils.js";
 
 async function rollStealth(actor, { skipDialog = true, player = false } = {}) {
@@ -83,7 +84,7 @@ async function renderEncounterSection(avoidanceCheck, context) {
     templateData.title = `${MODULE_ID}.avoidanceCheck.createEncounterTooltip`;
     templateData.create = `${MODULE_ID}.avoidanceCheck.createEncounter`;
   }
-  return foundry.applications.handlebars.renderTemplate(
+  return renderTemplateAndEnrich(
     `modules/${MODULE_ID}/templates/encounter.hbs`,
     templateData,
   );
@@ -248,7 +249,7 @@ async function renderAvoidanceCheck(avoidanceCheck, context) {
     }
   }
 
-  let content = await foundry.applications.handlebars.renderTemplate(
+  let content = await renderTemplateAndEnrich(
     `modules/${MODULE_ID}/templates/avoidance-check.hbs`,
     templateData,
   );
@@ -307,16 +308,13 @@ async function createEncounter(message, _event, flags) {
       return entry;
     })
     .concat(
-      avoidanceCheck.friendlyIds.map((id) => {
+      Object.keys(avoidanceCheck.friendlyStealth).map((id) => {
         const token = getToken(id);
         let entry = {
           tokenId: token?.id,
           hidden: token?.hidden,
         };
-        if (
-          id in avoidanceCheck.friendlyStealth &&
-          avoidanceCheck.friendlyStealth[id]?.skillResult !== null
-        ) {
+        if (avoidanceCheck.friendlyStealth[id]?.skillResult !== null) {
           const stealthEntry = avoidanceCheck.friendlyStealth[id];
           entry.initiative = stealthEntry?.skillResult;
           entry.flags = {

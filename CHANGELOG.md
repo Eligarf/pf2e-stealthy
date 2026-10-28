@@ -1,5 +1,9 @@
 ## pending
 
+## 1.1.3
+
+- Fixed some player/GM data visibility errors
+
 ## 1.1.2
 
 - filter unnecessary detectors if GM edits results from hide/sneak actions

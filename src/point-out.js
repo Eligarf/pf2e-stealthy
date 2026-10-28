@@ -1,4 +1,9 @@
-import { debuglog, localizeString, getToken } from "./utils.js";
+import {
+  debuglog,
+  localizeString,
+  getToken,
+  renderTemplateAndEnrich,
+} from "./utils.js";
 import {
   MODULE_ID,
   STEALTH_LABELS,
@@ -14,11 +19,6 @@ import {
 } from "./effects.js";
 
 export async function preparePointOutData(message, userId, actingToken) {
-  debuglog("point out action", {
-    message,
-    userId,
-    actingToken,
-  });
   // Warn if != 1 targets
   const targets = Array.from(game.user.targets);
   if (targets.length !== 1) {
@@ -112,8 +112,8 @@ async function applyPointOutEffects(message, _event, flags) {
 }
 
 const stealthToggle = HIDDEN + UNDETECTED;
+
 async function onPointOutStatusClick(message, _event, flags, targetId) {
-  debuglog("statusClick", { message, _event, flags, targetId });
   const targetList = flags.pointOut?.newDetectors;
   if (!targetList) return;
   const target = targetList.find((t) => t.tokenId === targetId);
@@ -167,14 +167,13 @@ async function renderDetectors(targetList, context) {
     }),
   };
 
-  return foundry.applications.handlebars.renderTemplate(
+  return renderTemplateAndEnrich(
     `modules/${MODULE_ID}/templates/detectors.hbs`,
     templateData,
   );
 }
 
 export async function renderPointOutCard(message, html, data, flags) {
-  debuglog("renderPointOutCard", { message, html, data, flags });
   const pointOut = flags.pointOut;
   if (!pointOut) return;
   const hoverId = foundry.utils.randomID();
@@ -193,29 +192,31 @@ export async function renderPointOutCard(message, html, data, flags) {
     }),
     message: pointOut.message || "",
   };
-  let content = await foundry.applications.handlebars.renderTemplate(
+  let content = await renderTemplateAndEnrich(
     `modules/${MODULE_ID}/templates/point-out.hbs`,
     templateData,
   );
 
-  const targetList = pointOut.newDetectors;
-  if (targetList?.length) {
-    context.change = targetList.some((t) => t.stealth !== UNDETECTED);
-    content += await renderDetectors(targetList, context);
-    if (context.interactive) {
-      const clickId = foundry.utils.randomID();
-      (context["clickIds"] ??= {})[clickId] = applyPointOutEffects;
-      const templateData = {
-        action: "point-out",
-        moduleId: MODULE_ID,
-        clickId,
-        label: `${MODULE_ID}.effects.${context.change ? "apply" : "noChange"}`,
-        ...(context.change ? { change: true } : {}),
-      };
-      content += await foundry.applications.handlebars.renderTemplate(
-        `modules/${MODULE_ID}/templates/button.hbs`,
-        templateData,
-      );
+  if (game.user.isGM) {
+    const targetList = pointOut.newDetectors;
+    if (targetList?.length) {
+      context.change = targetList.some((t) => t.stealth !== UNDETECTED);
+      content += await renderDetectors(targetList, context);
+      if (context.interactive) {
+        const clickId = foundry.utils.randomID();
+        (context["clickIds"] ??= {})[clickId] = applyPointOutEffects;
+        const templateData = {
+          action: "point-out",
+          moduleId: MODULE_ID,
+          clickId,
+          label: `${MODULE_ID}.effects.${context.change ? "apply" : "noChange"}`,
+          ...(context.change ? { change: true } : {}),
+        };
+        content += await foundry.applications.handlebars.renderTemplate(
+          `modules/${MODULE_ID}/templates/button.hbs`,
+          templateData,
+        );
+      }
     }
   }
   html.insertAdjacentHTML("beforeend", content);

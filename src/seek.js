@@ -1,4 +1,9 @@
-import { debuglog, getToken, breakdownRoll } from "./utils.js";
+import {
+  debuglog,
+  getToken,
+  breakdownRoll,
+  renderTemplateAndEnrich,
+} from "./utils.js";
 import {
   MODULE_ID,
   STEALTH_LABELS,
@@ -38,11 +43,6 @@ function resolveSeek(origin, check) {
 }
 
 export async function prepareSeekData(message, userId, actingToken) {
-  debuglog("seek action", {
-    message,
-    userId,
-    actingToken,
-  });
   const combat = game?.combat;
   const { minionTokens, eidolonTokens } = findCompanionsOnCanvas();
   const { them } = findPossibleTargets({
@@ -125,7 +125,7 @@ async function onSeekStatusClick(message, _event, flags, targetId) {
 }
 
 export async function renderSeekCard(message, html, data, flags) {
-  debuglog("renderSeekCard", { message, html, data, flags });
+  if (!game.user.isGM) return;
   const seek = flags.seek;
   const targetList = seek.targetList;
   if (!targetList?.length) return {};
@@ -148,7 +148,7 @@ export async function renderSeekCard(message, html, data, flags) {
       label: `${MODULE_ID}.effects.${context.change ? "apply" : "noChange"}`,
       ...(context.change ? { change: true } : {}),
     };
-    content += await foundry.applications.handlebars.renderTemplate(
+    content += await renderTemplateAndEnrich(
       `modules/${MODULE_ID}/templates/button.hbs`,
       templateData,
     );

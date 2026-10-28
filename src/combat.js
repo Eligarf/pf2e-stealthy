@@ -115,11 +115,11 @@ async function startCombatWrapper(wrapped, ...args) {
       if (!cachedSettings.requireActivity) {
         if (isStealth) avoiders.push(c);
       } else {
-        const isEligible = c.actor.system.exploration.some(
+        const isAvoiding = c.actor.system.exploration.some(
           (a) => c.actor.items.get(a)?.system?.slug === SLUGS.avoidNotice,
         );
-        if (isEligible) avoiders.push(c);
-        else ineligiblePcs.push(c);
+        if (isStealth && !isAvoiding) ineligiblePcs.push(c);
+        else if (isAvoiding) avoiders.push(c);
       }
     }
   });

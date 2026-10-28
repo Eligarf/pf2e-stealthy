@@ -1,4 +1,9 @@
-import { debuglog, localizeString, getToken } from "./utils.js";
+import {
+  debuglog,
+  localizeString,
+  getToken,
+  renderTemplateAndEnrich,
+} from "./utils.js";
 import {
   MODULE_ID,
   STEALTH_LABELS,
@@ -7,11 +12,14 @@ import {
   DOS_KEYS,
 } from "./const.js";
 import { renderSummary } from "./render-status.js";
-import { adaptStealthyToObservers, getStealthinessTo } from "./effects.js";
+import {
+  adaptStealthyToObservers,
+  getStealthinessTo,
+  getStealthBaseline,
+} from "./effects.js";
 import { findCompanionsOnCanvas, findPossibleTargets } from "./combat.js";
 
 export async function editStealth(actingToken) {
-  debuglog("editStealth", actingToken);
   const combat = game?.combat;
   const { minionTokens, eidolonTokens } = findCompanionsOnCanvas();
   const { us, them } = findPossibleTargets({
@@ -36,6 +44,7 @@ export async function editStealth(actingToken) {
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));
+  const gmIds = game.users.filter((u) => u.isGM).map((u) => u.id);
 
   return ChatMessage.create({
     rollmode: "gmroll",
@@ -51,6 +60,7 @@ export async function editStealth(actingToken) {
         },
       },
     },
+    whisper: gmIds,
   });
 }
 
@@ -75,12 +85,11 @@ async function applyEditEffects(message, _event, flags) {
   );
 
   const origin = getToken(edit.originId);
+  const stealthy = getStealthyEffect(origin);
+  const baselineStealth = getStealthBaseline(stealthy);
   await adaptStealthyToObservers({
     actor: origin?.actor,
-    baselineStealth: edit.targetList.reduce(
-      (b, t) => Math.max(b, t.stealth),
-      OBSERVED,
-    ),
+    baselineStealth,
     detectors: targetList,
   });
 
@@ -104,7 +113,7 @@ async function onEditStatusClick(message, _event, flags, targetId) {
 }
 
 export async function renderEditCard(_message, html, _data, flags) {
-  debuglog("renderEditCard", { _message, html, _data, flags });
+  if (!game.user.isGM) return null;
   const edit = flags.edit;
   const targetList = edit.targetList;
   if (!targetList?.length) return {};
@@ -186,7 +195,7 @@ export async function renderEditCard(_message, html, _data, flags) {
       label: `${MODULE_ID}.effects.${context.change ? "apply" : "noChange"}`,
       ...(context.change ? { change: true } : {}),
     };
-    content += await foundry.applications.handlebars.renderTemplate(
+    content += await renderTemplateAndEnrich(
       `modules/${MODULE_ID}/templates/button.hbs`,
       templateData,
     );

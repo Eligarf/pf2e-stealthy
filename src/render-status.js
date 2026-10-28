@@ -96,11 +96,11 @@ export async function renderTargetList(targetList, summary, context) {
       };
 
       if (clickId) result.clickId = clickId;
-      if (target.tooltips?.length > 0) {
+      if ((target.tooltips || []).length > 0) {
         result.tooltips = target.tooltips.map((t) =>
           localizeString(
             t.format,
-            t.interpolations?.length > 0
+            Object.keys(t.interpolations || {}).length > 0
               ? Object.fromEntries(
                   Object.entries(t.interpolations).map(([k, v]) => [
                     k,
@@ -157,6 +157,7 @@ export async function updateInitiativeCards(encounter, observations) {
 }
 
 export async function renderInitiativeCard(_message, html, _data, flags) {
+  if (!game.user.isGM) return null;
   const initiative = flags.initiative;
   const context = {
     interactive: false,

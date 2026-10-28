@@ -1,4 +1,9 @@
-import { debuglog, localizeString, getToken } from "./utils.js";
+import {
+  debuglog,
+  localizeString,
+  getToken,
+  renderTemplateAndEnrich,
+} from "./utils.js";
 import {
   MODULE_ID,
   STEALTH_LABELS,
@@ -121,6 +126,7 @@ async function onSneakStatusClick(message, _event, flags, targetId) {
 }
 
 export async function renderSneakCard(_message, html, _data, flags) {
+  if (!game.user.isGM) return null;
   const sneak = flags.sneak;
   const targetList = sneak.targetList;
   if (!targetList?.length) return {};
@@ -142,7 +148,7 @@ export async function renderSneakCard(_message, html, _data, flags) {
       label: `${MODULE_ID}.effects.${context.change ? "apply" : "noChange"}`,
       ...(context.change ? { change: true } : {}),
     };
-    content += await foundry.applications.handlebars.renderTemplate(
+    content += await renderTemplateAndEnrich(
       `modules/${MODULE_ID}/templates/button.hbs`,
       templateData,
     );

@@ -81,3 +81,13 @@ export function refreshPerception() {
   debuglog("Refreshing perception for all tokens");
   canvas.perception.update(REFRESH_OPTIONS);
 }
+
+export async function renderTemplateAndEnrich(template, data) {
+  const rawHtml = await foundry.applications.handlebars.renderTemplate(
+    template,
+    data,
+  );
+  return foundry.applications.ux.TextEditor.implementation.enrichHTML(rawHtml, {
+    secrets: true,
+  });
+}
