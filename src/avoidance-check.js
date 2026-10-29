@@ -154,8 +154,8 @@ async function prepareAvoidanceCheckData(tokens) {
 }
 
 async function renderAvoidanceCheck(avoidanceCheck, context) {
-  debuglog("renderAvoidanceCheck", { avoidanceCheck, context });
   const templateData = {
+    ...(game.user.isGM ? { isGM: true } : {}),
     moduleId: MODULE_ID,
     title: `${MODULE_ID}.avoidanceCheck.title`,
     observedEnemies: `${MODULE_ID}.avoidanceCheck.observedEnemies`,

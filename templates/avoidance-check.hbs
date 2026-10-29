@@ -62,7 +62,11 @@
                 <div class="{{@root.moduleId}}-name">{{name}}</div>
                 <span>{{localize label}}</span>
                 {{#if result}}
-                  <div class="{{@root.moduleId}}-roll" data-visibility="gm">{{result}}</div>
+                  {{#if @root.isGM}}
+                    <div class="{{@root.moduleId}}-roll" data-visibility="gm">{{result}}</div>
+                  {{else}}
+                    <i class="fa-solid fa-circle-question"></i>
+                  {{/if}}
                 {{else}}
                   <i class="fa-solid fa-dice-d20" data-click-id="{{clickId}}"></i>
                 {{/if}}

@@ -156,8 +156,8 @@ export async function updateInitiativeCards(encounter, observations) {
   }
 }
 
-export async function renderInitiativeCard(_message, html, _data, flags) {
-  if (!game.user.isGM) return null;
+export async function renderInitiativeCard(message, html, _data, flags) {
+  if (!game.user.isGM && !message.isAuthor) return;
   const initiative = flags.initiative;
   const context = {
     interactive: false,
@@ -183,8 +183,14 @@ export async function renderInitiativeCard(_message, html, _data, flags) {
       },
     );
     content = `<div class="${MODULE_ID}-init-activity">${activity}</div>`;
-    const summary = await renderSummary(initiative.targetList, context);
-    content += await renderTargetList(initiative.targetList, summary, context);
+    if (game.user.isGM) {
+      const summary = await renderSummary(initiative.targetList, context);
+      content += await renderTargetList(
+        initiative.targetList,
+        summary,
+        context,
+      );
+    }
   }
   html.insertAdjacentHTML("beforeend", content);
   return context;

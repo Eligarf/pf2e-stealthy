@@ -1,5 +1,11 @@
 ## pending
 
+## 1.1.5
+
+- better feedback for player when they roll avoidance check
+- player can see ineligibility message if they roll stealth without avoid notice activity
+- added images for readme
+
 ## 1.1.4
 
 - Players can use the end stealth buttons as well
