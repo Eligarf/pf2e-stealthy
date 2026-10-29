@@ -16,6 +16,7 @@ import {
   adaptStealthyToObservers,
   getStealthinessTo,
   getStealthBaseline,
+  getStealthyEffect,
 } from "./effects.js";
 import { findCompanionsOnCanvas, findPossibleTargets } from "./combat.js";
 

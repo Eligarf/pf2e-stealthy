@@ -55,7 +55,7 @@ export function prepareStealthChecks({ message, actingToken, resolver }) {
 }
 
 async function applyEndStealth(message, _event, flags) {
-  if (!game.user.isGM) return;
+  if (!game.user.isGM && !message.isAuthor) return;
   const endStealth = flags.endStealth;
   const token = message.token;
   await clearActorStealth({ actor: token.actor });
@@ -64,7 +64,7 @@ async function applyEndStealth(message, _event, flags) {
 }
 
 async function applyReduceStealth(message, _event, flags) {
-  if (!game.user.isGM) return;
+  if (!game.user.isGM && !message.isAuthor) return;
   const endStealth = flags.endStealth;
   const token = message.token;
   await reduceStealthBaseline(token, HIDDEN);
@@ -73,7 +73,7 @@ async function applyReduceStealth(message, _event, flags) {
 }
 
 export async function renderActionCard(message, html, _data, flags) {
-  if (!game.user.isGM) return;
+  if (!game.user.isGM && !message.isAuthor) return;
   const endStealth = flags.endStealth;
   const context = {
     after: endStealth.after,

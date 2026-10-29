@@ -18,7 +18,7 @@ import {
   setStealthinessTo,
 } from "./effects.js";
 
-export async function preparePointOutData(message, userId, actingToken) {
+export async function preparePointOutData(message, _userId, actingToken) {
   // Warn if != 1 targets
   const targets = Array.from(game.user.targets);
   if (targets.length !== 1) {
@@ -173,7 +173,7 @@ async function renderDetectors(targetList, context) {
   );
 }
 
-export async function renderPointOutCard(message, html, data, flags) {
+export async function renderPointOutCard(_message, html, _data, flags) {
   const pointOut = flags.pointOut;
   if (!pointOut) return;
   const hoverId = foundry.utils.randomID();

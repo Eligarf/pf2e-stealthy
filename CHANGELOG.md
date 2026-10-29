@@ -1,5 +1,9 @@
 ## pending
 
+## 1.1.4
+
+- Players can use the end stealth buttons as well
+
 ## 1.1.3
 
 - Fixed some player/GM data visibility errors
