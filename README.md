@@ -14,7 +14,7 @@ A light-weight combat-only module for PF2e/SF2e in FoundryVTT that manages token
 ## Module Tenets
 
 > [!CAUTION]
-> ![Not a vision system](https://github.com/user-attachments/assets/75c79e62-cc31-4334-86b6-c13d9ab0f311)
+> ![Not a vision system](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/janet.png)
 >
 > PF2e Stealthy is not and will not be a general vision solution. It is likely that there many edge cases between stealth-based hidden and other sources of hidden or undetected - most of these will be considered out-of-scope.
 
@@ -31,10 +31,7 @@ PF2e Stealthy:
 
 ## Exploration Mode
 
-> [!NOTE]
-> Due to a permissions bug I haven't yet solved which prevents them from rolling initiative, I can't add non-stealthy PCs to the combat with this feature, and they still have to be added by canvas selection.
-
-![Avoidance Check](https://github.com/user-attachments/assets/109db87a-498a-4942-812e-e9fa7962a2f9) ![Initiative](https://github.com/user-attachments/assets/05de5522-a9b9-4952-8d8a-e6588770b92c)
+![Avoidance Check](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/avoidance-check.png) ![Initiative](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/initiative.png)
 
 This module assumes that the party token is the primary token during exploration mode in PF2e; party members of course can be on the map, but the assumption is that things are being done in 10-minute chunks and positions/states are essentially theatre-of-the-mind. An 'Avoidance Check' is available in PF2e Stealthy's context menu that manages having any selected party, character, and monster tokens do Avoid Notice rolls so the GM can determine whether or not there is to be an encounter. Selected Party tokens will generate stealth roll requests for any PCs using Avoid Notice even if they aren't on the map yet, and if the GM determines there will be an encounter based on the results, PCs can be deposited from the party token, positioned on the map in some way that makes sense to everyone as play shifts into the tactical encounter/combat mode, and then *stealthy* characters will use the Avoidance Check results as their initiative rolls.
 
@@ -49,13 +46,13 @@ The *Stealthy* effect uses a badge to track the baseline stealth of the actor, a
 
 An 'End stealth' button will be generated on any detected action chat card created by a *stealthy* actor other than Hide, Sneak, or Step allowing the GM to easily delete the effect before or after the action. The button will say 'End stealth before action' unless it detects a strike, in which case it will say 'End stealth after action' as a reminder. If the character is undetected, it will offer an additional option to just drop stealth to hidden instead.
 
-![Vision Hack GM View](https://github.com/user-attachments/assets/0a6795e6-b144-4a9f-9cef-18c0f8ecdd18) ![Vision Hack Player View](https://github.com/user-attachments/assets/65f3ddde-0c95-4ea8-bf93-5913d8c4ff61)
+![Vision Hack GM View](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/vision-hack-gm-view.png) ![Vision Hack Player View](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/vision-hack-player-view.png)
 
 These images show the GM view and player view when controlling a *stealthy* Merisiel. She is undetected as a baseline and can see an Ogre but not the goblin who is undetected by her, indicated to the GM by the cyan outline borders. The goblin had a critical success when seeking and Merisiel is now observed to it, indicated by the triangle exclamation. The goblin has also pointed out Merisiel to the Ogre, so Merisiel is now only hidden to the Ogre, indicated by the circle question mark. Merisiel is still undetected to any other tokens on the canvas.
 
 ## Actions
 
-![Hide](https://github.com/user-attachments/assets/bfc9ce59-58c2-4fc6-a6cc-01e01055ad3d) ![Sneak](https://github.com/user-attachments/assets/3b04766a-42f7-4113-a4d4-f705ffd60140) ![Seek](https://github.com/user-attachments/assets/4fc02469-0c4f-4212-8dc7-8d3d697ce67f) ![Point Out](https://github.com/user-attachments/assets/5823e900-0501-4e9f-95a9-60dfe11eb7fa)
+![Hide](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/hide.png) ![Sneak](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/sneak.png) ![Seek](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/seek.png) ![Point Out](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/point-out.png)
 
 When a creature takes a Hide or Sneak action, PF2e Stealthy will append a target list (visible only to GM) to the roll chat card listing each observing token, dc, and resulting stealth status for that observer. The GM can click on any results to change specific ones for whatever reason like missing cover or whatever, and the clicks the Apply Effects button to store that info into the *stealthy* effect. Seek checks work similarly, allowing the GM to modify the seek results prior to accepting the changes.
 
