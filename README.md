@@ -29,12 +29,6 @@ PF2e Stealthy:
 - requires no prep on non-*stealthy* tokens.
 - does not police actions or states for cover or validity and simply does the mechanics as the GM is free to adjust results before they are applied.
 
-## Exploration Mode
-
-![Avoidance Check](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/avoidance-check.png) ![Initiative](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/initiative.png)
-
-This module assumes that the party token is the primary token during exploration mode in PF2e; party members of course can be on the map, but the assumption is that things are being done in 10-minute chunks and positions/states are essentially theatre-of-the-mind. An 'Avoidance Check' is available in PF2e Stealthy's context menu that manages having any selected party, character, and monster tokens do Avoid Notice rolls so the GM can determine whether or not there is to be an encounter. Selected Party tokens will generate stealth roll requests for any PCs using Avoid Notice even if they aren't on the map yet, and if the GM determines there will be an encounter based on the results, PCs can be deposited from the party token, positioned on the map in some way that makes sense to everyone as play shifts into the tactical encounter/combat mode, and then *stealthy* characters will use the Avoidance Check results as their initiative rolls.
-
 ## Combat Mode
 
 > [!CAUTION]
@@ -75,3 +69,10 @@ The following is a list of the menu options that can appear when pressing the me
 | Remove stealth | group of controlled or targeted tokens | Removes all stealth effects from the selected *stealthy* actors |
 | Reveal controlled token | Set of controlled and set of targeted tokens | Adds exceptions for the targeted tokens to the stealth conditions of any *stealthy* controlled actors | 
 | Undo controlled reveals | Set of controlled and set of targeted tokens | Removes any exceptions for the targeted tokens from the stealth conditions of the *stealthy* controlled actors |
+
+## Exploration Mode
+
+![Avoidance Check](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/avoidance-check.png) ![Initiative](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/initiative.png)
+
+This module assumes that the party token is the primary token during exploration mode in PF2e; party members of course can be on the map, but the assumption is that things are being done in 10-minute chunks and positions/states are essentially theatre-of-the-mind. An 'Avoidance Check' is available in PF2e Stealthy's context menu that manages having any selected party, character, and monster tokens do Avoid Notice rolls so the GM can determine whether or not there is to be an encounter. Selected Party tokens will generate stealth roll requests for any PCs using Avoid Notice even if they aren't on the map yet, and if the GM determines there will be an encounter based on the results, PCs can be deposited from the party token, positioned on the map in some way that makes sense to everyone as play shifts into the tactical encounter/combat mode, and then *stealthy* characters will use the Avoidance Check results as their initiative rolls.
+
