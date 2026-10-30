@@ -20,6 +20,7 @@ import {
 import { findCompanionsOnCanvas, findPossibleTargets } from "./combat.js";
 import { resolveSeekCheck } from "./observation-logic.js";
 import { getStealthinessTo, setStealthinessTo } from "./effects.js";
+import { refreshEverybody } from "./socket.js";
 
 function resolveSeek(origin, check) {
   const stealth = getStealthinessTo(check.tokenDoc, origin.tokenDoc.id);
@@ -42,7 +43,7 @@ function resolveSeek(origin, check) {
   check.stealthLabel = STEALTH_LABELS[check.stealth];
 }
 
-export async function prepareSeekData(message, userId, actingToken) {
+export async function prepareSeekData(message, _userId, actingToken) {
   const combat = game?.combat;
   const { minionTokens, eidolonTokens } = findCompanionsOnCanvas();
   const { them } = findPossibleTargets({
@@ -105,6 +106,7 @@ async function applySeekEffects(message, _event, flags) {
     if (!origin) return;
     await setStealthinessTo(origin, token, t.stealth);
   });
+  refreshEverybody();
   seek.showApplyButton = false;
   return message.update({ flags: { [MODULE_ID]: flags } });
 }
@@ -124,7 +126,7 @@ async function onSeekStatusClick(message, _event, flags, targetId) {
   return message.update(update);
 }
 
-export async function renderSeekCard(message, html, data, flags) {
+export async function renderSeekCard(_message, html, _data, flags) {
   if (!game.user.isGM) return;
   const seek = flags.seek;
   const targetList = seek.targetList;

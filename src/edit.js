@@ -19,6 +19,7 @@ import {
   getStealthyEffect,
 } from "./effects.js";
 import { findCompanionsOnCanvas, findPossibleTargets } from "./combat.js";
+import { refreshEverybody } from "./socket.js";
 
 export async function editStealth(actingToken) {
   const combat = game?.combat;
@@ -93,6 +94,7 @@ async function applyEditEffects(message, _event, flags) {
     baselineStealth,
     detectors: targetList,
   });
+  refreshEverybody();
 
   edit.showApplyButton = false;
   return message.update({ flags: { [MODULE_ID]: flags } });

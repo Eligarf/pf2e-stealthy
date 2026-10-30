@@ -18,6 +18,7 @@ import {
 import { renderTargetList, renderSummary } from "./render-status.js";
 import { prepareStealthChecks } from "./action.js";
 import { adaptStealthyToObservers, getStealthinessTo } from "./effects.js";
+import { refreshEverybody } from "./socket.js";
 
 export function resolveAvoidNotice(_origin, check) {
   check.stealth =
@@ -102,6 +103,7 @@ async function applySneakEffects(message, _event, flags) {
     baselineStealth: UNDETECTED,
     detectors,
   });
+  refreshEverybody();
 
   sneak.showApplyButton = false;
   return message.update({ flags: { [MODULE_ID]: flags } });

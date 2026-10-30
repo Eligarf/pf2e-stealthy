@@ -17,6 +17,7 @@ import {
   getStealthBaseline,
   setStealthinessTo,
 } from "./effects.js";
+import { refreshEverybody } from "./socket.js";
 
 export async function preparePointOutData(message, _userId, actingToken) {
   // Warn if != 1 targets
@@ -107,6 +108,7 @@ async function applyPointOutEffects(message, _event, flags) {
     if (!token) return;
     await setStealthinessTo(subject, token, t.stealth);
   });
+  refreshEverybody();
   pointOut.showApplyButton = false;
   return message.update({ flags: { [MODULE_ID]: flags } });
 }

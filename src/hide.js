@@ -21,6 +21,7 @@ import {
   getStealthBaseline,
   getStealthinessTo,
 } from "./effects.js";
+import { refreshEverybody } from "./socket.js";
 
 function resolveHide(origin, check) {
   const stealth = getStealthinessTo(origin, check.tokenDoc.id);
@@ -87,6 +88,7 @@ async function applyHideEffects(message, _event, flags) {
     baselineStealth,
     detectors,
   });
+  refreshEverybody();
 
   hide.showApplyButton = false;
   return message.update({ flags: { [MODULE_ID]: flags } });
