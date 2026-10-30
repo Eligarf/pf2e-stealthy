@@ -1,5 +1,9 @@
 ## pending
 
+## 1.1.6
+
+- Refresh clients when stealth changes are applied
+
 ## 1.1.5
 
 - better feedback for player when they roll avoidance check
