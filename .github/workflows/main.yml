@@ -112,4 +112,4 @@ jobs:
     uses: cs96and/FoundryVTT-release-package@v1
     with:
       package-token: ${{ secrets.FOUNDRY_PACKAGE_TOKEN }}
-      manifest-url: ${{ env.latest_manifest_url }}
+      manifest-url: https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/module.json
