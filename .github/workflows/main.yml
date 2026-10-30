@@ -109,7 +109,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
     if: ${{ github.event_name == 'release' && github.event.release.prerelease == false }}
-    uses: cs96and/FoundryVTT-release-package@v1
-    with:
-      package-token: ${{ secrets.FOUNDRY_PACKAGE_TOKEN }}
-      manifest-url: https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/module.json
+    steps:
+    - name: Skip Release (Not ready)
+      run: echo "Release step is currently disabled"
+
