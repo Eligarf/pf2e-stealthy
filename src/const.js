@@ -60,10 +60,10 @@ export const SUCCESS = 2;
 export const CRITICAL_SUCCESS = 3;
 
 export const DOS_KEYS = [
-  "critical-failure",
-  "failure",
-  "success",
-  "critical-success",
+  `${MODULE_ID}-critical-failure`,
+  `${MODULE_ID}-failure`,
+  `${MODULE_ID}-success`,
+  `${MODULE_ID}-critical-success`,
 ];
 
 export const OBSERVED = 0;

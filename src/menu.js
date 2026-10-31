@@ -32,9 +32,10 @@ function getChoices() {
     };
   }
 
-  // Three basic scenarios to pick between here. If no tokens are selected, then we
+  let config = {};
+
+  // Three basic scenarios to pick between here. If no tokens are select
   // are doing some full-scene operation.
-  let config;
   if (!controlled && !targeted) {
     config = fillNoTokensMenu();
   }
@@ -52,6 +53,8 @@ function getChoices() {
     const selection = controlled || targeted;
     config = fillTokensMenu({ selection });
   }
+  config.rawControlled = controlled;
+  config.rawTargeted = targeted;
 
   return config;
 }
@@ -131,11 +134,11 @@ function summarizeDispositions(tokens) {
 
 export async function invokeMenu(_event) {
   const config = getChoices();
-  if (!config) {
+  if (!config || !config.choices.length) {
     ui.notifications.info(
       localizeString(`${MODULE_ID}.notifications.noToDos`, {
-        controlled: `${controlledTokens.length}`,
-        targeted: `${targetedTokens.length}`,
+        controlled: `${config.rawControlled?.tokens?.length ?? 0}`,
+        targeted: `${config.rawTargeted?.tokens?.length ?? 0}`,
       }),
     );
     return true;

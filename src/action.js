@@ -15,6 +15,7 @@ import {
   reduceStealthBaseline,
 } from "./effects.js";
 import { clearActorStealth } from "./stealth.js";
+import { refreshEverybody } from "./socket.js";
 
 let pointOutText;
 let flavorRegex;
@@ -59,6 +60,7 @@ async function applyEndStealth(message, _event, flags) {
   const endStealth = flags.endStealth;
   const token = message.token;
   await clearActorStealth({ actor: token.actor });
+  refreshEverybody();
   endStealth.showEndButton = false;
   return message.update({ flags: { [MODULE_ID]: flags } });
 }
@@ -68,6 +70,7 @@ async function applyReduceStealth(message, _event, flags) {
   const endStealth = flags.endStealth;
   const token = message.token;
   await reduceStealthBaseline(token, HIDDEN);
+  refreshEverybody();
   endStealth.showEndButton = false;
   return message.update({ flags: { [MODULE_ID]: flags } });
 }
@@ -148,6 +151,12 @@ Hooks.on("createChatMessage", async (message, _options, userId) => {
     if (flags.origin.rollOptions.includes("origin:item:point-out")) {
       action = -1;
       await preparePointOutData(message, userId, actingToken);
+    } else if (
+      flags.origin.rollOptions.some((o) =>
+        o.startsWith("origin:item:cast:actions:"),
+      )
+    ) {
+      action = -1;
     }
   }
   if (!action) {

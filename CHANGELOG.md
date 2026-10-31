@@ -1,5 +1,12 @@
 ## pending
 
+## 1.1.7
+
+- Refresh clients when end stealth on actions is applied
+- Stop styling global css damage crit buttons
+- Improve feedback when stealthy context menu has no choices
+- Add End Stealth buttons to stealthy cast actions
+
 ## 1.1.6
 
 - Refresh clients when stealth changes are applied
