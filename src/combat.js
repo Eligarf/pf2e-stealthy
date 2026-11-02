@@ -8,6 +8,7 @@ import { zoomToCombat } from "./socket.js";
 import { resolveAvoidNotice } from "./sneak.js";
 import { breakdownRoll, debuglog, refreshPerception } from "./utils.js";
 import { MODULE_ID, SLUGS } from "./const.js";
+import { StartCombatDialog } from "./start-combat-dialog.js";
 
 let lastDeadNotificationTime = 0;
 const NOTIFICATION_COOLDOWN_MS = 500;
@@ -104,10 +105,12 @@ async function startCombatWrapper(wrapped, ...args) {
   let pcs = [];
   let avoiders = [];
   let ineligiblePcs = [];
+  let unrolled = false;
   encounter.combatants.contents.forEach((c) => {
     const isPc = c.actor?.parties?.size > 0 && c.actor.system?.exploration;
-    const isStealth =
-      c.flags[game.system.id]?.initiativeStatistic === "stealth";
+    const stat = c.flags[game.system.id]?.initiativeStatistic;
+    if (stat === null) unrolled = true;
+    const isStealth = stat === "stealth";
     if (!isPc) {
       if (isStealth) avoiders.push(c);
     } else {
@@ -181,6 +184,7 @@ async function startCombatWrapper(wrapped, ...args) {
     const avoiderSeenBy = {
       avoider: origin,
       observers: {},
+      alliance,
       allies: alliance === "party" ? us : [],
     };
     observations[avoidingCombatant.id] = avoiderSeenBy;
@@ -198,8 +202,26 @@ async function startCombatWrapper(wrapped, ...args) {
   }
 
   // Any manipulations go here
-  if (avoiders.length > 0 && cachedSettings.vetCombatStart) {
-    debuglog("Need to vet combat", { encounter, ineligiblePcs, observations });
+  if (cachedSettings.vetCombatStart) {
+    if (unrolled) {
+      ui.notifications.warn(
+        game.i18n.localize(`${MODULE_ID}.notifications.unrolled`),
+      );
+      return this;
+    }
+    if (avoiders.length > 0) {
+      const verified = await StartCombatDialog.wait({
+        encounter,
+        ineligiblePcs,
+        observations,
+      });
+      if (!verified) {
+        ui.notifications.info(
+          game.i18n.localize(`${MODULE_ID}.startCombat.cancelled`),
+        );
+        return this;
+      }
+    }
   }
 
   const update = {
@@ -241,7 +263,8 @@ async function combatStart(encounter) {
   // the result structure and build the messages for each affected chat card, as well
   // as the calls we need to do for the visibility manager
   //
-  await updateInitiativeCards(encounter, observations);
+  if (cachedSettings.showInitiative)
+    await updateInitiativeCards(encounter, observations);
 
   // Print out the warnings for PCs that aren't using Avoid Notice
   for (const pc of ineligiblePcs) {

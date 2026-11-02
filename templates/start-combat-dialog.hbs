@@ -1,0 +1,63 @@
+<section class="{{moduleId}}-start-combat-dialog">
+  <div class="{{moduleId}}-cards-row">
+    {{#each observations}}
+      {{#if ineligible}}
+        <div class="{{@root.moduleId}}-card">
+          <h4 class="{{@root.moduleId}}-card-title">{{name}}</h4>
+          <div class="{{@root.moduleId}}-card-body">
+            <div class="{{@root.moduleId}}-description">
+              <span>{{because}}</span>
+            </div>
+            <div class="{{@root.moduleId}}-target-list">
+              {{#each pcs}}
+                <div class="{{@root.moduleId}}-target">
+                  <div class="{{@root.moduleId}}-name">{{name}}</div>
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+      {{else}}
+        <div class="{{@root.moduleId}}-card" data-avoider-id="{{@key}}">
+          <h4 class="{{@root.moduleId}}-card-title">{{name}}</h4>
+          <div class="{{@root.moduleId}}-card-body">
+            <div class="{{@root.moduleId}}-description">
+              <span class="initiative-label">{{localize @root.stealthLabel}}</span>
+              <span class="initiative-value">{{skillResult}}</span>
+            </div>
+            <div class="{{@root.moduleId}}-target-list">
+              {{#each observers}}
+                <div class="{{@root.moduleId}}-target"
+                  data-avoider="{{@../key}}"
+                  data-observer="{{@key}}"
+                >
+                  <div class="{{@root.moduleId}}-name">{{name}}</div>
+                  <div class="{{@root.moduleId}}-card-result"
+                    data-action="cycleStatus"
+                    data-avoider="{{@../key}}"
+                    data-observer="{{@key}}"
+                    data-interactive="true"
+                  >
+                    <span class="degree-of-success {{dos}}">{{localize label}}</span>
+                  </div>
+                  <div class="{{@root.moduleId}}-dc"
+                    {{#if tooltips}}
+                      data-tooltip="<div>
+                        {{#each tooltips}}
+                          {{#unless @first}}<br>{{/unless}}{{this}}
+                        {{/each}}
+                      </div>"
+                    {{/if}}
+                    >
+                    <span class="degree-of-success {{dos}}">{{dc}}</span>
+                    {{#if tooltips}}<i class="fas fa-info-circle"></i>{{/if}}
+                  </div>
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+      {{/if}}
+    {{/each}}
+  </div>
+</section>

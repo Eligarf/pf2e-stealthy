@@ -1,9 +1,4 @@
-import {
-  debuglog,
-  localizeString,
-  getToken,
-  renderTemplateAndEnrich,
-} from "./utils.js";
+import { debuglog, getToken, renderTemplateAndEnrich } from "./utils.js";
 import {
   MODULE_ID,
   STEALTH_LABELS,
@@ -109,7 +104,7 @@ async function applySneakEffects(message, _event, flags) {
   return message.update({ flags: { [MODULE_ID]: flags } });
 }
 
-const sneakDosStates = [CRITICAL_FAILURE, FAILURE, SUCCESS];
+export const sneakDosStates = [CRITICAL_FAILURE, FAILURE, SUCCESS];
 
 async function onSneakStatusClick(message, _event, flags, targetId) {
   const targetList = flags[flags.card]?.targetList;

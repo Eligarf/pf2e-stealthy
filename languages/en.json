@@ -31,6 +31,10 @@
       "name": "Collapse initiative target lists",
       "hint": "Initially collapse target lists when adding them to initiative chat cards."
     },
+    "showInitiative": {
+      "name": "Display stealth results on initiative card",
+      "hint": "Shows target lists and stealth results vs each observer on initiative card when combat is started"
+    },
     "hideFromAllies": {
       "name": "Party stealth affects party members",
       "hint": "If enabled, party member stealth effect can affect other party members. This checkbox doesn't apply to neutral or opposing tokens."
@@ -48,7 +52,8 @@
       "target1": "Point Out action requires a single token to be targeted",
       "noToDos": "No relevant actions for PF2e Stealthy for this context: {controlled} controlled token(s), {targeted} targeted token(s)",
       "avoidNotice": "'PF2e Stealthy' is a replacement of and extension to 'PF2e Avoid Notice'. Please disable 'PF2e Avoid Notice'",
-      "keepDeadOut": "Dead or defeated NPCs are rejected from combat"
+      "keepDeadOut": "Dead or defeated NPCs are rejected from combat",
+      "unrolled": "All initiatives need to be rolled before stealth can be evaluated"
     },
     "schema": {
       "name": "Schema Version",
@@ -208,6 +213,15 @@
       "observed": "OBS",
       "hidden": "HDN",
       "undetected": "UDT"
+    },
+    "startCombat": {
+      "title": "Verify Stealthy Combatants",
+      "cancel": "Cancel Combat Start",
+      "confirm": "Confirm Combat Start",
+      "cancelled": "Combat start cancelled",
+      "stealthLabel": "Initiative/Stealth Check:",
+      "ineligible": "Ineligible PCs",
+      "ineligibleBecause": "These PCs must use the 'Avoid Notice' activity to gain stealth"
     }
   }
 }

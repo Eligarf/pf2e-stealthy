@@ -23,7 +23,7 @@ export function fillTokensMenu({ selection }) {
         const actor = t?.actor;
         if (!actor) return false;
         const stat = actor?.system?.initiative?.statistic;
-        return stat !== "stealth";
+        return stat !== "stealth" || !t.hidden;
       })
     ) {
       choices.push({
@@ -43,7 +43,7 @@ export function fillTokensMenu({ selection }) {
         const actor = t?.actor;
         if (!actor) return false;
         const stat = actor?.system?.initiative?.statistic;
-        return stat === "stealth";
+        return stat === "stealth" || t.hidden;
       })
     ) {
       choices.push({

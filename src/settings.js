@@ -17,6 +17,7 @@ export const SETTINGS = {
   visionHack: "visionHack",
   keepDeadOut: "keepDeadOut",
   vetCombatStart: "vetCombatStart",
+  showInitiative: "showInitiative",
 
   // Advanced settings
   logLevel: "logLevel",
@@ -35,6 +36,7 @@ export let cachedSettings = {
   visionHack: true,
   keepDeadOut: true,
   vetCombatStart: false,
+  showInitiative: true,
   logLevel: "none",
 };
 
@@ -57,6 +59,22 @@ export function setupSettings() {
   cachedSettings.collapseTargetList = game.settings.get(
     MODULE_ID,
     SETTINGS.collapseTargetList,
+  );
+
+  game.settings.register(MODULE_ID, SETTINGS.showInitiative, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.showInitiative}.name`),
+    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.showInitiative}.hint`),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: cachedSettings.showInitiative,
+    onChange: (newValue) => {
+      cachedSettings.showInitiative = newValue;
+    },
+  });
+  cachedSettings.showInitiative = game.settings.get(
+    MODULE_ID,
+    SETTINGS.showInitiative,
   );
 
   game.settings.register(MODULE_ID, SETTINGS.panZoomToCombat, {
@@ -95,7 +113,7 @@ export function setupSettings() {
     name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.vetCombatStart}.name`),
     hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.vetCombatStart}.hint`),
     scope: "world",
-    config: false,
+    config: true,
     type: Boolean,
     default: cachedSettings.vetCombatStart,
     onChange: (newValue) => {
@@ -211,6 +229,29 @@ const SETTING_GROUPS = [
 ];
 
 globalThis.Hooks.on("renderSettingsConfig", (_app, html, _data) => {
+  const container = html instanceof HTMLElement ? html : html[0];
+  if (!container) return;
+
+  // // In v14, html can be a raw HTMLElement or a jQuery object depending on context,
+  // // but if it's passed as a native HTMLElement (or you extract it via html[0]),
+  // // you can use standard querySelector/createElement.
+  //
+  // for (const section of SETTING_GROUPS) {
+  //   // 1. Create the element using vanilla DOM
+  //   const div = document.createElement("div");
+  //   div.className = "form-group group-header";
+  //   div.innerHTML = game.i18n.localize(`${MODULE_ID}.config.${section.label}`);
+  //
+  //   // 2. Find the target input/element and its parent form-group
+  //   const targetInput = container.querySelector(`[name="${MODULE_ID}.${section.before}"]`);
+  //   const formGroup = targetInput?.closest("div.form-group");
+  //
+  //   // 3. Insert the new header before the target form-group
+  //   if (formGroup && formGroup.parentNode) {
+  //     formGroup.parentNode.insertBefore(div, formGroup);
+  //   }
+  // }
+
   for (const section of SETTING_GROUPS) {
     $("<div>")
       .addClass("form-group group-header")
