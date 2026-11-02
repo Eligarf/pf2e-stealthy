@@ -395,6 +395,16 @@ button.pf2e-stealthy-button:disabled {
   padding-bottom: 4px;
 }
 
+.pf2e-stealthy-card-label {
+  font-weight: 500;
+}
+
+.pf2e-stealthy-card-label.pf2e-stealthy-not-stealth {
+  color: #f39c12;
+  font-weight: bold;
+  border: 1px dotted #f39c12;
+}
+
 .pf2e-stealthy-card-result[data-interactive="false"] {
   cursor: default;
   user-select: text;

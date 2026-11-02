@@ -122,7 +122,6 @@ export function fillConnectedTokensMenu({ controlled, targeted }) {
       },
     );
   }
-  if (!choices.length) return {};
 
   choices.sort((a, b) => a.group - b.group || a.label.localeCompare(b.label));
   return { title: `${MODULE_ID}.menu.connectedTokens`, choices };

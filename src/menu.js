@@ -135,7 +135,7 @@ function summarizeDispositions(tokens) {
 
 export async function invokeMenu(_event) {
   const config = getChoices();
-  if (!config || !config.choices.length) {
+  if (!config?.choices?.length) {
     ui.notifications.info(
       localizeString(`${MODULE_ID}.notifications.noToDos`, {
         controlled: `${config.rawControlled?.tokens?.length ?? 0}`,

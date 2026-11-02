@@ -56,39 +56,49 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
     context.cancelLabel = `${MODULE_ID}.startCombat.cancel`;
     context.confirmLabel = `${MODULE_ID}.startCombat.confirm`;
     context.observations = Object.fromEntries(
-      Object.entries(this.dialogData.observations).map(([id, o]) => [
-        id,
-        {
-          name: o.avoider.combatant.name,
-          skillResult: o.avoider.skillResult,
-          observers: Object.fromEntries(
-            Object.entries(o.observers).map(([k, v]) => {
-              const entry = {
-                name: v.name,
-                dos: DOS_KEYS[v.degreeOfSuccess],
-                label: LOCALIZATION_KEYS[v.stealthLabel],
-                dc: v.dc,
-              };
-              if ((v.tooltips || []).length > 0) {
-                entry.tooltips = v.tooltips.map((t) =>
-                  localizeString(
-                    t.format,
-                    Object.keys(t.interpolations || {}).length > 0
-                      ? Object.fromEntries(
-                          Object.entries(t.interpolations).map(([k, v]) => [
-                            k,
-                            game.i18n.localize(v),
-                          ]),
-                        )
-                      : {},
-                  ),
-                );
-              }
-              return [k, entry];
-            }),
-          ),
-        },
-      ]),
+      Object.entries(this.dialogData.observations).map(([id, o]) => {
+        const stat = o.avoider.combatant.flags.pf2e.initiativeStatistic;
+        const skill =
+          stat === "perception"
+            ? o.avoider.combatant.actor.perception
+            : o.avoider.combatant.actor.skills[stat];
+        const label = skill.label;
+        return [
+          id,
+          {
+            name: o.avoider.combatant.name,
+            isStealth: stat === "stealth",
+            label,
+            skillResult: o.avoider.skillResult,
+            observers: Object.fromEntries(
+              Object.entries(o.observers).map(([k, v]) => {
+                const entry = {
+                  name: v.name,
+                  dos: DOS_KEYS[v.degreeOfSuccess],
+                  label: LOCALIZATION_KEYS[v.stealthLabel],
+                  dc: v.dc,
+                };
+                if ((v.tooltips || []).length > 0) {
+                  entry.tooltips = v.tooltips.map((t) =>
+                    localizeString(
+                      t.format,
+                      Object.keys(t.interpolations || {}).length > 0
+                        ? Object.fromEntries(
+                            Object.entries(t.interpolations).map(([k, v]) => [
+                              k,
+                              game.i18n.localize(v),
+                            ]),
+                          )
+                        : {},
+                    ),
+                  );
+                }
+                return [k, entry];
+              }),
+            ),
+          },
+        ];
+      }),
     );
     if (this.dialogData.ineligiblePcs.length > 0) {
       context.observations.ineligible = {

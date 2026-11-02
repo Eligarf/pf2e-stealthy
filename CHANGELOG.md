@@ -1,5 +1,12 @@
 ## pending
 
+## 1.2.1
+
+- Fix error (again) when controlled/targeted tokens have no viable context choices.
+- Start Combat dialog
+    - Show initiative statistic used for stealthy characters, highlighting non-stealth rolls for GM review.
+    - Add 'DC' to the DC numbers listed on the cards to clarify.
+
 ## 1.2.0
 
 - Opt-in setting for a Start Combat dialog. If enabled, and there are stealthy characters in the combat, a dialog will be presented when Start Combat is pressed that shows the GM those characters and allows them final control of the visibility states they will have vs each observer based on cover or whatever prior to the completion of Start Combat.

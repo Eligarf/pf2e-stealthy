@@ -22,7 +22,9 @@
           <h4 class="{{@root.moduleId}}-card-title">{{name}}</h4>
           <div class="{{@root.moduleId}}-card-body">
             <div class="{{@root.moduleId}}-description">
-              <span class="initiative-label">{{localize @root.stealthLabel}}</span>
+              <span class="{{@root.moduleId}}-card-label {{#unless isStealth}}{{@root.moduleId}}-not-stealth{{/unless}}">
+                {{label}}
+              </span>
               <span class="initiative-value">{{skillResult}}</span>
             </div>
             <div class="{{@root.moduleId}}-target-list">
@@ -49,7 +51,7 @@
                       </div>"
                     {{/if}}
                     >
-                    <span class="degree-of-success {{dos}}">{{dc}}</span>
+                    <span class="degree-of-success {{dos}}">DC {{dc}}</span>
                     {{#if tooltips}}<i class="fas fa-info-circle"></i>{{/if}}
                   </div>
                 </div>
