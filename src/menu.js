@@ -53,6 +53,7 @@ function getChoices() {
     const selection = controlled || targeted;
     config = fillTokensMenu({ selection });
   }
+  if (config === null) config = {};
   config.rawControlled = controlled;
   config.rawTargeted = targeted;
 

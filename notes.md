@@ -3,6 +3,7 @@
 - Opt-in setting for a Start Combat dialog. If enabled, and there are stealthy characters in the combat, a dialog will be presented when Start Combat is pressed that shows the GM those characters and allows them final control of the visibility states they will have vs each observer based on cover or whatever prior to the completion of Start Combat.
 - Opt-out setting to disable listing target visibilities on initiative cards.
 - improved criteria for showing prepare/clear ambush on the context menu.
+- Fix error when controlled/targeted tokens have no viable context choices.
 
 ![Start Combat Dialog](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/start-combat.png)
 
