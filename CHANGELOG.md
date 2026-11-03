@@ -1,5 +1,9 @@
 ## pending
 
+## 1.2.2
+
+- Fix Start Combat dialog for SF2e
+
 ## 1.2.1
 
 - Fix error (again) when controlled/targeted tokens have no viable context choices.

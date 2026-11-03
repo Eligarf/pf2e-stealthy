@@ -57,7 +57,8 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
     context.confirmLabel = `${MODULE_ID}.startCombat.confirm`;
     context.observations = Object.fromEntries(
       Object.entries(this.dialogData.observations).map(([id, o]) => {
-        const stat = o.avoider.combatant.flags.pf2e.initiativeStatistic;
+        const stat =
+          o.avoider.combatant.flags[game.system.id].initiativeStatistic;
         const skill =
           stat === "perception"
             ? o.avoider.combatant.actor.perception
