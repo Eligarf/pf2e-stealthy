@@ -63,7 +63,7 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
           stat === "perception"
             ? o.avoider.combatant.actor.perception
             : o.avoider.combatant.actor.skills[stat];
-        const label = skill.label;
+        const label = skill?.label;
         return [
           id,
           {

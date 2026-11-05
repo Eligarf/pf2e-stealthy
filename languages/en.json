@@ -52,8 +52,7 @@
       "target1": "Point Out action requires a single token to be targeted",
       "noToDos": "No relevant actions for PF2e Stealthy for this context: {controlled} controlled token(s), {targeted} targeted token(s)",
       "avoidNotice": "'PF2e Stealthy' is a replacement of and extension to 'PF2e Avoid Notice'. Please disable 'PF2e Avoid Notice'",
-      "keepDeadOut": "Dead or defeated NPCs are rejected from combat",
-      "unrolled": "All initiatives need to be rolled before stealth can be evaluated"
+      "keepDeadOut": "Dead or defeated NPCs are rejected from combat"
     },
     "schema": {
       "name": "Schema Version",
@@ -221,7 +220,12 @@
       "cancelled": "Combat start cancelled",
       "initLabel": "Initiative({stat}) Check:",
       "ineligible": "Ineligible PCs",
-      "ineligibleBecause": "These PCs must use the 'Avoid Notice' activity to gain stealth"
+      "ineligibleBecause": "These PCs must use the 'Avoid Notice' activity to gain stealth",
+      "unrolled1": "{name} needs to roll initiative before stealth can be evaluated",
+      "unrolled2": "{name1} and {name2} need to roll initiative before stealth can be evaluated",
+      "unrolled": "{count} needs to roll initiative before stealth can be evaluated",
+      "proceedTitle": "PF2e Stealthy - Confirm Start Combat",
+      "choice": "{message}<p>Do you wish to proceed with combat start?</p>"
     }
   }
 }

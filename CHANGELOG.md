@@ -1,5 +1,9 @@
 ## pending
 
+## 1.2.3
+
+- Add a dialog that allows GMs the choice to proceed with combat start stealth analysis if all initiative rolls haven't been yet been made. This replaces the previous notification that simply blocked the combat start.
+
 ## 1.2.2
 
 - Fix Start Combat dialog for SF2e

@@ -6,7 +6,13 @@ import { resolveStealthCheck } from "./observation-logic.js";
 import { updateInitiativeCards } from "./render-status.js";
 import { zoomToCombat } from "./socket.js";
 import { resolveAvoidNotice } from "./sneak.js";
-import { breakdownRoll, debuglog, refreshPerception } from "./utils.js";
+import {
+  breakdownRoll,
+  debuglog,
+  warnlog,
+  refreshPerception,
+  localizeString,
+} from "./utils.js";
 import { MODULE_ID, SLUGS } from "./const.js";
 import { StartCombatDialog } from "./start-combat-dialog.js";
 
@@ -105,11 +111,12 @@ async function startCombatWrapper(wrapped, ...args) {
   let pcs = [];
   let avoiders = [];
   let ineligiblePcs = [];
-  let unrolled = false;
+  let unrolled = encounter.combatants.contents.filter(
+    (c) => c.flags[game.system.id]?.initiativeStatistic === null,
+  );
   encounter.combatants.contents.forEach((c) => {
     const isPc = c.actor?.parties?.size > 0 && c.actor.system?.exploration;
     const stat = c.flags[game.system.id]?.initiativeStatistic;
-    if (stat === null) unrolled = true;
     const isStealth = stat === "stealth";
     if (!isPc) {
       if (isStealth) avoiders.push(c);
@@ -203,11 +210,29 @@ async function startCombatWrapper(wrapped, ...args) {
 
   // Any manipulations go here
   if (cachedSettings.vetCombatStart) {
-    if (unrolled) {
-      ui.notifications.warn(
-        game.i18n.localize(`${MODULE_ID}.notifications.unrolled`),
-      );
-      return this;
+    if (unrolled.length > 0) {
+      warnlog("Unrolled combatants", unrolled);
+      const message =
+        unrolled.length === 1
+          ? localizeString(`${MODULE_ID}.startCombat.unrolled1`, {
+              name: unrolled[0].name,
+            })
+          : unrolled.length === 2
+            ? localizeString(`${MODULE_ID}.startCombat.unrolled2`, {
+                name1: unrolled[0].name,
+                name2: unrolled[1].name,
+              })
+            : localizeString(`${MODULE_ID}.startCombat.unrolled`, {
+                count: unrolled.length,
+              });
+      const proceed = await foundry.applications.api.DialogV2.confirm({
+        window: {
+          title: game.i18n.localize(`${MODULE_ID}.startCombat.proceedTitle`),
+        },
+        content: localizeString(`${MODULE_ID}.startCombat.choice`, { message }),
+        modal: true,
+      });
+      if (!proceed) return this;
     }
     if (avoiders.length > 0) {
       const verified = await StartCombatDialog.wait({
