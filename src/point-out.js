@@ -139,11 +139,11 @@ async function renderDetectors(targetList, context) {
   const templateData = {
     moduleId: MODULE_ID,
     ...(context.collapsed ? { collapsed: true } : {}),
+    originId: context.avoiderId,
     interactive: interactive ? "true" : "false",
+    showTicker: interactive,
     summary: localizeString(`${MODULE_ID}.pointOut.hiddens`, { count }),
     targetList: targetList.map((target) => {
-      const hoverId = foundry.utils.randomID();
-      (context["hoverIds"] ??= {})[hoverId] = target.tokenId;
       let clickId;
       if (interactive) {
         clickId = foundry.utils.randomID();
@@ -157,7 +157,7 @@ async function renderDetectors(targetList, context) {
       }
 
       const result = {
-        hoverId,
+        targetId: target.tokenId,
         to: localizeString(`${MODULE_ID}.pointOut.to`, {
           name: target.name,
         }),
@@ -182,6 +182,8 @@ export async function renderPointOutCard(_message, html, _data, flags) {
   const context = {
     interactive: pointOut.showApplyButton,
     collapsed: false,
+    avoiderId: pointOut.subjectId,
+    swap: true,
     onStatusClick: onPointOutStatusClick,
     hoverIds: { [hoverId]: pointOut.subjectId },
   };

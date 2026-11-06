@@ -5,7 +5,10 @@
 >
 <summary>{{summary}}</summary>
   {{#each targetList}}
-    <div class="{{@root.moduleId}}-target" data-hover-id="{{hoverId}}">
+    <div class="{{@root.moduleId}}-target"
+      data-origin="{{@root.originId}}"
+      data-target="{{targetId}}"
+    >
       <div
         class="{{@root.moduleId}}-result"
         {{#if clickId}}data-click-id="{{clickId}}"{{/if}}

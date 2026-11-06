@@ -180,12 +180,10 @@ async function renderAvoidanceCheck(avoidanceCheck, context) {
       for (let [tokenId, avoider] of Object.entries(
         avoidanceCheck.enemyStealth,
       )) {
-        const hoverId = foundry.utils.randomID();
-        (context["hoverIds"] ??= {})[hoverId] = tokenId;
+        context.avoiderId = tokenId;
         const summary = await renderSummary(avoider.targetList, context);
         templateData.enemyAvoiders.push({
           tokenId,
-          hoverId,
           name: avoider.name,
           label: `${MODULE_ID}.avoidanceCheck.checkLabel`,
           skillResult: avoider.skillResult,
@@ -217,11 +215,9 @@ async function renderAvoidanceCheck(avoidanceCheck, context) {
       for (let [tokenId, avoider] of Object.entries(
         avoidanceCheck.friendlyStealth,
       )) {
-        const hoverId = foundry.utils.randomID();
-        (context["hoverIds"] ??= {})[hoverId] = tokenId;
+        context.avoiderId = tokenId;
         const data = {
           tokenId,
-          hoverId,
           name: avoider.name,
           label: `${MODULE_ID}.avoidanceCheck.checkLabel`,
         };

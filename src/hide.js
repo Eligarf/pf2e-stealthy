@@ -113,13 +113,14 @@ async function onHideStatusClick(message, _event, flags, targetId) {
   return message.update(update);
 }
 
-export async function renderHideCard(_message, html, _data, flags) {
+export async function renderHideCard(message, html, _data, flags) {
   if (!game.user.isGM) return null;
   const hide = flags.hide;
   const targetList = hide.targetList;
   if (!targetList?.length) return {};
   const context = {
     interactive: hide.showApplyButton,
+    avoiderId: message.token.id,
     collapsed: false,
     onStatusClick: onHideStatusClick,
     change: targetList.some((t) => t.stealth !== t.was),

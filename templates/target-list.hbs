@@ -5,7 +5,17 @@
 >
 <summary>{{{summary}}}</summary>
   {{#each targetList}}
-    <div class="{{@root.moduleId}}-target" data-hover-id="{{hoverId}}">
+    <div class="{{@root.moduleId}}-target"
+      {{#if @root.showTicker}}
+        {{#if @root.swap}}
+          data-target="{{@root.originId}}"
+          data-origin="{{targetId}}"
+        {{else}}
+          data-origin="{{@root.originId}}"
+          data-target="{{targetId}}"
+        {{/if}}
+      {{/if}}
+    >
       <div class="{{@root.moduleId}}-name">{{vs}}</div>
       <div
         class="{{@root.moduleId}}-result"

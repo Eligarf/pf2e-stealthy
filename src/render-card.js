@@ -9,78 +9,36 @@ import { renderSeekCard } from "./seek.js";
 import { renderPointOutCard } from "./point-out.js";
 import { renderEditCard } from "./edit.js";
 import { renderActionCard } from "./action.js";
+import { LineTicker } from "./line-ticker.js";
 
-function attachHoverId(html, el, hoverIds) {
-  const hoverId = el.dataset.hoverId;
-  const tokenId = hoverIds[hoverId];
-  if (!tokenId) return;
+let activeLineTicker = null;
+let activeHoverKey = null;
 
-  let pendingEnter = false;
-  let onCanvasReady = null;
-
-  const onHoverIn = () => {
-    const token = getToken(tokenId);
-    if (token && typeof token._onHoverIn === "function") {
-      token._onHoverIn(new MouseEvent("mouseenter"));
-    }
-  };
-
-  const onEnter = () => {
-    if (canvas?.ready) {
-      onHoverIn();
-      return;
-    }
-    pendingEnter = true;
-    onCanvasReady = () => {
-      if (pendingEnter) onHoverIn();
-      pendingEnter = false;
-      onCanvasReady = null;
-    };
-    globalThis.Hooks.once("canvasReady", onCanvasReady);
-  };
-
-  const onLeave = () => {
-    pendingEnter = false;
-    if (onCanvasReady) {
-      globalThis.Hooks.off("canvasReady", onCanvasReady);
-      onCanvasReady = null;
-    }
-    if (canvas?.ready) {
-      const token = getToken(tokenId);
-      if (token && typeof token._onHoverOut === "function")
-        token._onHoverOut(new MouseEvent("mouseleave"));
-    }
-  };
-
-  el.addEventListener("mouseenter", onEnter);
-  el.addEventListener("mouseleave", onLeave);
-
-  const observer = new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      for (const removed of m.removedNodes) {
-        if (removed === el) {
-          el.removeEventListener("mouseenter", onEnter);
-          el.removeEventListener("mouseleave", onLeave);
-          if (onCanvasReady) {
-            globalThis.Hooks.off("canvasReady", onCanvasReady);
-            onCanvasReady = null;
-          }
-          observer.disconnect();
-          return;
-        }
-      }
-    }
-  });
-  observer.observe(html, { childList: true, subtree: true });
+function clearLineTicker() {
+  if (activeLineTicker) {
+    activeLineTicker.destroy();
+    activeLineTicker = null;
+  }
+  if (activeHoverKey) activeHoverKey = null;
 }
 
-export function attachHoverIds(html, hoverIds) {
-  const selected = html.querySelectorAll(`[data-hover-id]`);
-  if (hoverIds) {
-    for (const el of selected) {
-      attachHoverId(html, el, hoverIds);
-    }
-  }
+function onTargetHoverIn(originId, targetId) {
+  const hoverKey = `${MODULE_ID}-${originId}-${targetId}`;
+  if (activeHoverKey === hoverKey) return;
+  if (originId === undefined || targetId === undefined) return;
+  const origin = getToken(originId);
+  const target = getToken(targetId);
+  if (!origin || !target) return;
+
+  clearLineTicker();
+  activeHoverKey = hoverKey;
+  activeLineTicker = new LineTicker(origin, target);
+}
+
+function onTargetHoverOut(originId, targetId) {
+  const hoverKey = `${MODULE_ID}-${originId}-${targetId}`;
+  if (activeHoverKey !== hoverKey) return;
+  clearLineTicker();
 }
 
 async function clickHandler(message, event, flags, clickIds) {
@@ -122,9 +80,19 @@ globalThis.Hooks.on("renderChatMessageHTML", async (message, html, data) => {
           ),
       );
     }
-    if (interactionContext.hoverIds) {
-      attachHoverIds(html, interactionContext.hoverIds);
-    }
+
+    const targets = html.querySelectorAll(`.${MODULE_ID}-target`);
+    targets.forEach((target) => {
+      const dataSet = target.dataset;
+      const originId = dataSet.origin;
+      const targetId = dataSet.target;
+      target.addEventListener("pointerenter", () => {
+        onTargetHoverIn(originId, targetId);
+      });
+      target.addEventListener("pointerleave", () => {
+        onTargetHoverOut(originId, targetId);
+      });
+    });
   }
 
   async function guts() {
@@ -177,7 +145,13 @@ globalThis.Hooks.on("renderChatMessageHTML", async (message, html, data) => {
     doAttachments();
 
     if (flags.endStealth) {
-      interactionContext = await renderActionCard(message, html, data, flags);
+      interactionContext = await renderActionCard(
+        message,
+        html,
+        data,
+        flags,
+        interactionContext,
+      );
       doAttachments();
     }
   }

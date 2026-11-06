@@ -1,5 +1,10 @@
 ## pending
 
+## 1.2.4
+
+- Change PF2e Stealthy hover behavior on chat cards to use the ticker line between the two tokens. It will only display while hovered on the card prior to accepting results.
+- Fix Point-out button interaction with end stealth buttons.
+
 ## 1.2.3
 
 - Add a dialog that allows GMs the choice to proceed with combat start stealth analysis if all initiative rolls haven't been yet been made. This replaces the previous notification that simply blocked the combat start.

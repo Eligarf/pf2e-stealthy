@@ -122,13 +122,14 @@ async function onSneakStatusClick(message, _event, flags, targetId) {
   return message.update(update);
 }
 
-export async function renderSneakCard(_message, html, _data, flags) {
+export async function renderSneakCard(message, html, _data, flags) {
   if (!game.user.isGM) return null;
   const sneak = flags.sneak;
   const targetList = sneak.targetList;
   if (!targetList?.length) return {};
   const context = {
     interactive: sneak.showApplyButton,
+    avoiderId: message.token.id,
     collapsed: false,
     onStatusClick: onSneakStatusClick,
     change: targetList.some((t) => t.stealth !== t.was),

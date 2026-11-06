@@ -75,13 +75,11 @@ async function applyReduceStealth(message, _event, flags) {
   return message.update({ flags: { [MODULE_ID]: flags } });
 }
 
-export async function renderActionCard(message, html, _data, flags) {
+export async function renderActionCard(message, html, _data, flags, context) {
   if (!game.user.isGM && !message.isAuthor) return;
   const endStealth = flags.endStealth;
-  const context = {
-    after: endStealth.after,
-    interactive: endStealth.showEndButton,
-  };
+  (context ??= {}).after = endStealth.after;
+  context.interactive = endStealth.showEndButton;
   const stealthy = getStealthyEffect(message.token);
   if (stealthy && context.interactive) {
     const primaryClickId = foundry.utils.randomID();

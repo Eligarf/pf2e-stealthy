@@ -1,6 +1,6 @@
-### PF2e Stealthy v1.2.3
+### PF2e Stealthy v1.2.4
 
-- Add a dialog that allows GMs the choice to proceed with combat start stealth analysis if all initiative rolls haven't been yet been made. This replaces the previous notification that simply blocked the combat start.
+- Change PF2e Stealthy hover behavior on chat cards to use the ticker line between the two tokens. It will only display while hovered on the card prior to accepting results.
 
 [module](<https://foundryvtt.com/packages/pf2e-stealthy>) | [Github](<https://github.com/Eligarf/pf2e-stealthy>) | [Thread](<https://discord.com/channels/880968862240239708/1565811961839620346>)
 

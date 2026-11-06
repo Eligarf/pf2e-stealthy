@@ -1,6 +1,7 @@
 import { MODULE_ID, LOCALIZATION_KEYS, STEALTH_LABELS } from "./const.js";
 import { debuglog, localizeString, getToken } from "./utils.js";
 import { sneakDosStates } from "./sneak.js";
+import { LineTicker } from "./line-ticker.js";
 
 const DOS_KEYS = [
   `${MODULE_ID}-card-critical-failure`,
@@ -115,16 +116,10 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
     return context;
   }
 
-  async _clearSensingLine() {
-    if (this.lineTicker) {
-      canvas.app.ticker.remove(this.lineTicker);
-      this.lineTicker = null;
-    }
-
-    if (this.activeSensingLine) {
-      canvas.stage.removeChild(this.activeSensingLine);
-      this.activeSensingLine.destroy();
-      this.activeSensingLine = null;
+  _clearLineTicker() {
+    if (this.activeLineTicker) {
+      this.activeLineTicker.destroy();
+      this.activeLineTicker = null;
     }
 
     if (this.hoverKey) {
@@ -152,7 +147,7 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
       footer.style.flexShrink = "0";
     }
 
-    this._clearSensingLine();
+    this._clearLineTicker();
 
     const targets = this.element.querySelectorAll(`.${MODULE_ID}-target`);
     targets.forEach((target) => {
@@ -168,91 +163,28 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
     });
   }
 
-  async _onTargetHoverIn(avoiderId, observerId) {
+  _onTargetHoverIn(avoiderId, observerId) {
     const hoverKey = `${MODULE_ID}-${avoiderId}-${observerId}`;
     if (this.hoverKey === hoverKey) return;
     if (avoiderId === undefined || observerId === undefined) return;
 
-    await this._clearSensingLine();
+    this._clearLineTicker();
     this.hoverKey = hoverKey;
 
     const observation = this.dialogData.observations[avoiderId];
     const avoider = getToken(observation.avoider.tokenDoc.id);
     const observer = getToken(observerId);
 
-    const graphics = new PIXI.Graphics();
-    canvas.stage.addChild(graphics);
-    this.activeSensingLine = graphics;
-
-    let pulseOffset = 0;
-    const speed = 1.5;
-    const spacing = 40;
-
-    this.lineTicker = () => {
-      if (!avoider || !observer) return;
-
-      graphics.clear();
-
-      const p1 = avoider.center;
-      const p2 = observer.center;
-
-      const dx = p2.x - p1.x;
-      const dy = p2.y - p1.y;
-      const distance = Math.hypot(dx, dy);
-      if (distance === 0) return;
-
-      const angle = Math.atan2(dy, dx);
-
-      graphics.lineStyle({
-        width: 2,
-        color: 0x3a86ff,
-        alpha: 0.3,
-        alignment: 0.5,
-      });
-      graphics.moveTo(p1.x, p1.y);
-      graphics.lineTo(p2.x, p2.y);
-
-      pulseOffset = (pulseOffset + speed) % spacing;
-
-      graphics.lineStyle({
-        width: 4,
-        color: 0x8ab4f8,
-        alpha: 0.9,
-        alignment: 0.5,
-        cap: PIXI.LINE_CAP.ROUND,
-      });
-
-      for (
-        let currentDist = pulseOffset;
-        currentDist < distance;
-        currentDist += spacing
-      ) {
-        const segLength = 12;
-        const startDist = currentDist;
-        const endDist = Math.min(currentDist + segLength, distance);
-
-        if (startDist >= distance) break;
-
-        const startX = p1.x + Math.cos(angle) * startDist;
-        const startY = p1.y + Math.sin(angle) * startDist;
-        const endX = p1.x + Math.cos(angle) * endDist;
-        const endY = p1.y + Math.sin(angle) * endDist;
-
-        graphics.moveTo(startX, startY);
-        graphics.lineTo(endX, endY);
-      }
-    };
-
-    canvas.app.ticker.add(this.lineTicker);
+    this.activeLineTicker = new LineTicker(avoider, observer);
   }
 
-  async _onTargetHoverOut(avoiderId, observerId) {
+  _onTargetHoverOut(avoiderId, observerId) {
     const hoverKey = `${MODULE_ID}-${avoiderId}-${observerId}`;
     if (this.hoverKey !== hoverKey) return;
-    await this._clearSensingLine();
+    this._clearLineTicker();
   }
 
-  static async _onCycleStatus(_event, target) {
+  static _onCycleStatus(_event, target) {
     const dataSet = target.dataset;
     const avoiderId = dataSet.avoider;
     const observerId = dataSet.observer;

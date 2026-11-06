@@ -126,14 +126,16 @@ async function onSeekStatusClick(message, _event, flags, targetId) {
   return message.update(update);
 }
 
-export async function renderSeekCard(_message, html, _data, flags) {
+export async function renderSeekCard(message, html, _data, flags) {
   if (!game.user.isGM) return;
   const seek = flags.seek;
   const targetList = seek.targetList;
   if (!targetList?.length) return {};
   const context = {
     interactive: seek.showApplyButton,
+    avoiderId: message.token.id,
     collapsed: false,
+    swap: true,
     onStatusClick: onSeekStatusClick,
     change: targetList.some((t) => t.stealth !== t.was),
   };

@@ -22,14 +22,14 @@
         "id": "pf2e",
         "type": "system",
         "compatibility": {
-          "verified": "8.6"
+          "verified": "8.7"
         }
       },
       {
         "id": "sf2e",
         "type": "system",
         "compatibility": {
-          "verified": "1.6"
+          "verified": "1.7"
         }
       }
     ],

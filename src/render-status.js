@@ -69,10 +69,11 @@ export async function renderTargetList(targetList, summary, context) {
     moduleId: MODULE_ID,
     ...(context.collapsed ? { collapsed: true } : {}),
     interactive: interactive ? "true" : "false",
+    showTicker: interactive,
     summary,
+    swap: context.swap ?? false,
+    originId: context.avoiderId,
     targetList: targetList.map((target) => {
-      const hoverId = foundry.utils.randomID();
-      (context["hoverIds"] ??= {})[hoverId] = target.tokenId;
       let clickId;
       if (interactive) {
         clickId = foundry.utils.randomID();
@@ -86,7 +87,7 @@ export async function renderTargetList(targetList, summary, context) {
       }
 
       const result = {
-        hoverId,
+        targetId: target.tokenId,
         vs: localizeString(`${MODULE_ID}.initiative.vs`, {
           name: target.name,
         }),
@@ -160,6 +161,7 @@ export async function renderInitiativeCard(message, html, _data, flags) {
   if (!game.user.isGM && !message.isAuthor) return;
   const initiative = flags.initiative;
   const context = {
+    avoiderId: message.token.id,
     interactive: false,
     collapsed: cachedSettings.collapseTargetList,
   };
