@@ -163,14 +163,17 @@ export function setupSettings() {
     if (cachedSettings.useToolbeltCover) {
       const toolbeltApi = game.toolbelt?.api;
       if (toolbeltApi) {
-        const coverApi = toolbeltApi.autoCover?.calculateCover;
-        const creatureCoverApi = toolbeltApi.autoCover?.calculateCreatureCover;
-        if (typeof coverApi === "function") cachedSettings.coverApi = coverApi;
-        if (typeof creatureCoverApi === "function")
+        const wallCoverApi = toolbeltApi.autoCover?.calculateWallCover;
+        if (typeof wallCoverApi === "function")
+          cachedSettings.wallCoverApi = wallCoverApi;
+        const creatureCoverApi = toolbeltApi.autoCover?.testCreaturesCover;
+        if (typeof creatureCoverApi === "function") {
           cachedSettings.creatureCoverApi = creatureCoverApi;
+        }
       }
     } else {
-      delete cachedSettings.coverApi;
+      delete cachedSettings.wallCoverApi;
+      delete cachedSettings.creatureCoverApi;
     }
     debuglog("updated cachedSettings", cachedSettings);
   }

@@ -2,16 +2,54 @@ import { clampDos, debuglog } from "./utils.js";
 import { MODULE_ID } from "./const.js";
 import { cachedSettings } from "./settings.js";
 
+function computeCreatureCover(origin, target) {
+  if (!cachedSettings.creatureCoverApi) return { bonus: 0, token: null };
+  const mode = game.toolbelt?.getToolSetting("autoCover", "creatureMode");
+  const sideScale = game.toolbelt?.getToolSetting("autoCover", "creatureSide");
+  const skipDead = game.toolbelt?.getToolSetting("autoCover", "creatureDead");
+  const skipProne = game.toolbelt?.getToolSetting("autoCover", "creatureProne");
+  const test = cachedSettings.creatureCoverApi(origin, target, {
+    context: {},
+    debug: false,
+    mode,
+    sideScale,
+    skipDead,
+    skipProne,
+  });
+  if (!test) return { bonus: 0, token: null };
+  const token = test.collisions?.token;
+  switch (test.level) {
+    case "lesser":
+      return { bonus: 1, token };
+    case "standard":
+      return { bonus: 2, token };
+    case "greater":
+      return { bonus: 4, token };
+    default:
+      return { bonus: 0, token };
+  }
+}
+
+const SIZE_RANK = {
+  tiny: 0,
+  sm: 1,
+  med: 2,
+  lg: 3,
+  large: 3,
+  huge: 4,
+  grg: 5,
+};
+
 export function computeCover(origin, target, base = 0) {
   let bonus = base;
   let creatureBonus = 0;
   let tooltips = [];
   let creatureCover = null;
-  if (cachedSettings.coverApi) {
-    const cover = cachedSettings.coverApi(origin, target);
-    bonus = cover.bonus;
+  if (cachedSettings.wallCoverApi) {
+    const wallCover = cachedSettings.wallCoverApi(origin, target);
+    bonus = wallCover.bonus;
     if (cachedSettings.creatureCoverApi) {
-      creatureCover = cachedSettings.creatureCoverApi(origin, target);
+      creatureCover = computeCreatureCover(origin, target);
       creatureBonus = creatureCover.bonus;
     }
   }
@@ -31,9 +69,20 @@ export function computeCover(origin, target, base = 0) {
         (i) => i.system.slug === "distracting-shadows",
       );
       if (found) {
-        tooltips.push({
-          format: `${MODULE_ID}.distractingShadows`,
-        });
+        const token = creatureCover.token;
+        if (token) {
+          const coverSize = token.actor?.system?.traits?.size?.value;
+          const originSize = origin.actor?.system?.traits?.size?.value;
+          if (SIZE_RANK[coverSize] > SIZE_RANK[originSize]) {
+            tooltips.push({
+              format: `${MODULE_ID}.distractingShadows.bigger`,
+            });
+          }
+        } else {
+          tooltips.push({
+            format: `${MODULE_ID}.distractingShadows.maybe`,
+          });
+        }
       }
     }
   }

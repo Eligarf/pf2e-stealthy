@@ -35,6 +35,18 @@ globalThis.Hooks.once("ready", () => {
       game.i18n.localize(`${MODULE_ID}.notifications.avoidNotice`),
     );
   }
+
+  if (game.user.isGM && cachedSettings.useToolbeltCover) {
+    const coverEnabled = game.toolbelt?.getToolSetting(
+      "autoCover",
+      "coverEnabled",
+    );
+    if (coverEnabled === "disabled") {
+      ui.notifications.info(
+        game.i18n.localize(`${MODULE_ID}.notifications.toolbeltDisabled`),
+      );
+    }
+  }
 });
 
 globalThis.Hooks.once("setup", () => {

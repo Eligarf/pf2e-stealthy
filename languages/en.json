@@ -56,7 +56,8 @@
       "target1": "Point Out action requires a single token to be targeted",
       "noToDos": "No relevant actions for PF2e Stealthy for this context: {controlled} controlled token(s), {targeted} targeted token(s)",
       "avoidNotice": "'PF2e Stealthy' is a replacement of and extension to 'PF2e Avoid Notice'. Please disable 'PF2e Avoid Notice'",
-      "keepDeadOut": "Dead or defeated NPCs are rejected from combat"
+      "keepDeadOut": "Dead or defeated NPCs are rejected from combat",
+      "toolbeltDisabled": "auto-cover is currently disabled in 'PF2e Toolbelt'. Enable it to use auto-cover in 'PF2e Stealthy'"
     },
     "schema": {
       "name": "Schema Version",
@@ -231,6 +232,9 @@
       "proceedTitle": "PF2e Stealthy - Confirm Start Combat",
       "choice": "{message}<p>Do you wish to proceed with combat start?</p>"
     },
-    "distractingShadows": "Distracting Shadows: creature cover qualifies if bigger"
+    "distractingShadows": {
+      "bigger": "Distracting Shadows: lesser cover from larger creature",
+      "maybe": "Distracting Shadows: lesser cover from maybe larger creature?"
+    }
   }
 }
