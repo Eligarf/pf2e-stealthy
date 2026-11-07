@@ -18,6 +18,7 @@ export const SETTINGS = {
   keepDeadOut: "keepDeadOut",
   vetCombatStart: "vetCombatStart",
   showInitiative: "showInitiative",
+  useToolbeltCover: "useToolbeltCover",
 
   // Advanced settings
   logLevel: "logLevel",
@@ -37,6 +38,7 @@ export let cachedSettings = {
   keepDeadOut: true,
   vetCombatStart: false,
   showInitiative: true,
+  useToolbeltCover: true,
   logLevel: "none",
 };
 
@@ -157,6 +159,39 @@ export function setupSettings() {
     SETTINGS.requireActivity,
   );
 
+  function updateToolbeltApi() {
+    if (cachedSettings.useToolbeltCover) {
+      const toolbeltApi = game.toolbelt?.api;
+      if (toolbeltApi) {
+        const coverApi = toolbeltApi.autoCover?.calculateCover;
+        const creatureCoverApi = toolbeltApi.autoCover?.calculateCreatureCover;
+        if (typeof coverApi === "function") cachedSettings.coverApi = coverApi;
+        if (typeof creatureCoverApi === "function")
+          cachedSettings.creatureCoverApi = creatureCoverApi;
+      }
+    } else {
+      delete cachedSettings.coverApi;
+    }
+    debuglog("updated cachedSettings", cachedSettings);
+  }
+
+  game.settings.register(MODULE_ID, SETTINGS.useToolbeltCover, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.useToolbeltCover}.name`),
+    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.useToolbeltCover}.hint`),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: cachedSettings.useToolbeltCover,
+    onChange: (newValue) => {
+      cachedSettings.useToolbeltCover = newValue;
+      updateToolbeltApi();
+    },
+  });
+  cachedSettings.useToolbeltCover = game.settings.get(
+    MODULE_ID,
+    SETTINGS.useToolbeltCover,
+  );
+
   game.settings.register(MODULE_ID, SETTINGS.alerts, {
     name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.alerts}.name`),
     hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.alerts}.hint`),
@@ -208,6 +243,9 @@ export function setupSettings() {
     },
   });
   cachedSettings.logLevel = game.settings.get(MODULE_ID, SETTINGS.logLevel);
+
+  // Update after all settings are read
+  updateToolbeltApi();
 }
 
 export function setupKeybindings() {

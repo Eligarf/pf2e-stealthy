@@ -1,29 +1,64 @@
 import { clampDos, debuglog } from "./utils.js";
-import { prepareTargetList } from "./render-status.js";
 import { MODULE_ID } from "./const.js";
+import { cachedSettings } from "./settings.js";
+
+export function computeCover(origin, target, base = 0) {
+  let bonus = base;
+  let creatureBonus = 0;
+  let tooltips = [];
+  let creatureCover = null;
+  if (cachedSettings.coverApi) {
+    const cover = cachedSettings.coverApi(origin, target);
+    bonus = cover.bonus;
+    if (cachedSettings.creatureCoverApi) {
+      creatureCover = cachedSettings.creatureCoverApi(origin, target);
+      creatureBonus = creatureCover.bonus;
+    }
+  }
+
+  if (bonus === 4 || creatureBonus === 4) {
+    bonus = 4;
+    tooltips.push({ format: `${MODULE_ID}.greaterCover` });
+  } else if (bonus === 2 || creatureBonus === 2) {
+    bonus = 2;
+    tooltips.push({
+      format: `${MODULE_ID}.standardCover`,
+    });
+  } else {
+    bonus = 0;
+    if (creatureBonus === 1) {
+      const found = origin.actor.items.some(
+        (i) => i.system.slug === "distracting-shadows",
+      );
+      if (found) {
+        tooltips.push({
+          format: `${MODULE_ID}.distractingShadows`,
+        });
+      }
+    }
+  }
+
+  return { bonus, tooltips };
+}
 
 export function resolveStealthCheck({ origin, target, resolver }) {
-  let check = {
+  const check = {
     dc: target.actor.system.perception.dc,
     name: target.name,
     tokenId: target.id,
     tokenDoc: target,
   };
 
-  let coverBonus = origin.baseCoverBonus || 0;
-  if (coverBonus > 0) {
-    check.coverBonus = coverBonus;
-    switch (coverBonus) {
-      case 2:
-        (check.tooltips ??= []).push({ format: `${MODULE_ID}.standardCover` });
-        break;
-      case 4:
-        (check.tooltips ??= []).push({ format: `${MODULE_ID}.greaterCover` });
-        break;
-    }
-  }
+  const cover = computeCover(
+    origin.tokenDoc,
+    target,
+    origin.baseCoverBonus || 0,
+  );
 
-  const delta = origin.skillResult + coverBonus - check.dc;
+  if (cover.bonus > 0) check.coverBonus = cover.bonus;
+  (check.tooltips ??= []).push(...cover.tooltips);
+
+  const delta = origin.skillResult + cover.bonus - check.dc;
   check.delta = delta;
   check.deltaStr = delta < 0 ? `${delta}` : `+${delta}`;
   check.degreeOfSuccess = clampDos(delta, origin.rawRollDosDelta);

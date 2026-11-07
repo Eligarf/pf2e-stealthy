@@ -29,14 +29,14 @@ PF2e Stealthy:
 - uses chat cards as its primary interface.
 - uses the *Stealthy* effect which controls the hidden and undetected conditions based on the results of stealth or perception checks. These are straightforward effects plainly visible to the GM and use standard REs.
 - requires no prep on non-*stealthy* tokens.
-- does not police actions or states for cover or validity and simply does the mechanics as the GM is free to adjust results before they are applied.
+- does not police actions or states for cover or validity. It will inform GM as it finds things, but the GM is free to adjust results before they are applied.
 
 ## Combat Mode
 
-> [!CAUTION]
-> Cover calculations, Darkness, Concealment, etc are not taken into account when granting stealth. It is up to the GM to police or tweak any results accordingly on the chat cards.
+This module basically tracks which tokens should be granted an exception to the hidden or undetected conditions carried by *stealthy* actors. It assumes that if a *stealthy* actor has achieved the hidden or undetected condition, it is hidden to all other tokens except for those who are on its specific exception list for its conditions.
 
-This module basically tracks which tokens should be granted an exception to the hidden or undetected conditions carried by *stealthy* actors. It assumes that if a *stealthy* actor has achieved the hidden or undetected condition, it is hidden to all other tokens except for those who are on its specific exception list for its conditions. No cover calculations are done (this is out-of-scope), but if one day there is a standard way to calculate cover I'll likely use it to add the bonus to the sneak checks. The cover condition is used if present, but nothing token-to-token
+> [!NOTE]
+> PF2e Stealthy has an opt-out setting to use the auto-cover results from PF2e Toolbelt if version 3.60+ of that module is installed.
 
 The *Stealthy* effect uses a badge to track the baseline stealth of the actor, and grants the hidden and undetected conditions based on the level of the badge. It uses signature predicates to conditionally disable the condition roll options it grants depending on the target of the roll. If the vision hack is enabled, *stealthy* tokens will show on the GM canvas as with a thick cyan border if no tokens are controlled or if the *stealthy* token is undetected to all controlled tokens. Once an actor is *stealthy*, the module's context menu will offer a choice to edit and present a new chat card where the GM can tweak stealth settings as needed.
 
@@ -79,4 +79,5 @@ The following is a list of the menu options that can appear when pressing the me
 This module assumes that the party token is the primary token during exploration mode in PF2e; party members of course can be on the map, but the assumption is that things are being done in 10-minute chunks and positions/states are essentially theatre-of-the-mind. An 'Avoidance Check' is available in PF2e Stealthy's context menu that manages having any selected party, character, and monster tokens do Avoid Notice rolls so the GM can determine whether or not there is to be an encounter. Selected Party tokens will generate stealth roll requests for any PCs using Avoid Notice even if they aren't on the map yet, and if the GM determines there will be an encounter based on the results, PCs can be deposited from the party token, positioned on the map in some way that makes sense to everyone as play shifts into the tactical encounter/combat mode, and then *stealthy* characters will use the Avoidance Check results as their initiative rolls.
 
 If GMs enable the dialog option, a Start Combat dialog will appear when they click the Start Combat button with stealthy characters in the combat. This dialog will let them adjust any stealth result based on cover, concealment, or whatever.
+
 ![Start Combat Dialog](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/start-combat.png)

@@ -47,6 +47,10 @@
       "name": "Use Stealthy Combat Start dialog",
       "hint": "If enabled and Combat is started with some combatants that use stealth, a dialog will present that allows the GM to adjust any stealth settings before Foundry's Combat Start machinery starts up"
     },
+    "useToolbeltCover": {
+      "name": "Use PF2e Toolbelt auto-cover",
+      "hint": "If enabled and PF2e Toolbelt v3.60+ is installed, token cover conditions will be ignored and per-pair cover adjustments will be determined by PF2e Toolbelt auto-cover."
+    },
     "notifications": {
       "noSocketLib": "PF2e Stealthy needs socketlib module to be active in order to pan/zoom to combat. Please activate it.",
       "target1": "Point Out action requires a single token to be targeted",
@@ -226,6 +230,7 @@
       "unrolled": "{count} needs to roll initiative before stealth can be evaluated",
       "proceedTitle": "PF2e Stealthy - Confirm Start Combat",
       "choice": "{message}<p>Do you wish to proceed with combat start?</p>"
-    }
+    },
+    "distractingShadows": "Distracting Shadows: creature cover qualifies if bigger"
   }
 }

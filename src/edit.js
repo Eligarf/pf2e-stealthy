@@ -20,6 +20,7 @@ import {
 } from "./effects.js";
 import { findCompanionsOnCanvas, findPossibleTargets } from "./combat.js";
 import { refreshEverybody } from "./socket.js";
+import { computeCover } from "./observation-logic.js";
 
 export async function editStealth(actingToken) {
   const combat = game?.combat;
@@ -37,10 +38,15 @@ export async function editStealth(actingToken) {
   const targetList = them
     .map((target) => {
       const stealth = getStealthinessTo(origin, target.id);
+      const cover = computeCover(
+        actingToken.document || actingToken,
+        target.document || target,
+      );
       return {
         name: target.name,
         tokenId: target.id,
         stealth,
+        cover: cover,
         was: stealth,
         stealthLabel: STEALTH_LABELS[stealth],
       };
@@ -124,6 +130,7 @@ export async function renderEditCard(_message, html, _data, flags) {
   const context = {
     interactive: edit.showApplyButton,
     collapsed: false,
+    avoiderId: edit.originId,
     onStatusClick: onEditStatusClick,
     change: targetList.some((t) => t.stealth !== t.was),
     hoverIds: { [hoverId]: edit.originId },
@@ -132,15 +139,15 @@ export async function renderEditCard(_message, html, _data, flags) {
   const interactive = context.interactive ?? false;
   const templateData = {
     moduleId: MODULE_ID,
+    originId: context.avoiderId,
     hoverId,
     interactive,
+    showTicker: interactive,
     subject: localizeString(`${MODULE_ID}.edit.subject`, {
       name: edit.originName,
     }),
     summary: await renderSummary(targetList, context),
     targetList: targetList.map((target) => {
-      const hoverId = foundry.utils.randomID();
-      (context["hoverIds"] ??= {})[hoverId] = target.tokenId;
       let clickId;
       if (interactive) {
         clickId = foundry.utils.randomID();
@@ -154,7 +161,7 @@ export async function renderEditCard(_message, html, _data, flags) {
       }
 
       const result = {
-        hoverId,
+        targetId: target.tokenId,
         vs: localizeString(`${MODULE_ID}.initiative.vs`, {
           name: target.name,
         }),
@@ -162,9 +169,10 @@ export async function renderEditCard(_message, html, _data, flags) {
         label: LOCALIZATION_KEYS[target.stealthLabel],
       };
 
+      const tooltips = [...target.cover.tooltips, ...(target.tooltips || [])];
       if (clickId) result.clickId = clickId;
-      if (target.tooltips?.length > 0) {
-        result.tooltips = target.tooltips.map((t) =>
+      if (tooltips.length > 0) {
+        result.tooltips = tooltips.map((t) =>
           localizeString(
             t.format,
             t.interpolations?.length > 0

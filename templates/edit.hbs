@@ -1,5 +1,5 @@
 <div class="{{moduleId}}-edit">
-  <div class="{{moduleId}}-subject" data-hover-id="{{hoverId}}">
+  <div class="{{moduleId}}-subject">
     <div class="{{moduleId}}-name">{{subject}}</div>
   </div>
 </div>
@@ -10,7 +10,12 @@
 >
 <summary>{{{summary}}}</summary>
   {{#each targetList}}
-    <div class="{{@root.moduleId}}-target" data-hover-id="{{hoverId}}">
+    <div class="{{@root.moduleId}}-target"
+      {{#if @root.showTicker}}
+        data-origin="{{@root.originId}}"
+        data-target="{{targetId}}"
+      {{/if}}
+    >
       <div class="{{@root.moduleId}}-name">{{vs}}</div>
       <div
         class="{{@root.moduleId}}-result"
@@ -18,6 +23,17 @@
         data-interactive="{{@root.interactive}}"
       >
         <span class="degree-of-success {{dos}}">{{localize label}}</span>
+      </div>
+      <div class="{{@root.moduleId}}-dc"
+        {{#if tooltips}}
+          data-tooltip="<div>
+            {{#each tooltips}}
+              {{#unless @first}}<br>{{/unless}}{{this}}
+            {{/each}}
+          </div>"
+        {{/if}}
+        >
+        {{#if tooltips}}<i class="fas fa-info-circle"></i>{{/if}}
       </div>
     </div>
   {{/each}}
