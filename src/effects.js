@@ -150,7 +150,7 @@ export async function setStealthinessTo(origin, target, stealth) {
     for (let condition = stealthBaseline; condition >= HIDDEN; --condition) {
       const stealthLabel = STEALTH_LABELS[condition];
       let except = flags[stealthLabel]?.except;
-      if (!except.length) continue;
+      if (!except?.length) continue;
       except = except.filter((id) => id !== target.id);
       if (!except.length) delete flags[stealthLabel].except;
       else flags[stealthLabel] = except;

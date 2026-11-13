@@ -6,15 +6,17 @@ import {
   OBSERVED,
   STEALTH_LABELS,
 } from "./const.js";
-import { debuglog, warnlog } from "./utils.js";
+import { debuglog, warnlog, getToken } from "./utils.js";
 import { cachedSettings } from "./settings.js";
 
 let hooks = {};
-const observingTokenIds = {};
-let revealedToTokenIds = {};
-const tokenIdsWithAlerts = {};
+let observingTokenIds = {};
+let blindedObservers = 0;
+let alertableTokenIds = {};
+let alertedTokenIds = {};
+let activeSenses = {};
 
-function union(a, b) {
+function mergeAlertables(a, b) {
   const spread = [...a, ...b];
   const redux = spread.reduce((acc, [key, value]) => {
     if (!(key in acc) || value < acc[key]) acc[key] = value;
@@ -57,9 +59,9 @@ globalThis.Hooks.once("ready", async () => {
 
 export function refreshVisibilityCache() {
   debuglog(`refreshVisibilityCache`);
-  revealedToTokenIds = {};
+  alertableTokenIds = {};
   for (const token of canvas.tokens.placeables) {
-    if (token.id in tokenIdsWithAlerts) {
+    if (token.id in alertedTokenIds) {
       showAlert({ token, stealth: UNDETECTED });
     }
   }
@@ -77,6 +79,24 @@ function findDetections(token) {
   };
 }
 
+function mergeSenses(senses) {
+  senses.forEach((s) => {
+    if (s in activeSenses) return;
+    activeSenses[s] = {};
+  });
+}
+
+function resetSenses() {
+  activeSenses = {};
+  for (const id in observingTokenIds) {
+    const token = canvas.tokens.get(id);
+    const actor = token.actor;
+    const perception = actor.perception;
+    const senses = perception.senses.contents.map((s) => s.type);
+    mergeSenses(senses);
+  }
+}
+
 function showAlert({ token, stealth }) {
   // UNDETECTED means no alert
   if (stealth === UNDETECTED) {
@@ -84,7 +104,7 @@ function showAlert({ token, stealth }) {
       (c) => c.name === OBSERVED_ALERT_LABEL || c.name === HIDDEN_ALERT_LABEL,
     );
     if (alert) {
-      delete tokenIdsWithAlerts[token.id];
+      delete alertedTokenIds[token.id];
       token.removeChild(alert);
       alert.destroy({ children: true, texture: false });
     }
@@ -111,7 +131,7 @@ function showAlert({ token, stealth }) {
   alert.y = 0;
   alert.alpha = 0.5;
   token.mesh.addChild(alert);
-  tokenIdsWithAlerts[token.id] = stealth;
+  alertedTokenIds[token.id] = stealth;
 }
 
 function findDetectors(token) {
@@ -123,32 +143,59 @@ function findDetectors(token) {
 }
 
 function controlTokenHook(token, controlled) {
-  debuglog(`'${token.name}' controlled: ${controlled}`, { token, controlled });
+  // debuglog(`'${token.name}' controlled: ${controlled}`, { token, controlled });
+
+  // Look for blinded condition because we always care
+  const actor = token.actor;
+  const isBlinded = actor.items.some((i) => i.system.slug === "blinded");
+
+  // if we are releasing control, stop caring about the observing token
   if (!controlled) {
     delete observingTokenIds[token.id];
-  } else {
+
+    // We don't know which observer has which sense, so rebuild them
+    if (isBlinded) blindedObservers = blindedObservers - 1;
+    resetSenses();
+    // debuglog("Reset senses:", foundry.utils.duplicate(activeSenses));
+  }
+
+  // Otherwise, we have a new observer so now we have to pay attention to it
+  // to its senses
+  else {
     observingTokenIds[token.id] = true;
+
+    // Maybe we have to clean a mutation up?
     const tokenDoc = token.document || token;
     if (filterMap.has(tokenDoc)) {
-      debuglog(`==> '${token.name}' might need to restore filter`);
+      // debuglog(`==> '${token.name}' might need to restore filter`);
       // filterMap.delete(token.document || token);
     }
+
+    if (isBlinded) blindedObservers = blindedObservers + 1;
+    const perception = actor.perception;
+    const senses = perception.senses.contents.map((s) => s.type);
+    mergeSenses(senses);
+    // debuglog("Updated senses:", foundry.utils.duplicate(activeSenses));
   }
+
+  // Handle updating the alertable set which only the GM sees
   if (!game.user.isGM) return;
   canvas.perception.initialize();
-
   if (controlled) {
     const detectors = findDetectors(token);
     if (detectors)
-      revealedToTokenIds = union(Object.entries(revealedToTokenIds), detectors);
+      alertableTokenIds = mergeAlertables(
+        Object.entries(alertableTokenIds),
+        detectors,
+      );
   } else {
-    revealedToTokenIds = {};
+    alertableTokenIds = {};
     for (const id in observingTokenIds) {
       const token = canvas.tokens.get(id);
       const detectors = findDetectors(token);
       if (detectors)
-        revealedToTokenIds = union(
-          Object.entries(revealedToTokenIds),
+        alertableTokenIds = mergeAlertables(
+          Object.entries(alertableTokenIds),
           detectors,
         );
     }
@@ -158,11 +205,19 @@ function controlTokenHook(token, controlled) {
 function refreshTokenHook(token, options) {
   if (!options.refreshVisibility) return;
 
+  // First handle alerts - we show them to enabled GM regardless of
+  // other vision states
   if (game.user.isGM && cachedSettings.alerts) {
-    const isRevealed = token.id in revealedToTokenIds;
+    const isRevealed = token.id in alertableTokenIds;
+
+    // UNDETECTED means nobody is alerted
     if (!isRevealed) {
       showAlert({ token, stealth: UNDETECTED });
-    } else {
+    }
+
+    // Otherwise we show the appropriate alert, but make sure that we
+    // don't alert on allies if we don't hide from them
+    else {
       if (!cachedSettings.hideFromAllies) {
         const us = token.actor?.system?.details?.alliance;
         const notUs = Object.keys(observingTokenIds).some((id) => {
@@ -172,18 +227,24 @@ function refreshTokenHook(token, options) {
         });
         if (!notUs) return;
       }
-      const stealth = revealedToTokenIds[token.id];
+      const stealth = alertableTokenIds[token.id];
       showAlert({ token, stealth });
     }
   }
 
+  // If GM is in gm vision, we leave things alone. Same goes for controlled
+  // tokens, or tokens that are ghosted
   if (game.pf2e.settings.gmVision) return;
   if (token.id in observingTokenIds || token.document.hidden) return;
 
+  // We only adjust visibility of stealthy actors, so bail if we aren't that
   const actor = token?.actor;
   if (!actor) return;
   const stealth = actor?.items.find((i) => i.slug === SLUGS.stealthy);
   if (!stealth) return;
+
+  // Find what the stealthy token thinks it is at vs what the most observant
+  // controlled token sees it at
   const baseline = stealth.system?.badge?.value;
   const detectors = stealth.flags[MODULE_ID]?.detectors || {};
   const spottedAt = Object.entries(detectors).reduce(
@@ -192,53 +253,62 @@ function refreshTokenHook(token, options) {
     baseline,
   );
 
-  if (spottedAt === OBSERVED && baseline === UNDETECTED) {
-    token.visible = true;
-    token.mesh.visible = true;
+  // Assuming that the system stomps us everytime, we need to figure out
+  // exactly what state we want the token to end up in based on stealth
+  // and conditions
+  const wantFilter = spottedAt === HIDDEN;
+  let wantVisible = !(spottedAt === UNDETECTED && baseline === UNDETECTED);
+  const wantGmFilter = !wantVisible && game.user.isGM;
+  wantVisible ||= wantGmFilter;
+  const gotVisible = token.visible && token.mesh.visible;
+  const gotFilter = !!token.detectionFilter;
+
+  // Stomp the token visibility to what we want. If we don't want to see it, we are done
+  if (!wantVisible !== !gotVisible) {
+    token.visible = wantVisible;
+    token.mesh.visible = wantVisible;
+    if (!wantVisible) return;
+  }
+
+  // Now we need to deal with any changes in filter state since we can see the token. First
+  // we'll look at the cases where we don't want a filter; if we don't have a filter, then
+  // we are done
+  if (!wantFilter && !wantGmFilter) {
+    if (!gotFilter) return;
+
+    // We found a filter, we may/may not need to kill it depending
+    // debuglog(
+    //   `==> '${token.name}' ${STEALTH_LABELS[spottedAt]}/${STEALTH_LABELS[baseline]}, delete filter`,
+    //   token.detectionFilter,
+    // );
+    token.detectionFilter = null;
     return;
   }
-  if (spottedAt === baseline) {
-    if (baseline !== UNDETECTED || !game.user.isGM) {
-      const tokenDoc = token.document || token;
-      const filter = filterMap.get(tokenDoc);
-      if (!filter) return;
-      filterMap.delete(tokenDoc);
-      // debuglog(`'${token.name}' wants to dump filter`, {
-      //   filter,
-      //   tokenFilter: token.detectionFilter,
-      // });
-      if (!token.detectionFilter) token.detectionFilter = filter;
-      return;
-    }
 
-    token.visible = true;
-    token.mesh.visible = true;
+  // Now we look at adding a filter. If we already have a filter, we have to evaluate it
+  // if (gotFilter) {
+  // debuglog(
+  //   `==> '${token.name}' ${STEALTH_LABELS[spottedAt]}/${STEALTH_LABELS[baseline]}, replace filter (gm=${wantGmFilter ? 1 : 0})`,
+  //   token.detectionFilter,
+  // );
+  // return if no filter made
+  // return;
+  // }
 
-    const filter = foundry.canvas.rendering.filters.OutlineOverlayFilter.create(
-      {
-        wave: true,
-        outlineColor: [0.5, 1.0, 1.0, 1.0],
-      },
-    );
-    token.detectionFilter = filter;
-  }
-
-  if (spottedAt === HIDDEN) {
-    // debuglog(`==> '${token.name}' wants undetected -> hidden`);
-    token.visible = true;
-    token.mesh.visible = true;
-
-    const filter = foundry.canvas.rendering.filters.OutlineOverlayFilter.create(
-      {
-        wave: true,
-      },
-    );
+  // Make the filter based on being the GM or not
+  let filter;
+  if (wantGmFilter) {
+    filter = foundry.canvas.rendering.filters.OutlineOverlayFilter.create({
+      wave: true,
+      outlineColor: [0.5, 1.0, 1.0, 1.0],
+    });
+  } else {
+    filter = foundry.canvas.rendering.filters.OutlineOverlayFilter.create({
+      wave: true,
+    });
     filter.thickness = 1;
-    token.detectionFilter = filter;
-  } else if (baseline === HIDDEN) {
-    filterMap.set(token.document || token, token.detectionFilter);
-    token.detectionFilter = null;
   }
+  token.detectionFilter = filter;
 }
 
 function deleteTokenHook(tokenDoc, _options, _userId) {

@@ -9,6 +9,7 @@ import {
   FAILURE,
   CRITICAL_FAILURE,
   SLUGS,
+  LOCALIZATION_KEYS,
 } from "./const.js";
 import { renderTargetList, renderSummary } from "./render-status.js";
 import { prepareStealthChecks } from "./action.js";
@@ -26,7 +27,20 @@ export function resolveAvoidNotice(_origin, check) {
 }
 
 function resolveSneak(origin, check) {
-  const stealth = getStealthinessTo(origin, check.tokenDoc.id);
+  let stealth = getStealthinessTo(origin, check.tokenDoc.id);
+  const invisible = origin.tokenDoc.actor.items.some(
+    (i) => i.system.slug === "invisible",
+  );
+  if (invisible && stealth === OBSERVED) {
+    (check.tooltips ??= []).push({ format: LOCALIZATION_KEYS.invisible });
+    const perception = check.tokenDoc.actor.perception;
+    const seeInvisible = perception.senses.get("see-invisibility");
+    if (seeInvisible) {
+      check.tooltips.push({ format: seeInvisible.source });
+    } else {
+      stealth = HIDDEN;
+    }
+  }
   check.was = stealth;
   if (stealth > OBSERVED) {
     let dos = check.degreeOfSuccess;

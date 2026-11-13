@@ -171,7 +171,8 @@
       "noChange": "No Change"
     },
     "initiative": {
-      "vs": "vs {name}"
+      "vs": "vs {name}",
+      "dc": "DC {dc}"
     },
     "avoidanceCheck": {
       "title": "Avoidance Check",
@@ -191,7 +192,8 @@
     },
     "sneak": {
       "observed": "Prerequisite: hidden or undetected condition",
-      "sneakAdept": "Sneak Adept"
+      "sneakAdept": "Sneak Adept",
+      "seesInvisible": "Sees Invisible"
     },
     "seek": {
       "was": "Was {stealth}"

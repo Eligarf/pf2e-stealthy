@@ -146,7 +146,7 @@ Hooks.on("createChatMessage", async (message, _options, userId) => {
 
   // Gotta try and find the point out action specifically
   if (!action && flags.origin?.rollOptions) {
-    if (flags.origin.rollOptions.includes("origin:item:point-out")) {
+    if (flags.origin.rollOptions.includes("origin:item:slug:point-out")) {
       action = -1;
       await preparePointOutData(message, userId, actingToken);
     } else if (

@@ -1,5 +1,10 @@
 ## pending
 
+## 1.4.0
+- Sneaking now interacts properly with *See the Unseen* or other sources of the see-invisibility sense
+- Invisibility counts as prequisite for stealth (barring see-invisibility)
+- Added DC to label on chat card target numbers
+
 ## 1.3.1
 
 - Use calculateWallCover instead of calculateCover to keep wall and creature cover calculations separable.

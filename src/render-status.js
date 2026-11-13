@@ -93,7 +93,7 @@ export async function renderTargetList(targetList, summary, context) {
         }),
         dos: DOS_KEYS[target.degreeOfSuccess],
         label: LOCALIZATION_KEYS[target.stealthLabel],
-        dc: target.dc,
+        dc: localizeString(`${MODULE_ID}.initiative.dc`, { dc: target.dc }),
       };
 
       if (clickId) result.clickId = clickId;

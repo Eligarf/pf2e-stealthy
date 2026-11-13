@@ -34,6 +34,7 @@ export const LOCALIZATION_KEYS = {
   observed: "PF2E.condition.observed.name",
   hidden: "PF2E.condition.hidden.name",
   undetected: "PF2E.condition.undetected.name",
+  invisible: "PF2E.condition.invisible.name",
 };
 
 export const SLUGS = {
