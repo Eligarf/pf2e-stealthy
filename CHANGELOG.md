@@ -1,9 +1,10 @@
 ## pending
 
 ## 1.4.0
-- Sneaking now interacts properly with *See the Unseen* or other sources of the see-invisibility sense
-- Invisibility counts as prequisite for stealth (barring see-invisibility)
+- Did a rewrite of the vision hack to try and handle *Foil Senses* and sneaking vs precise/imprecise senses.
+- Invisibility counts as a prequisite for Sneaking (barring see-invisibility)
 - Added DC to label on chat card target numbers
+- Refresh clients when Stealthy effect badge is updated
 
 ## 1.3.1
 

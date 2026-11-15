@@ -8,13 +8,65 @@ import {
 } from "./const.js";
 import { debuglog, warnlog, getToken } from "./utils.js";
 import { cachedSettings } from "./settings.js";
+import { refreshEverybody } from "./socket.js";
+
+const OBSERVED_ALERT_LABEL = `${MODULE_ID}-observed`;
+const HIDDEN_ALERT_LABEL = `${MODULE_ID}-hidden`;
+
+const SVG_DATA = [
+  "M320 64C334.7 64 348.2 72.1 355.2 85L571.2 485C577.9 497.4 577.6 512.4 570.4 524.5C563.2 536.6 550.1 544 536 544L104 544C89.9 544 76.8 536.6 69.6 524.5C62.4 512.4 62.1 497.4 68.8 485L284.8 85C291.8 72.1 305.3 64 320 64zM320 416C302.3 416 288 430.3 288 448C288 465.7 302.3 480 320 480C337.7 480 352 465.7 352 448C352 430.3 337.7 416 320 416zM320 224C301.8 224 287.3 239.5 288.6 257.7L296 361.7C296.9 374.2 307.4 384 319.9 384C332.5 384 342.9 374.3 343.8 361.7L351.2 257.7C352.5 239.5 338.1 224 319.8 224z",
+  "M320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576zM320 240C302.3 240 288 254.3 288 272C288 285.3 277.3 296 264 296C250.7 296 240 285.3 240 272C240 227.8 275.8 192 320 192C364.2 192 400 227.8 400 272C400 319.2 364 339.2 344 346.5L344 350.3C344 363.6 333.3 374.3 320 374.3C306.7 374.3 296 363.6 296 350.3L296 342.2C296 321.7 310.8 307 326.1 302C332.5 299.9 339.3 296.5 344.3 291.7C348.6 287.5 352 281.7 352 272.1C352 254.4 337.7 240.1 320 240.1zM288 432C288 414.3 302.3 400 320 400C337.7 400 352 414.3 352 432C352 449.7 337.7 464 320 464C302.3 464 288 449.7 288 432z",
+];
+
+const VISION = {
+  type: "vision",
+  acuity: "precise",
+  range: Infinity,
+  special: false,
+};
+const HEARING = {
+  type: "hearing",
+  acuity: "imprecise",
+  range: 30,
+  special: false,
+};
+const SENSES = {
+  bloodsense: { isVision: false, isHearing: false, special: true },
+  darkvision: { isVision: true, isHearing: false, special: false },
+  echolocation: { isVision: false, isHearing: true, special: true },
+  "electromagnetic-sense": {
+    isVision: false,
+    isHearing: false,
+    special: true,
+  },
+  "greater-darkvision": { isVision: true, isHearing: false, special: false },
+  "infrared-vision": { isVision: true, isHearing: false, special: false },
+  lifesense: { isVision: false, isHearing: false, special: true },
+  "low-light-vision": { isVision: true, isHearing: false, special: false },
+  magicsense: { isVision: true, isHearing: false, special: false },
+  "motion-sense": { isVision: false, isHearing: false, special: true },
+  scent: { isVision: false, isHearing: false, special: true },
+  "see-invisibility": { isVision: true, isHearing: false, special: false },
+  spiritsense: { isVision: false, isHearing: false, special: true },
+  thoughtsense: { isVision: false, isHearing: false, special: true },
+  tremorsense: { isVision: false, isHearing: false, special: true },
+  truesight: { isVision: true, isHearing: false, special: false },
+  wavesense: { isVision: false, isHearing: false, special: true },
+};
+
+const NONSENSED = 3;
+const ACUITY_VALUES = {
+  precise: 0,
+  imprecise: 1,
+  vague: 2,
+  nonsensed: NONSENSED,
+};
 
 let hooks = {};
 let observingTokenIds = {};
-let blindedObservers = 0;
 let alertableTokenIds = {};
 let alertedTokenIds = {};
-let activeSenses = {};
+let alertTextures = [];
 
 function mergeAlertables(a, b) {
   const spread = [...a, ...b];
@@ -30,14 +82,6 @@ hooks.canvasReady = globalThis.Hooks.on("canvasReady", async () => {
 });
 
 let filterMap = new WeakMap();
-
-const OBSERVED_ALERT_LABEL = `${MODULE_ID}-observed`;
-const HIDDEN_ALERT_LABEL = `${MODULE_ID}-hidden`;
-let alertTextures = [];
-const SVG_DATA = [
-  "M320 64C334.7 64 348.2 72.1 355.2 85L571.2 485C577.9 497.4 577.6 512.4 570.4 524.5C563.2 536.6 550.1 544 536 544L104 544C89.9 544 76.8 536.6 69.6 524.5C62.4 512.4 62.1 497.4 68.8 485L284.8 85C291.8 72.1 305.3 64 320 64zM320 416C302.3 416 288 430.3 288 448C288 465.7 302.3 480 320 480C337.7 480 352 465.7 352 448C352 430.3 337.7 416 320 416zM320 224C301.8 224 287.3 239.5 288.6 257.7L296 361.7C296.9 374.2 307.4 384 319.9 384C332.5 384 342.9 374.3 343.8 361.7L351.2 257.7C352.5 239.5 338.1 224 319.8 224z",
-  "M320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576zM320 240C302.3 240 288 254.3 288 272C288 285.3 277.3 296 264 296C250.7 296 240 285.3 240 272C240 227.8 275.8 192 320 192C364.2 192 400 227.8 400 272C400 319.2 364 339.2 344 346.5L344 350.3C344 363.6 333.3 374.3 320 374.3C306.7 374.3 296 363.6 296 350.3L296 342.2C296 321.7 310.8 307 326.1 302C332.5 299.9 339.3 296.5 344.3 291.7C348.6 287.5 352 281.7 352 272.1C352 254.4 337.7 240.1 320 240.1zM288 432C288 414.3 302.3 400 320 400C337.7 400 352 414.3 352 432C352 449.7 337.7 464 320 464C302.3 464 288 449.7 288 432z",
-];
 
 globalThis.Hooks.once("ready", async () => {
   debuglog(`appstate is ready`);
@@ -77,24 +121,6 @@ function findDetections(token) {
     baselineStealth: stealth.system.badge.value,
     detectors: flags.detectors || {},
   };
-}
-
-function mergeSenses(senses) {
-  senses.forEach((s) => {
-    if (s in activeSenses) return;
-    activeSenses[s] = {};
-  });
-}
-
-function resetSenses() {
-  activeSenses = {};
-  for (const id in observingTokenIds) {
-    const token = canvas.tokens.get(id);
-    const actor = token.actor;
-    const perception = actor.perception;
-    const senses = perception.senses.contents.map((s) => s.type);
-    mergeSenses(senses);
-  }
 }
 
 function showAlert({ token, stealth }) {
@@ -142,40 +168,63 @@ function findDetectors(token) {
     .map(([id, d]) => [id, d.stealth]);
 }
 
+function getSenses(token) {
+  const actor = token.actor;
+  const perception = actor.perception;
+  let senses = perception.senses.contents.map((s) => ({
+    type: s.type,
+    acuity: s.acuity,
+    range: s.range,
+    ...(SENSES[s.type] || {}),
+  }));
+
+  if (!actor.items.some((i) => i.system.slug === SLUGS.blinded))
+    senses.push(VISION);
+  else senses = senses.filter((s) => !s.isVision);
+
+  if (!actor.items.some((i) => i.system.slug === SLUGS.deafened))
+    senses.push(HEARING);
+  else senses = senses.filter((s) => !s.isHearing);
+  return senses;
+}
+
+function getDetectionAcuity(detector, target) {
+  const senses = getSenses(detector);
+  const range = detector.distanceTo(target);
+  const inRange = senses.filter((s) => range <= s.range);
+
+  const acuities = inRange.reduce(
+    (acc, s) => {
+      if (s.special)
+        acc.special = Math.min(
+          ACUITY_VALUES[s.acuity] ?? NONSENSED,
+          acc.special,
+        );
+      else
+        acc.regular = Math.min(
+          ACUITY_VALUES[s.acuity] ?? NONSENSED,
+          acc.regular,
+        );
+      return acc;
+    },
+    { regular: NONSENSED, special: NONSENSED },
+  );
+
+  return acuities;
+}
+
 function controlTokenHook(token, controlled) {
   // debuglog(`'${token.name}' controlled: ${controlled}`, { token, controlled });
-
-  // Look for blinded condition because we always care
-  const actor = token.actor;
-  const isBlinded = actor.items.some((i) => i.system.slug === "blinded");
 
   // if we are releasing control, stop caring about the observing token
   if (!controlled) {
     delete observingTokenIds[token.id];
-
-    // We don't know which observer has which sense, so rebuild them
-    if (isBlinded) blindedObservers = blindedObservers - 1;
-    resetSenses();
-    // debuglog("Reset senses:", foundry.utils.duplicate(activeSenses));
   }
 
   // Otherwise, we have a new observer so now we have to pay attention to it
   // to its senses
   else {
-    observingTokenIds[token.id] = true;
-
-    // Maybe we have to clean a mutation up?
-    const tokenDoc = token.document || token;
-    if (filterMap.has(tokenDoc)) {
-      // debuglog(`==> '${token.name}' might need to restore filter`);
-      // filterMap.delete(token.document || token);
-    }
-
-    if (isBlinded) blindedObservers = blindedObservers + 1;
-    const perception = actor.perception;
-    const senses = perception.senses.contents.map((s) => s.type);
-    mergeSenses(senses);
-    // debuglog("Updated senses:", foundry.utils.duplicate(activeSenses));
+    observingTokenIds[token.id] = token;
   }
 
   // Handle updating the alertable set which only the GM sees
@@ -243,15 +292,23 @@ function refreshTokenHook(token, options) {
   const stealth = actor?.items.find((i) => i.slug === SLUGS.stealthy);
   if (!stealth) return;
 
-  // Find what the stealthy token thinks it is at vs what the most observant
-  // controlled token sees it at
+  // Extract some stealth data for the loop
   const baseline = stealth.system?.badge?.value;
   const detectors = stealth.flags[MODULE_ID]?.detectors || {};
-  const spottedAt = Object.entries(detectors).reduce(
-    (acc, [id, d]) =>
-      id in observingTokenIds && d.stealth < acc ? d.stealth : acc,
-    baseline,
+  const foilSenses = token.actor.items.some(
+    (i) => i.system.slug === SLUGS.foilSenses,
   );
+
+  // Each observer will test its acuity against the stealth of the refreshed token.
+  // Foil senses treat special senses as regular senses
+  const spottedAt = Object.values(observingTokenIds).reduce((acc, observer) => {
+    const spot = detectors[observer.id]?.stealth ?? baseline;
+    const acuities = getDetectionAcuity(observer, token);
+    const acuity = foilSenses
+      ? Math.max(spot, Math.min(acuities.regular, acuities.special))
+      : Math.min(Math.max(spot, acuities.regular), acuities.special);
+    return Math.min(acuity, acc);
+  }, baseline);
 
   // Assuming that the system stomps us everytime, we need to figure out
   // exactly what state we want the token to end up in based on stealth
@@ -315,6 +372,11 @@ function deleteTokenHook(tokenDoc, _options, _userId) {
   filterMap.delete(tokenDoc);
 }
 
+function preUpdateItemHook(item, change, _action, _userId) {
+  if (item?.system?.slug !== SLUGS.stealthy) return;
+  if (change?.system?.badge) refreshEverybody();
+}
+
 export function setupVisibilityHooks() {
   if (!hooks?.controlToken)
     hooks.controlToken = globalThis.Hooks.on("controlToken", controlTokenHook);
@@ -322,11 +384,17 @@ export function setupVisibilityHooks() {
     hooks.refreshToken = globalThis.Hooks.on("refreshToken", refreshTokenHook);
   if (!hooks?.deleteToken)
     hooks.deleteToken = globalThis.Hooks.on("deleteToken", deleteTokenHook);
+  if (!hooks?.preUpdateItem)
+    hooks.preUpdateItem = globalThis.Hooks.on(
+      "preUpdateItem",
+      preUpdateItemHook,
+    );
 }
 
 export function releaseVisibilityHooks() {
   globalThis.Hooks.off("deleteToken", deleteTokenHook);
   globalThis.Hooks.off("refreshToken", refreshTokenHook);
   globalThis.Hooks.off("controlToken", controlTokenHook);
+  globalThis.Hooks.off("preUpdateItem", preUpdateItemHook);
   hooks = {};
 }

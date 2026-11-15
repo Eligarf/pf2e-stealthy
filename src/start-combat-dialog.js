@@ -78,7 +78,7 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
                   name: v.name,
                   dos: DOS_KEYS[v.degreeOfSuccess],
                   label: LOCALIZATION_KEYS[v.stealthLabel],
-                  dc: v.dc,
+                  dc: localizeString(`${MODULE_ID}.dc`, { dc: v.dc }),
                 };
                 if ((v.tooltips || []).length > 0) {
                   entry.tooltips = v.tooltips.map((t) =>

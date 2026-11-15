@@ -39,7 +39,10 @@ export const LOCALIZATION_KEYS = {
 
 export const SLUGS = {
   avoidNotice: "avoid-notice",
+  blinded: "blinded",
   circumstanceBonus: "circumstance-bonus",
+  deafened: "deafened",
+  foilSenses: "foil-senses",
   incredibleScout: "incredible-scout",
   perception: "perception",
   scout: "scout",

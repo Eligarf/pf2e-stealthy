@@ -171,9 +171,9 @@
       "noChange": "No Change"
     },
     "initiative": {
-      "vs": "vs {name}",
-      "dc": "DC {dc}"
+      "vs": "vs {name}"
     },
+    "dc": "DC {dc}",
     "avoidanceCheck": {
       "title": "Avoidance Check",
       "secretTitle": "Secret Avoidance Check",
