@@ -46,6 +46,9 @@ An 'End stealth' button will be generated on any detected action chat card creat
 
 These images show the GM view and player view when controlling a *stealthy* Merisiel. She is undetected as a baseline and can see an Ogre but not the goblin who is undetected by her, indicated to the GM by the cyan outline borders. The goblin had a critical success when seeking and Merisiel is now observed to it, indicated by the triangle exclamation. The goblin has also pointed out Merisiel to the Ogre, so Merisiel is now only hidden to the Ogre, indicated by the circle question mark. Merisiel is still undetected to any other tokens on the canvas.
 
+> [!Note]
+> The *Stealthy* effect will selectively remove hidden or undetected from attacks made by a *stealthy* token against other tokens based on the stealth status stored within the *Stealthy* effect about the target token. It cannot, however, affect the hidden or undetected state for attacks where the *stealthy* token is the target of the attack; I've tried ephemeral effects/grant item/etc and none of them seem to quite work with the origin/target voodoo that happens to REs. So GMs will have to still exercise judgement about whether or not a flat check is required until some RE ninja can tell me how this can be done.
+
 ## Actions
 
 ![Hide](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/hide.png) ![Sneak](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/sneak.png) ![Seek](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/seek.png) ![Point Out](https://raw.githubusercontent.com/Eligarf/pf2e-stealthy/main/images/point-out.png)

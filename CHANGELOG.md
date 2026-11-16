@@ -1,6 +1,11 @@
 ## pending
 
+## 1.4.1
+
+- Added some color pickers in the settings for the GM undetected halo and the pair-wise line ticker colors.
+
 ## 1.4.0
+
 - Did a rewrite of the vision hack to try and handle *Foil Senses* and sneaking vs precise/imprecise senses.
 - Invisibility counts as a prequisite for Sneaking (barring see-invisibility)
 - Added DC to label on chat card target numbers

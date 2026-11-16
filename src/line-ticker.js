@@ -1,4 +1,5 @@
 import { debuglog } from "./utils.js";
+import { cachedSettings } from "./settings.js";
 
 const defaults = {
   offset: 0,
@@ -7,13 +8,11 @@ const defaults = {
   segLength: 12,
   lineStyle: {
     width: 2,
-    color: 0x3a86ff,
     alpha: 0.3,
     alignment: 0.5,
   },
   segmentStyle: {
     width: 4,
-    color: 0x8ab4f8,
     alpha: 0.9,
     alignment: 0.5,
     cap: PIXI.LINE_CAP.ROUND,
@@ -75,10 +74,12 @@ export class LineTicker {
     const sin = dy / distance;
 
     const options = this.options;
+    options.lineStyle.color = Number(cachedSettings.tickerLineColor);
     this.graphics.lineStyle(options.lineStyle);
     this.graphics.moveTo(p1.x, p1.y);
     this.graphics.lineTo(p2.x, p2.y);
 
+    options.segmentStyle.color = Number(cachedSettings.tickerSegmentColor);
     this.graphics.lineStyle(options.segmentStyle);
 
     options.offset = (options.offset + options.speed) % options.spacing;

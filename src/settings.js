@@ -19,6 +19,9 @@ export const SETTINGS = {
   vetCombatStart: "vetCombatStart",
   showInitiative: "showInitiative",
   useToolbeltCover: "useToolbeltCover",
+  undetectedColor: "undetectedColor",
+  tickerLineColor: "tickerLineColor",
+  tickerSegmentColor: "tickerSegmentColor",
 
   // Advanced settings
   logLevel: "logLevel",
@@ -39,10 +42,15 @@ export let cachedSettings = {
   vetCombatStart: false,
   showInitiative: true,
   useToolbeltCover: true,
+  undetectedColor: "#80ffff",
+  tickerLineColor: "#3a86ff",
+  tickerSegmentColor: "#8ab4f8",
   logLevel: "none",
 };
 
 export function setupSettings() {
+  const { ColorField } = foundry.data.fields;
+
   game.settings.register(MODULE_ID, SETTINGS.collapseTargetList, {
     name: game.i18n.localize(
       `${MODULE_ID}.${SETTINGS.collapseTargetList}.name`,
@@ -229,6 +237,58 @@ export function setupSettings() {
     },
   });
   cachedSettings.visionHack = game.settings.get(MODULE_ID, SETTINGS.visionHack);
+
+  game.settings.register(MODULE_ID, SETTINGS.undetectedColor, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.undetectedColor}.name`),
+    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.undetectedColor}.hint`),
+    scope: "world",
+    config: true,
+    type: new ColorField({ initial: cachedSettings.undetectedColor }),
+    default: cachedSettings.undetectedColor,
+    onChange: (newValue) => {
+      cachedSettings.undetectedColor = newValue;
+    },
+  });
+  cachedSettings.undetectedColor = game.settings.get(
+    MODULE_ID,
+    SETTINGS.undetectedColor,
+  );
+
+  game.settings.register(MODULE_ID, SETTINGS.tickerLineColor, {
+    name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.tickerLineColor}.name`),
+    hint: game.i18n.localize(`${MODULE_ID}.${SETTINGS.tickerLineColor}.hint`),
+    scope: "world",
+    config: true,
+    type: new ColorField({ initial: cachedSettings.tickerLineColor }),
+    default: cachedSettings.tickerLineColor,
+    onChange: (newValue) => {
+      cachedSettings.tickerLineColor = newValue;
+    },
+  });
+  cachedSettings.tickerLineColor = game.settings.get(
+    MODULE_ID,
+    SETTINGS.tickerLineColor,
+  );
+
+  game.settings.register(MODULE_ID, SETTINGS.tickerSegmentColor, {
+    name: game.i18n.localize(
+      `${MODULE_ID}.${SETTINGS.tickerSegmentColor}.name`,
+    ),
+    hint: game.i18n.localize(
+      `${MODULE_ID}.${SETTINGS.tickerSegmentColor}.hint`,
+    ),
+    scope: "world",
+    config: true,
+    type: new ColorField({ initial: cachedSettings.tickerSegmentColor }),
+    default: cachedSettings.tickerSegmentColor,
+    onChange: (newValue) => {
+      cachedSettings.tickerSegmentColor = newValue;
+    },
+  });
+  cachedSettings.tickerSegmentColor = game.settings.get(
+    MODULE_ID,
+    SETTINGS.tickerSegmentColor,
+  );
 
   game.settings.register(MODULE_ID, SETTINGS.logLevel, {
     name: game.i18n.localize(`${MODULE_ID}.${SETTINGS.logLevel}.name`),

@@ -355,9 +355,10 @@ function refreshTokenHook(token, options) {
   // Make the filter based on being the GM or not
   let filter;
   if (wantGmFilter) {
+    const color = cachedSettings.undetectedColor.rgb;
     filter = foundry.canvas.rendering.filters.OutlineOverlayFilter.create({
       wave: true,
-      outlineColor: [0.5, 1.0, 1.0, 1.0],
+      outlineColor: [color[0], color[1], color[2], 1.0],
     });
   } else {
     filter = foundry.canvas.rendering.filters.OutlineOverlayFilter.create({

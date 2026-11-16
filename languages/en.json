@@ -51,6 +51,18 @@
       "name": "Use PF2e Toolbelt auto-cover",
       "hint": "If enabled and PF2e Toolbelt v3.60+ is installed, token cover conditions will be ignored and per-pair cover adjustments will be determined by PF2e Toolbelt auto-cover."
     },
+    "undetectedColor": {
+      "name": "GM-undetected halo color",
+      "hint": "Pick the halo color to use when vision hack is showing the GM an undetected token"
+    },
+    "tickerLineColor": {
+      "name": "Ticker line color",
+      "hint": "Pick the color used for the base pair-wise ticker line when hovering"
+    },
+    "tickerSegmentColor": {
+      "name": "Ticker segment color",
+      "hint": "Pick the segment color for the moving segments of the pair-wise ticker line while hovering"
+    },
     "notifications": {
       "noSocketLib": "PF2e Stealthy needs socketlib module to be active in order to pan/zoom to combat. Please activate it.",
       "target1": "Point Out action requires a single token to be targeted",
