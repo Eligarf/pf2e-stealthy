@@ -1,5 +1,5 @@
 import { adaptStealthyToObservers } from "./effects.js";
-import { UNDETECTED, OBSERVED } from "./const.js";
+import { STEALTH } from "./const.js";
 import { debuglog, interpolateString, getToken } from "./utils.js";
 
 export async function findInitiativeCard(combatant) {
@@ -19,8 +19,27 @@ export async function findInitiativeCard(combatant) {
   return messages.length ? game.messages.get(messages.pop()._id) : null;
 }
 
+export async function declumpInitiative() {
+  const combat = game.combats.active;
+  const turns = combat?.turns ?? [];
+  if (!turns.length) return;
+  const delta = 3;
+  const total = turns.length;
+  const topInit = turns[0].initiative ?? 20;
+  const bottomInit = topInit - delta * (total - 1);
+
+  let init = bottomInit < 1 ? topInit + 1 - bottomInit : topInit;
+  for (let i = 0; i < total; ++i) {
+    const combatant = turns[i];
+    if (init !== combatant.initiative) {
+      await combat.setInitiative(combatant.id, init);
+    }
+    init -= delta;
+  }
+}
+
 export async function applyInitiativeConditions(encounter, observations) {
-  const baselineStealth = UNDETECTED;
+  const baselineStealth = STEALTH.undetected;
   for (const id in observations) {
     const { observers, allies } = observations[id];
     const combatant = encounter.combatants.get(id);
@@ -44,7 +63,7 @@ export async function applyInitiativeConditions(encounter, observations) {
           allies.map((allyId) => [
             allyId,
             {
-              stealth: OBSERVED,
+              stealth: STEALTH.observed,
               signature: getToken(allyId)?.actor?.signature,
             },
           ]),

@@ -7,7 +7,7 @@ import {
 import {
   MODULE_ID,
   STEALTH_LABELS,
-  OBSERVED,
+  STEALTH,
   LOCALIZATION_KEYS,
   DOS_KEYS,
 } from "./const.js";
@@ -87,7 +87,10 @@ async function applyEditEffects(message, _event, flags) {
       .concat(
         edit.allies.map((id) => [
           id,
-          { stealth: OBSERVED, signature: getToken(id)?.actor?.signature },
+          {
+            stealth: STEALTH.observed,
+            signature: getToken(id)?.actor?.signature,
+          },
         ]),
       ),
   );

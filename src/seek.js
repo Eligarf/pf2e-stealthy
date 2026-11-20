@@ -7,10 +7,9 @@ import {
 import {
   MODULE_ID,
   STEALTH_LABELS,
-  OBSERVED,
+  STEALTH,
   LOCALIZATION_KEYS,
-  SUCCESS,
-  CRITICAL_SUCCESS,
+  DOS,
 } from "./const.js";
 import {
   renderTargetList,
@@ -31,11 +30,11 @@ function resolveSeek(origin, check) {
       stealth: LOCALIZATION_KEYS[STEALTH_LABELS[stealth]],
     },
   };
-  if (check.degreeOfSuccess === CRITICAL_SUCCESS) {
-    check.stealth = OBSERVED;
+  if (check.degreeOfSuccess === DOS.criticalSuccess) {
+    check.stealth = STEALTH.observed;
     (check.tooltips ??= []).push(tooltip);
-  } else if (check.degreeOfSuccess === SUCCESS) {
-    check.stealth = Math.max(OBSERVED, stealth - 1);
+  } else if (check.degreeOfSuccess === DOS.success) {
+    check.stealth = Math.max(STEALTH.observed, stealth - 1);
     (check.tooltips ??= []).push(tooltip);
   } else {
     check.stealth = stealth;
@@ -53,7 +52,7 @@ export async function prepareSeekData(message, _userId, actingToken) {
     eidolonTokens,
   });
   const avoiders = them.filter(
-    (t) => getStealthinessTo(t, actingToken.id) > OBSERVED,
+    (t) => getStealthinessTo(t, actingToken.id) > STEALTH.observed,
   );
   if (!avoiders.length) return;
 

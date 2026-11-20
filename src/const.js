@@ -58,10 +58,12 @@ export const COMBAT_STATES = {
   started: "started",
 };
 
-export const CRITICAL_FAILURE = 0;
-export const FAILURE = 1;
-export const SUCCESS = 2;
-export const CRITICAL_SUCCESS = 3;
+export const DOS = {
+  criticalFailure: 0,
+  failure: 1,
+  success: 2,
+  criticalSuccess: 3,
+};
 
 export const DOS_KEYS = [
   `${MODULE_ID}-critical-failure`,
@@ -70,8 +72,24 @@ export const DOS_KEYS = [
   `${MODULE_ID}-critical-success`,
 ];
 
-export const OBSERVED = 0;
-export const HIDDEN = 1;
-export const UNDETECTED = 2;
+export const DOS_CARD_KEYS = [
+  `${MODULE_ID}-card-critical-failure`,
+  `${MODULE_ID}-card-failure`,
+  `${MODULE_ID}-card-success`,
+  `${MODULE_ID}-card-critical-success`,
+];
+
+export const STEALTH = {
+  observed: 0,
+  hidden: 1,
+  undetected: 2,
+};
 
 export const STEALTH_LABELS = ["observed", "hidden", "undetected"];
+
+export const ACUITY = {
+  precise: 0,
+  imprecise: 1,
+  vague: 2,
+  none: 3,
+};

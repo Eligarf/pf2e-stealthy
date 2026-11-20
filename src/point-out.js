@@ -8,8 +8,7 @@ import {
   MODULE_ID,
   STEALTH_LABELS,
   LOCALIZATION_KEYS,
-  UNDETECTED,
-  HIDDEN,
+  STEALTH,
 } from "./const.js";
 import { findCompanionsOnCanvas } from "./combat.js";
 import {
@@ -52,7 +51,7 @@ export async function preparePointOutData(message, _userId, actingToken) {
   // ... and if they are stealthy
   const stealthy = getStealthyEffect(subject);
   const stealthBaseline = getStealthBaseline(stealthy);
-  if (stealthBaseline !== UNDETECTED) {
+  if (stealthBaseline !== STEALTH.undetected) {
     pointOut.message = `${MODULE_ID}.pointOut.notStealthy`;
     return message.update(update);
   }
@@ -87,8 +86,8 @@ export async function preparePointOutData(message, _userId, actingToken) {
   pointOut.newDetectors = newDetectors.map((t) => ({
     tokenId: t.id,
     name: t.name,
-    stealth: HIDDEN,
-    stealthLabel: STEALTH_LABELS[HIDDEN],
+    stealth: STEALTH.hidden,
+    stealthLabel: STEALTH_LABELS[STEALTH.hidden],
   }));
   return message.update(update);
 }
@@ -113,7 +112,7 @@ async function applyPointOutEffects(message, _event, flags) {
   return message.update({ flags: { [MODULE_ID]: flags } });
 }
 
-const stealthToggle = HIDDEN + UNDETECTED;
+const stealthToggle = STEALTH.hidden + STEALTH.undetected;
 
 async function onPointOutStatusClick(message, _event, flags, targetId) {
   const targetList = flags.pointOut?.newDetectors;
@@ -133,7 +132,7 @@ async function onPointOutStatusClick(message, _event, flags, targetId) {
 async function renderDetectors(targetList, context) {
   const interactive = context.interactive ?? false;
   const count = targetList.reduce(
-    (acc, t) => (t.stealth === HIDDEN ? acc + 1 : acc),
+    (acc, t) => (t.stealth === STEALTH.hidden ? acc + 1 : acc),
     0,
   );
   const templateData = {
@@ -204,7 +203,7 @@ export async function renderPointOutCard(_message, html, _data, flags) {
   if (game.user.isGM) {
     const targetList = pointOut.newDetectors;
     if (targetList?.length) {
-      context.change = targetList.some((t) => t.stealth !== UNDETECTED);
+      context.change = targetList.some((t) => t.stealth !== STEALTH.undetected);
       content += await renderDetectors(targetList, context);
       if (context.interactive) {
         const clickId = foundry.utils.randomID();

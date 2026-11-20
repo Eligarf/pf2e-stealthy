@@ -1,11 +1,4 @@
-import {
-  MODULE_ID,
-  SLUGS,
-  HIDDEN,
-  UNDETECTED,
-  OBSERVED,
-  STEALTH_LABELS,
-} from "./const.js";
+import { MODULE_ID, SLUGS, STEALTH, STEALTH_LABELS, ACUITY } from "./const.js";
 import { debuglog, warnlog, getToken } from "./utils.js";
 import { cachedSettings } from "./settings.js";
 import { refreshEverybody } from "./socket.js";
@@ -54,14 +47,6 @@ const SENSES = {
   wavesense: { isVision: false, isHearing: false, special: true },
 };
 
-const NONSENSED = 3;
-const ACUITY_VALUES = {
-  precise: 0,
-  imprecise: 1,
-  vague: 2,
-  nonsensed: NONSENSED,
-};
-
 let hooks = {};
 let observingTokenIds = {};
 let alertableTokenIds = {};
@@ -106,7 +91,7 @@ export function refreshVisibilityCache() {
   alertableTokenIds = {};
   for (const token of canvas.tokens.placeables) {
     if (token.id in alertedTokenIds) {
-      showAlert({ token, stealth: UNDETECTED });
+      showAlert({ token, stealth: STEALTH.undetected });
     }
   }
 }
@@ -125,7 +110,7 @@ function findDetections(token) {
 
 function showAlert({ token, stealth }) {
   // UNDETECTED means no alert
-  if (stealth === UNDETECTED) {
+  if (stealth === STEALTH.undetected) {
     const alert = token.mesh.children.find(
       (c) => c.name === OBSERVED_ALERT_LABEL || c.name === HIDDEN_ALERT_LABEL,
     );
@@ -143,7 +128,7 @@ function showAlert({ token, stealth }) {
   if (alert) return;
 
   // Is the other one there?
-  const otherName = `${MODULE_ID}-${STEALTH_LABELS[OBSERVED + HIDDEN - stealth]}`;
+  const otherName = `${MODULE_ID}-${STEALTH_LABELS[STEALTH.observed + STEALTH.hidden - stealth]}`;
   let oldAlert = token.mesh.children.find((c) => c.name === otherName);
   if (oldAlert) {
     token.removeChild(oldAlert);
@@ -196,18 +181,11 @@ function getDetectionAcuity(detector, target) {
   const acuities = inRange.reduce(
     (acc, s) => {
       if (s.special)
-        acc.special = Math.min(
-          ACUITY_VALUES[s.acuity] ?? NONSENSED,
-          acc.special,
-        );
-      else
-        acc.regular = Math.min(
-          ACUITY_VALUES[s.acuity] ?? NONSENSED,
-          acc.regular,
-        );
+        acc.special = Math.min(ACUITY[s.acuity] ?? ACUITY.none, acc.special);
+      else acc.regular = Math.min(ACUITY[s.acuity] ?? ACUITY.none, acc.regular);
       return acc;
     },
-    { regular: NONSENSED, special: NONSENSED },
+    { regular: ACUITY.none, special: ACUITY.none },
   );
 
   return acuities;
@@ -261,7 +239,7 @@ function refreshTokenHook(token, options) {
 
     // UNDETECTED means nobody is alerted
     if (!isRevealed) {
-      showAlert({ token, stealth: UNDETECTED });
+      showAlert({ token, stealth: STEALTH.undetected });
     }
 
     // Otherwise we show the appropriate alert, but make sure that we
@@ -313,8 +291,10 @@ function refreshTokenHook(token, options) {
   // Assuming that the system stomps us everytime, we need to figure out
   // exactly what state we want the token to end up in based on stealth
   // and conditions
-  const wantFilter = spottedAt === HIDDEN;
-  let wantVisible = !(spottedAt === UNDETECTED && baseline === UNDETECTED);
+  const wantFilter = spottedAt === STEALTH.hidden;
+  let wantVisible = !(
+    spottedAt === STEALTH.undetected && baseline === STEALTH.undetected
+  );
   const wantGmFilter = !wantVisible && game.user.isGM;
   wantVisible ||= wantGmFilter;
   const gotVisible = token.visible && token.mesh.visible;

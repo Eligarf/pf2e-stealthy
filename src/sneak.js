@@ -2,12 +2,8 @@ import { debuglog, getToken, renderTemplateAndEnrich } from "./utils.js";
 import {
   MODULE_ID,
   STEALTH_LABELS,
-  UNDETECTED,
-  OBSERVED,
-  HIDDEN,
-  SUCCESS,
-  FAILURE,
-  CRITICAL_FAILURE,
+  STEALTH,
+  DOS,
   SLUGS,
   LOCALIZATION_KEYS,
 } from "./const.js";
@@ -18,11 +14,11 @@ import { refreshEverybody } from "./socket.js";
 
 export function resolveAvoidNotice(_origin, check) {
   check.stealth =
-    check.degreeOfSuccess >= SUCCESS
-      ? UNDETECTED
-      : check.degreeOfSuccess > CRITICAL_FAILURE
-        ? HIDDEN
-        : OBSERVED;
+    check.degreeOfSuccess >= DOS.success
+      ? STEALTH.undetected
+      : check.degreeOfSuccess > DOS.criticalFailure
+        ? STEALTH.hidden
+        : STEALTH.observed;
   check.stealthLabel = STEALTH_LABELS[check.stealth];
 }
 
@@ -31,33 +27,37 @@ function resolveSneak(origin, check) {
   const invisible = origin.tokenDoc.actor.items.some(
     (i) => i.system.slug === "invisible",
   );
-  if (invisible && stealth === OBSERVED) {
+  if (invisible && stealth === STEALTH.observed) {
     (check.tooltips ??= []).push({ format: LOCALIZATION_KEYS.invisible });
     const perception = check.tokenDoc.actor.perception;
     const seeInvisible = perception.senses.get("see-invisibility");
     if (seeInvisible) {
       check.tooltips.push({ format: seeInvisible.source });
     } else {
-      stealth = HIDDEN;
+      stealth = STEALTH.hidden;
     }
   }
   check.was = stealth;
-  if (stealth > OBSERVED) {
+  if (stealth > STEALTH.observed) {
     let dos = check.degreeOfSuccess;
     if (
-      check.degreeOfSuccess === FAILURE &&
+      check.degreeOfSuccess === DOS.failure &&
       origin.tokenDoc.actor.items.some(
         (i) => i.system.slug === SLUGS.sneakAdept,
       )
     ) {
       (check.tooltips ??= []).push({ format: `${MODULE_ID}.sneak.sneakAdept` });
-      dos = SUCCESS;
+      dos = DOS.success;
     }
 
     check.stealth =
-      dos >= SUCCESS ? UNDETECTED : dos > CRITICAL_FAILURE ? HIDDEN : OBSERVED;
+      dos >= DOS.success
+        ? STEALTH.undetected
+        : dos > DOS.criticalFailure
+          ? STEALTH.hidden
+          : STEALTH.observed;
   } else {
-    check.stealth = OBSERVED;
+    check.stealth = STEALTH.observed;
     (check.tooltips ??= []).push({ format: `${MODULE_ID}.sneak.observed` });
   }
   check.stealthLabel = STEALTH_LABELS[check.stealth];
@@ -92,7 +92,7 @@ async function applySneakEffects(message, _event, flags) {
   const sneak = flags.sneak;
   const detectors = Object.fromEntries(
     sneak.targetList
-      .filter((t) => t.stealth < UNDETECTED)
+      .filter((t) => t.stealth < STEALTH.undetected)
       .map((t) => [
         t.tokenId,
         {
@@ -103,13 +103,16 @@ async function applySneakEffects(message, _event, flags) {
       .concat(
         sneak.allies.map((id) => [
           id,
-          { stealth: OBSERVED, signature: getToken(id)?.actor?.signature },
+          {
+            stealth: STEALTH.observed,
+            signature: getToken(id)?.actor?.signature,
+          },
         ]),
       ),
   );
   await adaptStealthyToObservers({
     actor: message.token.actor,
-    baselineStealth: UNDETECTED,
+    baselineStealth: STEALTH.undetected,
     detectors,
   });
   refreshEverybody();
@@ -118,7 +121,7 @@ async function applySneakEffects(message, _event, flags) {
   return message.update({ flags: { [MODULE_ID]: flags } });
 }
 
-export const sneakDosStates = [CRITICAL_FAILURE, FAILURE, SUCCESS];
+export const sneakDosStates = [DOS.criticalFailure, DOS.failure, DOS.success];
 
 async function onSneakStatusClick(message, _event, flags, targetId) {
   const targetList = flags[flags.card]?.targetList;

@@ -1,5 +1,10 @@
 ## pending
 
+## 1.4.2
+
+- Fix permission error that prevented some players from rolling initiatives when avoidance check was used to create a combat.
+- 'Declump initiative' option shows up in more contexts now.
+
 ## 1.4.1
 
 - Added some color pickers in the settings for the GM undetected halo and the pair-wise line ticker colors.

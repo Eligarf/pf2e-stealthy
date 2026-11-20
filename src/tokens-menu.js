@@ -4,6 +4,7 @@ import { undoRevealsOf } from "./effects.js";
 import { avoidanceCheck } from "./avoidance-check.js";
 import { debuglog, iterateTokensAndParties, localizeString } from "./utils.js";
 import { editStealth } from "./edit.js";
+import { declumpInitiative } from "./initiative.js";
 
 export function fillTokensMenu({ selection }) {
   const title = localizeString(`${MODULE_ID}.menu.tokensSelected`, {
@@ -145,6 +146,24 @@ export function fillTokensMenu({ selection }) {
       onClick: async () => {
         return avoidanceCheck(selection.tokens);
       },
+    });
+  } else {
+    if (choices.length > 0) {
+      choices.push({
+        isDivider: true,
+        group: 4,
+      });
+    }
+    const turns = combat?.turns ?? [];
+    choices.push({
+      key: "declump",
+      label: game.i18n.localize(
+        `${MODULE_ID}.menu.declump.${!turns.length ? "disabledLabel" : "label"}`,
+      ),
+      hint: `${MODULE_ID}.menu.declump.hint`,
+      group: 5,
+      disabled: !turns.length,
+      onClick: declumpInitiative,
     });
   }
 

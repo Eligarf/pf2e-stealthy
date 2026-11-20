@@ -81,7 +81,6 @@ async function renderEncounterSection(avoidanceCheck, context) {
     const clickId = foundry.utils.randomID();
     (context["clickIds"] ??= {})[clickId] = createEncounter;
     templateData.clickId = clickId;
-    templateData.title = `${MODULE_ID}.avoidanceCheck.createEncounterTooltip`;
     templateData.create = `${MODULE_ID}.avoidanceCheck.createEncounter`;
   }
   return renderTemplateAndEnrich(
@@ -287,38 +286,35 @@ async function createEncounter(message, _event, flags) {
     ui.notifications.warn(makeMissingActorsString());
     return message.update({ flags: { [MODULE_ID]: flags } });
   }
-  const combatants = avoidanceCheck.enemyIds
-    .map((id) => {
+
+  function fillStatistics(ids, stealths) {
+    return ids.map((id) => {
       const token = canvas.tokens.get(id);
       let entry = {
         tokenId: token?.id,
+        actorId: token.actor?.id,
         hidden: token?.hidden,
       };
-      if (
-        id in avoidanceCheck.enemyStealth &&
-        avoidanceCheck.enemyStealth[id]?.skillResult !== null
-      ) {
-        entry.initiative = avoidanceCheck.enemyStealth[id]?.skillResult;
-        entry.flags = { [game.system.id]: { initiativeStatistic: "stealth" } };
+      const stealth = stealths[id]?.skillResult ?? null;
+      if (stealth !== null) {
+        entry.initiative = stealth;
+        entry.flags = {
+          [game.system.id]: { initiativeStatistic: "stealth" },
+        };
       }
       return entry;
-    })
+    });
+  }
+
+  const combatants = fillStatistics(
+    avoidanceCheck.enemyIds,
+    avoidanceCheck.enemyStealth,
+  )
     .concat(
-      Object.keys(avoidanceCheck.friendlyStealth).map((id) => {
-        const token = getToken(id);
-        let entry = {
-          tokenId: token?.id,
-          hidden: token?.hidden,
-        };
-        if (avoidanceCheck.friendlyStealth[id]?.skillResult !== null) {
-          const stealthEntry = avoidanceCheck.friendlyStealth[id];
-          entry.initiative = stealthEntry?.skillResult;
-          entry.flags = {
-            [game.system.id]: { initiativeStatistic: "stealth" },
-          };
-        }
-        return entry;
-      }),
+      fillStatistics(
+        avoidanceCheck.friendlyIds,
+        avoidanceCheck.friendlyStealth,
+      ),
     )
     .filter(
       (c) =>

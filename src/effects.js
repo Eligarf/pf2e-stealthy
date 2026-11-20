@@ -1,11 +1,9 @@
 import {
   ITEM_IDS,
   CONDITION_PACKS,
-  HIDDEN,
+  STEALTH,
   MODULE_ID,
-  OBSERVED,
   SLUGS,
-  UNDETECTED,
   STEALTH_LABELS,
 } from "./const.js";
 import { debuglog } from "./utils.js";
@@ -46,7 +44,7 @@ export function getStealthyEffect(token) {
 }
 
 export function getStealthBaseline(stealth) {
-  return stealth?.system?.badge?.value || OBSERVED;
+  return stealth?.system?.badge?.value || STEALTH.observed;
 }
 
 export async function reduceStealthBaseline(token, baseline) {
@@ -73,21 +71,21 @@ export function getStealthinessTo(origin, targetId) {
   );
   const stealthBaseline = getStealthBaseline(stealthy);
   const flags = stealthy?.flags?.[MODULE_ID];
-  if (stealthBaseline === UNDETECTED) {
+  if (stealthBaseline === STEALTH.undetected) {
     const undetected = flags?.undetected || {};
-    if (!undetected?.except?.includes(targetId)) return UNDETECTED;
+    if (!undetected?.except?.includes(targetId)) return STEALTH.undetected;
   }
-  if (stealthBaseline >= HIDDEN) {
+  if (stealthBaseline >= STEALTH.hidden) {
     const hidden = flags?.hidden || {};
-    if (!hidden?.except?.includes(targetId)) return HIDDEN;
+    if (!hidden?.except?.includes(targetId)) return STEALTH.hidden;
   }
-  return OBSERVED;
+  return STEALTH.observed;
 }
 
 function buildRulesFromFlags(flags, stealthBaseline) {
   const rules = [];
   let offGuardPredicate = [];
-  for (let stealth = HIDDEN; stealth <= stealthBaseline; ++stealth) {
+  for (let stealth = STEALTH.hidden; stealth <= stealthBaseline; ++stealth) {
     const stealthLabel = STEALTH_LABELS[stealth];
     rules.push({
       key: "GrantItem",
@@ -115,7 +113,7 @@ function buildRulesFromFlags(flags, stealthBaseline) {
         ],
       };
       rules.push(re);
-      if (stealth === HIDDEN) offGuardPredicate = re.predicate;
+      if (stealth === STEALTH.hidden) offGuardPredicate = re.predicate;
     }
   }
 
@@ -147,7 +145,11 @@ export async function setStealthinessTo(origin, target, stealth) {
   const stealthBaseline = getStealthBaseline(stealthy);
   let flags = foundry.utils.duplicate(stealthy?.flags?.[MODULE_ID]);
   if (stealthBaseline <= stealth) {
-    for (let condition = stealthBaseline; condition >= HIDDEN; --condition) {
+    for (
+      let condition = stealthBaseline;
+      condition >= STEALTH.hidden;
+      --condition
+    ) {
       const stealthLabel = STEALTH_LABELS[condition];
       let except = flags[stealthLabel]?.except;
       if (!except?.length) continue;
@@ -209,9 +211,9 @@ export async function undoRevealsOf({ avoiders, observers = [] }) {
 }
 
 const REVEALED_AS = {
-  observed: OBSERVED,
-  hidden: HIDDEN,
-  undetected: UNDETECTED,
+  observed: STEALTH.observed,
+  hidden: STEALTH.hidden,
+  undetected: STEALTH.undetected,
 };
 
 export async function revealAvoidersTo({
@@ -327,13 +329,17 @@ function buildFlagsAndRules(stealths, detectors, baselineStealth) {
 
   const observed = Object.entries(stealths.observed || {});
   {
-    const hFlags = buildFlagsForExcept(HIDDEN, observed, baselineStealth);
+    const hFlags = buildFlagsForExcept(
+      STEALTH.hidden,
+      observed,
+      baselineStealth,
+    );
     if (Object.keys(hFlags).length > 0) flags.hidden = hFlags;
   }
 
   {
     const uFlags = buildFlagsForExcept(
-      UNDETECTED,
+      STEALTH.undetected,
       observed.concat(Object.entries(stealths.hidden || {})),
       baselineStealth,
     );

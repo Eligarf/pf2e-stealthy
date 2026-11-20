@@ -1,14 +1,12 @@
-import { MODULE_ID, LOCALIZATION_KEYS, STEALTH_LABELS } from "./const.js";
+import {
+  MODULE_ID,
+  LOCALIZATION_KEYS,
+  STEALTH_LABELS,
+  DOS_CARD_KEYS,
+} from "./const.js";
 import { debuglog, localizeString, getToken } from "./utils.js";
 import { sneakDosStates } from "./sneak.js";
 import { LineTicker } from "./line-ticker.js";
-
-const DOS_KEYS = [
-  `${MODULE_ID}-card-critical-failure`,
-  `${MODULE_ID}-card-failure`,
-  `${MODULE_ID}-card-success`,
-  `${MODULE_ID}-card-critical-success`,
-];
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -76,7 +74,7 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
               Object.entries(o.observers).map(([k, v]) => {
                 const entry = {
                   name: v.name,
-                  dos: DOS_KEYS[v.degreeOfSuccess],
+                  dos: DOS_CARD_KEYS[v.degreeOfSuccess],
                   label: LOCALIZATION_KEYS[v.stealthLabel],
                   dc: localizeString(`${MODULE_ID}.dc`, { dc: v.dc }),
                 };

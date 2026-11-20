@@ -1,4 +1,4 @@
-import { HIDDEN, MODULE_ID, UNDETECTED } from "./const.js";
+import { MODULE_ID, STEALTH } from "./const.js";
 import { debuglog, breakdownRoll, renderTemplateAndEnrich } from "./utils.js";
 import { prepareSeekData } from "./seek.js";
 import { prepareHideData } from "./hide.js";
@@ -69,7 +69,7 @@ async function applyReduceStealth(message, _event, flags) {
   if (!game.user.isGM && !message.isAuthor) return;
   const endStealth = flags.endStealth;
   const token = message.token;
-  await reduceStealthBaseline(token, HIDDEN);
+  await reduceStealthBaseline(token, STEALTH.hidden);
   refreshEverybody();
   endStealth.showEndButton = false;
   return message.update({ flags: { [MODULE_ID]: flags } });
@@ -91,7 +91,7 @@ export async function renderActionCard(message, html, _data, flags, context) {
       primaryLabel: `${MODULE_ID}.endStealth.${endStealth.after ? "afterLabel" : "beforeLabel"}`,
       change: true,
     };
-    if (getStealthBaseline(stealthy) === UNDETECTED) {
+    if (getStealthBaseline(stealthy) === STEALTH.undetected) {
       const secondaryClickId = foundry.utils.randomID();
       context.clickIds[secondaryClickId] = applyReduceStealth;
       templateData.secondaryClickId = secondaryClickId;

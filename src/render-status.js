@@ -1,11 +1,4 @@
-import {
-  MODULE_ID,
-  LOCALIZATION_KEYS,
-  OBSERVED,
-  HIDDEN,
-  UNDETECTED,
-  DOS_KEYS,
-} from "./const.js";
+import { MODULE_ID, LOCALIZATION_KEYS, STEALTH, DOS_KEYS } from "./const.js";
 import { findInitiativeCard } from "./initiative.js";
 import { debuglog, interpolateString, localizeString } from "./utils.js";
 import { cachedSettings } from "./settings.js";
@@ -29,29 +22,29 @@ export async function renderSummary(targetList, _context) {
   const summary = summarizeTargetList(targetList);
   const templateData = {
     moduleId: MODULE_ID,
-    ...(summary[OBSERVED]
+    ...(summary[STEALTH.observed]
       ? {
           observedLabel: localizeString(
             `${MODULE_ID}.avoidanceCheck.observed`,
             {
-              count: summary[OBSERVED],
+              count: summary[STEALTH.observed],
             },
           ),
         }
       : {}),
-    ...(summary[HIDDEN]
+    ...(summary[STEALTH.hidden]
       ? {
           observedLabel: localizeString(`${MODULE_ID}.avoidanceCheck.hidden`, {
-            count: summary[HIDDEN],
+            count: summary[STEALTH.hidden],
           }),
         }
       : {}),
-    ...(summary[UNDETECTED]
+    ...(summary[STEALTH.undetected]
       ? {
           observedLabel: localizeString(
             `${MODULE_ID}.avoidanceCheck.undetected`,
             {
-              count: summary[UNDETECTED],
+              count: summary[STEALTH.undetected],
             },
           ),
         }

@@ -1,4 +1,4 @@
-import { MODULE_ID, UNDETECTED } from "./const.js";
+import { MODULE_ID, STEALTH } from "./const.js";
 import { onStealthReply } from "./avoidance-check.js";
 import { refreshVisibilityCache } from "./visibility.js";
 import { cachedSettings } from "./settings.js";
@@ -39,7 +39,7 @@ export function zoomToCombat(encounter, observations) {
     for (const targetId in avoider.detectors) {
       const detector = avoider.detectors[targetId];
       const check = detector.check;
-      if (check.stealth !== UNDETECTED) {
+      if (check.stealth !== STEALTH.undetected) {
         detectors.push(targetId);
       }
     }

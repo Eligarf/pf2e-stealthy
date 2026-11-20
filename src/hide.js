@@ -4,15 +4,7 @@ import {
   getToken,
   renderTemplateAndEnrich,
 } from "./utils.js";
-import {
-  MODULE_ID,
-  STEALTH_LABELS,
-  HIDDEN,
-  OBSERVED,
-  UNDETECTED,
-  SUCCESS,
-  FAILURE,
-} from "./const.js";
+import { MODULE_ID, STEALTH_LABELS, STEALTH, DOS } from "./const.js";
 import { renderTargetList, renderSummary } from "./render-status.js";
 import { prepareStealthChecks } from "./action.js";
 import {
@@ -26,12 +18,12 @@ import { refreshEverybody } from "./socket.js";
 function resolveHide(origin, check) {
   const stealth = getStealthinessTo(origin, check.tokenDoc.id);
   check.was = stealth;
-  if (check.degreeOfSuccess >= SUCCESS) {
-    if (stealth === UNDETECTED) {
+  if (check.degreeOfSuccess >= DOS.success) {
+    if (stealth === STEALTH.undetected) {
       (check.tooltips ??= []).push({ format: `${MODULE_ID}.hide.retain` });
-      check.stealth = UNDETECTED;
-    } else check.stealth = HIDDEN;
-  } else check.stealth = OBSERVED;
+      check.stealth = STEALTH.undetected;
+    } else check.stealth = STEALTH.hidden;
+  } else check.stealth = STEALTH.observed;
   check.stealthLabel = STEALTH_LABELS[check.stealth];
 }
 
@@ -63,8 +55,8 @@ async function applyHideEffects(message, _event, flags) {
   if (!game.user.isGM) return;
   const stealthy = getStealthyEffect(message.token);
   const baselineStealth = stealthy
-    ? Math.max(getStealthBaseline(stealthy), HIDDEN)
-    : HIDDEN;
+    ? Math.max(getStealthBaseline(stealthy), STEALTH.hidden)
+    : STEALTH.hidden;
   const hide = flags.hide;
   const detectors = Object.fromEntries(
     hide.targetList
@@ -79,7 +71,10 @@ async function applyHideEffects(message, _event, flags) {
       .concat(
         hide.allies.map((id) => [
           id,
-          { stealth: OBSERVED, signature: getToken(id)?.actor?.signature },
+          {
+            stealth: STEALTH.observed,
+            signature: getToken(id)?.actor?.signature,
+          },
         ]),
       ),
   );
@@ -94,7 +89,7 @@ async function applyHideEffects(message, _event, flags) {
   return message.update({ flags: { [MODULE_ID]: flags } });
 }
 
-const hideDosStates = [FAILURE, SUCCESS, SUCCESS];
+const hideDosStates = [DOS.failure, DOS.success, DOS.success];
 
 async function onHideStatusClick(message, _event, flags, targetId) {
   const targetList = flags[flags.card]?.targetList;
@@ -102,7 +97,9 @@ async function onHideStatusClick(message, _event, flags, targetId) {
   const target = targetList.find((t) => t.tokenId === targetId);
   if (!target) return;
   target.stealth =
-    target.stealth === OBSERVED ? Math.max(HIDDEN, target.was) : OBSERVED;
+    target.stealth === STEALTH.observed
+      ? Math.max(STEALTH.hidden, target.was)
+      : STEALTH.observed;
   target.stealthLabel = STEALTH_LABELS[target.stealth];
   const update = {
     flags: {
