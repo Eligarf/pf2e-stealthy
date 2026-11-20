@@ -287,44 +287,38 @@ async function createEncounter(message, _event, flags) {
     return message.update({ flags: { [MODULE_ID]: flags } });
   }
 
-  function fillStatistics(ids, stealths) {
-    return ids
-      .map((id) => canvas.tokens.get(id))
-      .filter((token) => token)
-      .map((token) => {
-        let entry = {
-          tokenId: token.id,
-          sceneId: token.parent.id,
-          actorId: token.actor.id,
-          hidden: token.hidden,
-        };
-        const stealth = stealths[token.id]?.skillResult ?? null;
-        if (stealth !== null) {
-          entry.initiative = stealth;
-          entry.flags = {
-            [game.system.id]: { initiativeStatistic: "stealth" },
-          };
-        }
-        return entry;
+  async function addCombatants(ids, stealths) {
+    const tokenDocs = ids
+      .filter(
+        (id) => !combat.combatants.some((existing) => existing.tokenId === id),
+      )
+      .map((id) => {
+        const token = canvas.tokens.get(id);
+        return token.document ?? token;
       });
+    const combatants =
+      await TokenDocument.implementation.createCombatants(tokenDocs);
+    const updates = combatants
+      .filter((c) => (stealths[c.tokenId]?.skillResult ?? null) !== null)
+      .map((c) => ({
+        _id: c.id,
+        initiative: stealths[c.tokenId].skillResult,
+        flags: {
+          [game.system.id]: { initiativeStatistic: "stealth" },
+        },
+      }));
+    if (updates.length) {
+      await combat.updateEmbeddedDocuments("Combatant", updates);
+    }
   }
 
   debuglog("createEncounter", { avoidanceCheck });
-  const combatants = fillStatistics(
-    avoidanceCheck.enemyIds,
-    avoidanceCheck.enemyStealth,
-  )
-    .concat(
-      fillStatistics(
-        avoidanceCheck.friendlyIds,
-        avoidanceCheck.friendlyStealth,
-      ),
-    )
-    .filter(
-      (c) =>
-        !combat.combatants.find((existing) => existing.tokenId === c.tokenId),
-    );
-  await combat.createEmbeddedDocuments("Combatant", combatants);
+  await addCombatants(avoidanceCheck.enemyIds, avoidanceCheck.enemyStealth);
+  await addCombatants(
+    avoidanceCheck.friendlyIds,
+    avoidanceCheck.friendlyStealth,
+  );
+
   await combat.update({
     flags: { [MODULE_ID]: { avoidanceCheckMessageId: message.id } },
   });
