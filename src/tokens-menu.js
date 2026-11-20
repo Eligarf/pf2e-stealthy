@@ -4,6 +4,7 @@ import { undoRevealsOf } from "./effects.js";
 import { avoidanceCheck } from "./avoidance-check.js";
 import { debuglog, iterateTokensAndParties, localizeString } from "./utils.js";
 import { editStealth } from "./edit.js";
+import { refreshEverybody } from "./socket.js";
 import { declumpInitiative } from "./initiative.js";
 
 export function fillTokensMenu({ selection }) {
@@ -63,7 +64,11 @@ export function fillTokensMenu({ selection }) {
 
   if (avoiders.length > 0) {
     let section = [];
-    if (avoiders.length === 1 && combat.started) {
+    if (
+      avoiders.length === 1 &&
+      selection.tokens.length === 1 &&
+      combat.started
+    ) {
       section.push({
         key: "edit-stealth",
         label: game.i18n.localize(`${MODULE_ID}.menu.editStealth.label`),
@@ -129,13 +134,13 @@ export function fillTokensMenu({ selection }) {
     }
   }
 
+  if (choices.length > 0) {
+    choices.push({
+      isDivider: true,
+      group: 4,
+    });
+  }
   if (!combat || !combat.started) {
-    if (choices.length > 0) {
-      choices.push({
-        isDivider: true,
-        group: 4,
-      });
-    }
     choices.push({
       key: "avoidance-check",
       label: game.i18n.localize(`${MODULE_ID}.menu.avoidanceCheck.label`),
@@ -148,12 +153,6 @@ export function fillTokensMenu({ selection }) {
       },
     });
   } else {
-    if (choices.length > 0) {
-      choices.push({
-        isDivider: true,
-        group: 4,
-      });
-    }
     const turns = combat?.turns ?? [];
     choices.push({
       key: "declump",
@@ -166,6 +165,15 @@ export function fillTokensMenu({ selection }) {
       onClick: declumpInitiative,
     });
   }
+  choices.push({
+    key: "refresh",
+    label: game.i18n.localize(`${MODULE_ID}.menu.refresh.label`),
+    hint: `${MODULE_ID}.menu.refresh.hint`,
+    group: 5,
+    onClick: () => {
+      return refreshEverybody();
+    },
+  });
 
   choices.sort((a, b) => a.group - b.group || a.label.localeCompare(b.label));
   return { title, choices };

@@ -67,7 +67,7 @@ The following is a list of the menu options that can appear when pressing the me
 | ----------- | ------------- | ------- |
 | Avoidance Check | Selected or targeted tokens | Sends a chat message with the avoidance check details to the GM |
 | Clear Ambush | Out of combat, selected or targeted non-party tokens using stealth for initiative | Set initiative statistic to 'perception' for any actors using 'stealth' |
-| De-clump Initiative | In combat, no tokens controlled or targeted | Spreads out the initiative value of all combatants, resulting in a gap of 3 between each |
+| De-clump Initiative | In combat | Spreads out the initiative value of all combatants, resulting in a gap of 3 between each |
 | Edit Stealth | Single *stealthy* token selected or targeted | Sends a chat card to the GM where they can edit the stealth values vs that token's potential observers |
 | Prepare Ambush | Out of combat, selected or targeted non-party tokens not using stealth for initiative | Sets the actors' initiative statistics to 'stealth', and ghosts the tokens (sets Foundry hidden) |
 | Refresh all | None | Sends a refresh perception signal to all clients |

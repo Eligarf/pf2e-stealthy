@@ -2,6 +2,8 @@ import { MODULE_ID, SLUGS } from "./const.js";
 import { clearActorStealth } from "./stealth.js";
 import { revealAvoidersTo, undoRevealsOf } from "./effects.js";
 import { debuglog, iterateTokensAndParties } from "./utils.js";
+import { declumpInitiative } from "./initiative.js";
+import { refreshEverybody } from "./socket.js";
 
 export function fillConnectedTokensMenu({ controlled, targeted }) {
   const controlledAvoidingTokens = controlled.tokens.filter((t) => {
@@ -122,6 +124,36 @@ export function fillConnectedTokensMenu({ controlled, targeted }) {
       },
     );
   }
+
+  if (choices.length > 0) {
+    choices.push({
+      isDivider: true,
+      group: 5,
+    });
+  }
+  const combat = game?.combat;
+  if (combat?.started) {
+    const turns = combat?.turns ?? [];
+    choices.push({
+      key: "declump",
+      label: game.i18n.localize(
+        `${MODULE_ID}.menu.declump.${!turns.length ? "disabledLabel" : "label"}`,
+      ),
+      hint: `${MODULE_ID}.menu.declump.hint`,
+      group: 6,
+      disabled: !turns.length,
+      onClick: declumpInitiative,
+    });
+  }
+  choices.push({
+    key: "refresh",
+    label: game.i18n.localize(`${MODULE_ID}.menu.refresh.label`),
+    hint: `${MODULE_ID}.menu.refresh.hint`,
+    group: 6,
+    onClick: () => {
+      return refreshEverybody();
+    },
+  });
 
   choices.sort((a, b) => a.group - b.group || a.label.localeCompare(b.label));
   return { title: `${MODULE_ID}.menu.connectedTokens`, choices };

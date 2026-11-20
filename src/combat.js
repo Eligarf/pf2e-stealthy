@@ -37,6 +37,12 @@ export function findPossibleTargets({
   minionTokens,
   eidolonTokens,
 }) {
+  // debuglog("findPossibleTargets", {
+  //   encounter,
+  //   origin,
+  //   minionTokens,
+  //   eidolonTokens,
+  // });
   const alliance = origin.actor?.system?.details?.alliance;
   const tokens = encounter.combatants.contents.map((c) => c.token);
   const them = tokens
@@ -144,7 +150,7 @@ async function startCombatWrapper(wrapped, ...args) {
   // recording the results for later batch processing
   //
   for (const avoidingCombatant of avoiders) {
-    // log("avoider", avoider);
+    // debuglog("avoidingCombatant", avoidingCombatant);
 
     const initiativeCard = await findInitiativeCard(avoidingCombatant);
     let rawRollDosDelta = 0;

@@ -270,8 +270,22 @@ function refreshTokenHook(token, options) {
   const stealth = actor?.items.find((i) => i.slug === SLUGS.stealthy);
   if (!stealth) return;
 
-  // Extract some stealth data for the loop
+  // Get our baseline, then bail if hidden things are behind a wall or something
   const baseline = stealth.system?.badge?.value;
+  if (baseline === STEALTH.hidden) {
+    const los = canvas.visibility.testVisibility(token.center, {
+      object: token,
+    });
+    if (!los) return;
+  } else if (baseline === STEALTH.undetected) {
+    const tolerance = Math.min(token.w, token.h) / 4;
+    const los = canvas.visibility.testVisibility(token.center, {
+      tolerance,
+    });
+    if (!los) return;
+  }
+
+  // Get the rest of the detection info we'll need
   const detectors = stealth.flags[MODULE_ID]?.detectors || {};
   const foilSenses = token.actor.items.some(
     (i) => i.system.slug === SLUGS.foilSenses,

@@ -3,7 +3,8 @@
 ## 1.4.2
 
 - Fix permission error that prevented some players from rolling initiatives when avoidance check was used to create a combat.
-- 'Declump initiative' option shows up in more contexts now.
+- 'Declump initiative' and 'Refresh all clients' options shows up in more contexts now.
+- Fix some spurious visibility of failed sneak attempts while fully behind walls.
 
 ## 1.4.1
 
