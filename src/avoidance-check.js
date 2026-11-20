@@ -288,24 +288,27 @@ async function createEncounter(message, _event, flags) {
   }
 
   function fillStatistics(ids, stealths) {
-    return ids.map((id) => {
-      const token = canvas.tokens.get(id);
-      let entry = {
-        tokenId: token?.id,
-        actorId: token.actor?.id,
-        hidden: token?.hidden,
-      };
-      const stealth = stealths[id]?.skillResult ?? null;
-      if (stealth !== null) {
-        entry.initiative = stealth;
-        entry.flags = {
-          [game.system.id]: { initiativeStatistic: "stealth" },
+    return ids
+      .map((id) => canvas.tokens.get(id))
+      .filter((token) => token)
+      .map((token) => {
+        let entry = {
+          tokenId: token.id,
+          actorId: token.actor.id,
+          hidden: token.hidden,
         };
-      }
-      return entry;
-    });
+        const stealth = stealths[token.id]?.skillResult ?? null;
+        if (stealth !== null) {
+          entry.initiative = stealth;
+          entry.flags = {
+            [game.system.id]: { initiativeStatistic: "stealth" },
+          };
+        }
+        return entry;
+      });
   }
 
+  debuglog("createEncounter", { avoidanceCheck });
   const combatants = fillStatistics(
     avoidanceCheck.enemyIds,
     avoidanceCheck.enemyStealth,
