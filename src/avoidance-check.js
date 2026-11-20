@@ -294,6 +294,7 @@ async function createEncounter(message, _event, flags) {
       .map((token) => {
         let entry = {
           tokenId: token.id,
+          sceneId: token.parent.id,
           actorId: token.actor.id,
           hidden: token.hidden,
         };

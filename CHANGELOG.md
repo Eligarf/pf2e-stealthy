@@ -1,6 +1,6 @@
 ## pending
 
-## 1.4.2
+## 1.4.2, 1.4.3
 
 - Fix permission error that prevented some players from rolling initiatives when avoidance check was used to create a combat.
 - 'Declump initiative' and 'Refresh all clients' options shows up in more contexts now.
