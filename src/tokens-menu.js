@@ -1,11 +1,12 @@
 import { prepareAmbush, clearAmbush, clearActorStealth } from "./stealth.js";
 import { MODULE_ID, SLUGS } from "./const.js";
 import { undoRevealsOf } from "./effects.js";
-import { avoidanceCheck } from "./avoidance-check.js";
+import { resolveExplorationStealth } from "./exploration-check.js";
 import { debuglog, iterateTokensAndParties, localizeString } from "./utils.js";
 import { editStealth } from "./edit.js";
 import { refreshEverybody } from "./socket.js";
 import { declumpInitiative } from "./initiative.js";
+import { countAvoiders } from "./combat.js";
 
 export function fillTokensMenu({ selection }) {
   const title = localizeString(`${MODULE_ID}.menu.tokensSelected`, {
@@ -141,15 +142,31 @@ export function fillTokensMenu({ selection }) {
     });
   }
   if (!combat || !combat.started) {
+    const avoiderCount = countAvoiders(selection.tokens);
+    const labelCase =
+      (avoiderCount.party > 0 ? 2 : 0) + (avoiderCount.opposition > 0 ? 1 : 0);
+    let label = "naLabel";
+    switch (labelCase) {
+      case 1:
+        label = "ambushLabel";
+        break;
+      case 2:
+        label = "avoidLabel";
+        break;
+      case 3:
+        label = "bothLabel";
+        break;
+    }
     choices.push({
-      key: "avoidance-check",
-      label: game.i18n.localize(`${MODULE_ID}.menu.avoidanceCheck.label`),
-      hint: localizeString(`${MODULE_ID}.menu.avoidanceCheck.hint`, {
+      key: "exploration-check",
+      label: game.i18n.localize(`${MODULE_ID}.menu.explorationCheck.${label}`),
+      hint: localizeString(`${MODULE_ID}.menu.explorationCheck.hint`, {
         type: game.i18n.localize(`${MODULE_ID}.menu.type.${selection.type}`),
       }),
-      group: 5,
+      disabled: label === "naLabel",
+      group: 1,
       onClick: async () => {
-        return avoidanceCheck(selection.tokens);
+        return resolveExplorationStealth(selection.tokens);
       },
     });
   } else {

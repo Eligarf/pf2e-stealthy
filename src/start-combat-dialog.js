@@ -45,7 +45,7 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
       template: `modules/${MODULE_ID}/templates/start-combat-dialog.hbs`,
     },
     footer: {
-      template: `modules/${MODULE_ID}/templates/start-combat-footer.hbs`,
+      template: `modules/${MODULE_ID}/templates/dialog-footer.hbs`,
     },
   };
 
@@ -63,6 +63,7 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
             ? o.avoider.combatant.actor.perception
             : o.avoider.combatant.actor.skills[stat];
         const label = skill?.label;
+        const alliance = o.avoider.combatant.actor?.alliance ?? "none";
         return [
           id,
           {
@@ -70,6 +71,7 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
             isStealth: stat === "stealth",
             label,
             skillResult: o.avoider.skillResult,
+            alliance,
             observers: Object.fromEntries(
               Object.entries(o.observers).map(([k, v]) => {
                 const entry = {
@@ -110,7 +112,6 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
         pcs: this.dialogData.ineligiblePcs.map((c) => ({ name: c.name })),
       };
     }
-    context.stealthLabel = `${MODULE_ID}.startCombat.stealthLabel`;
     return context;
   }
 
@@ -131,7 +132,7 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
     const content = this.element.querySelector(
       `.${MODULE_ID}-start-combat-dialog`,
     );
-    const footer = this.element.querySelector(`.${MODULE_ID}-sheet-footer`);
+    const footer = this.element.querySelector(`.${MODULE_ID}-dialog-footer`);
     if (content && footer) {
       const parent = content.parentElement;
       if (parent) {

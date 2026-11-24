@@ -1,6 +1,6 @@
 import { MODULE_ID } from "./const.js";
 import { debuglog, getToken } from "./utils.js";
-import { renderAvoidanceCheckCard } from "./avoidance-check.js";
+import { renderAvoidanceCheckCard } from "./exploration-check.js";
 import { renderInitiativeCard } from "./render-status.js";
 import { renderSneakCard } from "./sneak.js";
 import { renderHideCard } from "./hide.js";
@@ -105,7 +105,7 @@ globalThis.Hooks.on("renderChatMessageHTML", async (message, html, data) => {
           flags,
         );
         break;
-      case "avoidance-check":
+      case "exploration-check":
         interactionContext = await renderAvoidanceCheckCard(
           message,
           html,

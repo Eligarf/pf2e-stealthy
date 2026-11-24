@@ -139,8 +139,11 @@
         "label": "Undo Stealth Reveals",
         "hint": "Undo any stealth reveals of {type} tokens"
       },
-      "avoidanceCheck": {
-        "label": "Check Avoidance",
+      "explorationCheck": {
+        "avoidLabel": "Resolve Avoid Notice Detection",
+        "ambushLabel": "Resolve Ambush Detection",
+        "bothLabel": "Resolve both Ambush vs. Avoid Notice Detection",
+        "naLabel": "No exploration stealth resolution needed",
         "hint": "Run a stealth vs perception check for all stealthing {type} tokens"
       },
       "revealControlledToTargeted": {
@@ -186,17 +189,16 @@
       "vs": "vs {name}"
     },
     "dc": "DC {dc}",
-    "avoidanceCheck": {
-      "title": "Avoidance Check",
-      "secretTitle": "Secret Avoidance Check",
+    "explorationCheck": {
+      "title": "Exploration Stealth Resolution",
       "checkLabel": "Check result:",
       "observed": "Observed: {count}",
       "hidden": "Hidden: {count}",
       "undetected": "Undetected: {count}",
       "createEncounter": "Add All to Combat",
-      "missingActors": "Please {clownCar} to the canvas before pressing the {createEncounter} button:",
       "observedEnemies": "Noticable Enemies",
-      "observedFriendlies": "Noticable Party Members"
+      "observedFriendlies": "Noticable Party Members",
+      "reopen": "Re-open Resolver"
     },
     "hide": {
       "retain": "Success retains undetected status"
@@ -239,11 +241,20 @@
       "initLabel": "Initiative({stat}) Check:",
       "ineligible": "Ineligible PCs",
       "ineligibleBecause": "These PCs must use the 'Avoid Notice' activity to gain stealth",
-      "unrolled1": "{name} needs to roll initiative before stealth can be evaluated",
-      "unrolled2": "{name1} and {name2} need to roll initiative before stealth can be evaluated",
-      "unrolled": "{count} needs to roll initiative before stealth can be evaluated",
+      "unrolled1": "{name} needs to roll initiative",
+      "unrolled2": "{name1} and {name2} need to roll initiative",
+      "unrolled": "{count} combatants need to roll initiative",
       "proceedTitle": "PF2e Stealthy - Confirm Start Combat",
-      "choice": "{message}<p>Do you wish to proceed with combat start?</p>"
+      "choice": "{message}<p>Do you wish to proceed with combat start anyway?</p>"
+    },
+    "explorationCheckDialog": {
+      "title": "Exploration Stealth Resolution",
+      "cancel": "No Combat at this time",
+      "confirm": "Add Combatants to Combat",
+      "missingActors": "Please {clownCar} to the canvas before adding combatants to combat",
+      "noticableEnemies": "Noticable Enemies",
+      "noticableFriendlies": "Noticable Party Members",
+      "stealthResult": "Stealth Check:"
     },
     "distractingShadows": {
       "bigger": "Distracting Shadows: lesser cover from larger creature",

@@ -17,7 +17,7 @@
 
 /* Avoidance Check structure */
 
-.pf2e-stealthy-avoidance-check {
+.pf2e-stealthy-exploration-check {
   width: 100% !important;
   display: flex !important;
   flex-direction: column;
@@ -379,9 +379,33 @@ button.pf2e-stealthy-button:disabled {
   text-align: left;
 }
 
+.pf2e-stealthy-card[data-alliance="party"] {
+  border-color: #49b868;
+}
+
+.pf2e-stealthy-card[data-alliance="opposition"] {
+  border-color: #b3475c;
+}
+
+.pf2e-stealthy-card[data-alliance="none"] {
+  border-color: #b88b35;
+}
+
 .pf2e-stealthy-card:hover {
   border-color: var(--color-border-highlight, #ff6400);
   box-shadow: 0 4px 8px rgba(255, 100, 0, 0.2);
+}
+
+.pf2e-stealthy-card[data-alliance="party"]:hover {
+  border-color: #63ad85;
+}
+
+.pf2e-stealthy-card[data-alliance="opposition"]:hover {
+  border-color: #d16277;
+}
+
+.pf2e-stealthy-card[data-alliance="none"]:hover {
+  border-color: #d4a64a;
 }
 
 .pf2e-stealthy-card .pf2e-card-title {

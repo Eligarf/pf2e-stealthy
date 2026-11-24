@@ -1,0 +1,50 @@
+<section class="{{moduleId}}-exploration-check-dialog">
+  <div class="{{moduleId}}-cards-row">
+    {{#each avoiders}}
+      {{#if noticable}}
+        <div class="{{@root.moduleId}}-card" data-alliance={{alliance}}>
+          <h4 class="{{@root.moduleId}}-card-title">{{name}}</h4>
+          <div class="{{@root.moduleId}}-card-body">
+            <div class="{{@root.moduleId}}-target-list">
+              {{#each noticables}}
+                <div class="{{@root.moduleId}}-target">
+                  <div class="{{@root.moduleId}}-name">{{name}}</div>
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+      {{else}}
+        <div class="{{@root.moduleId}}-card" data-avoider-id="{{@key}}" data-alliance={{alliance}}>
+          <h4 class="{{@root.moduleId}}-card-title">{{name}}</h4>
+          <div class="{{@root.moduleId}}-card-body">
+            <div class="{{@root.moduleId}}-description">
+              <span class="{{@root.moduleId}}-card-label">{{localize label}}</span>
+              <span class="initiative-value">{{skillResult}}</span>
+            </div>
+            <div class="{{@root.moduleId}}-target-list">
+              {{#each observers}}
+                <div class="{{@root.moduleId}}-target"
+                  data-avoider="{{@../key}}"
+                  data-observer="{{@key}}"
+                >
+                  <div class="{{@root.moduleId}}-name">{{name}}</div>
+                  <div class="{{@root.moduleId}}-card-result"
+                    data-avoider="{{@../key}}"
+                    data-observer="{{@key}}"
+                  >
+                    <span class="degree-of-success {{dos}}">{{localize label}}</span>
+                  </div>
+                  <div class="{{@root.moduleId}}-dc">
+                    <span class="degree-of-success {{dos}}">{{dc}}</span>
+                  </div>
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+      {{/if}}
+    {{/each}}
+  </div>
+</section>
+

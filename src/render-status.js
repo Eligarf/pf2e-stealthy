@@ -25,7 +25,7 @@ export async function renderSummary(targetList, _context) {
     ...(summary[STEALTH.observed]
       ? {
           observedLabel: localizeString(
-            `${MODULE_ID}.avoidanceCheck.observed`,
+            `${MODULE_ID}.explorationCheck.observed`,
             {
               count: summary[STEALTH.observed],
             },
@@ -34,15 +34,18 @@ export async function renderSummary(targetList, _context) {
       : {}),
     ...(summary[STEALTH.hidden]
       ? {
-          observedLabel: localizeString(`${MODULE_ID}.avoidanceCheck.hidden`, {
-            count: summary[STEALTH.hidden],
-          }),
+          observedLabel: localizeString(
+            `${MODULE_ID}.explorationCheck.hidden`,
+            {
+              count: summary[STEALTH.hidden],
+            },
+          ),
         }
       : {}),
     ...(summary[STEALTH.undetected]
       ? {
           observedLabel: localizeString(
-            `${MODULE_ID}.avoidanceCheck.undetected`,
+            `${MODULE_ID}.explorationCheck.undetected`,
             {
               count: summary[STEALTH.undetected],
             },

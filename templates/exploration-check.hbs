@@ -1,40 +1,5 @@
-<div class="{{moduleId}}-avoidance-check">
+<div class="{{moduleId}}-exploration-check">
   <h3>{{localize title}}</h3>
-  {{#if enemyIds}}
-    <div class="{{moduleId}}-enemies" data-visibility="gm">
-      {{#if noticableEnemies}}
-        <div class="{{@root.moduleId}}-noticable-enemies">
-          {{localize observedEnemies}}
-          <div class="{{@root.moduleId}}-noticables">
-            {{#each noticableEnemies}}
-              <div class="{{@root.moduleId}}-noticable">
-                <div class="{{@root.moduleId}}-name" data-hover-id="{{hoverId}}">{{name}}</div>
-              </div>
-            {{/each}}
-          </div>
-        </div>
-      {{/if}}
-      {{#if enemyAvoiders }}
-        <div class="{{@root.moduleId}}-enemy-avoiders">
-          {{#each enemyAvoiders}}
-            {{#unless @first}}<hr>{{/unless}}
-            <div
-              class="{{@root.moduleId}}-avoider"
-              data-combatant-id="{{tokenId}}"
-              data-hover-id="{{hoverId}}"
-            >
-              <div class="{{@root.moduleId}}-description">
-                <div class="{{@root.moduleId}}-name">{{name}}</div>
-                <span>{{localize label}}</span>
-                <div class="{{@root.moduleId}}-roll">{{skillResult}}</div>
-              </div>
-              {{{targetList}}}
-            </div>
-          {{/each}}
-        </div>
-      {{/if}}
-    </div>
-  {{/if}}
   {{#if friendlyIds}}
     <div class="{{moduleId}}-friendlies">
       {{#if noticableFriendlies}}
@@ -81,5 +46,14 @@
         </div>
       {{/if}}
     </div>
+  {{/if}}
+  {{#if clickId}}
+    <button
+      class="{{moduleId}}-button"
+      data-click-id="{{clickId}}"
+      data-visibility="gm"
+    >
+      {{localize reopen}}
+    </button>
   {{/if}}
 </div>

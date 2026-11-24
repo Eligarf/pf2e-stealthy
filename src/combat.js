@@ -76,6 +76,41 @@ export function findPossibleTargets({
   return { us, them };
 }
 
+export function countAvoiders(tokens) {
+  return tokens.reduce(
+    (acc, t) => {
+      const actor = t.actor;
+      if (!actor) return acc;
+      const isPc = actor.parties?.size > 0 && actor.system?.exploration;
+      const stat = actor.system?.initiative?.statistic;
+      const isStealth = stat === "stealth";
+      if (!isPc) {
+        if (isStealth) {
+          acc[t.document.disposition === 1 ? "party" : "opposition"] += 1;
+        }
+      } else {
+        if (!cachedSettings.requireActivity) {
+          if (isStealth) {
+            acc[t.document.disposition === 1 ? "party" : "opposition"] += 1;
+          }
+        } else {
+          const isAvoiding = actor.system.exploration.some(
+            (a) => actor.items.get(a)?.system?.slug === SLUGS.avoidNotice,
+          );
+          if (isAvoiding) {
+            acc[t.document.disposition === 1 ? "party" : "opposition"] += 1;
+          }
+        }
+      }
+      return acc;
+    },
+    {
+      party: 0,
+      opposition: 0,
+    },
+  );
+}
+
 function preCreateCombatant(combatant, _data, _options, userId) {
   if (userId !== game.user.id) return true;
   if (!cachedSettings.keepDeadOut) return true;
@@ -105,12 +140,7 @@ async function startCombatWrapper(wrapped, ...args) {
   if (!game.user.isGM) return wrapped(...args);
 
   const encounter = this;
-
-  const avoidanceCheckMessageId =
-    encounter.flags[MODULE_ID]?.avoidanceCheckMessageId;
-  const avoidanceCheckMessage = avoidanceCheckMessageId
-    ? game.messages.get(avoidanceCheckMessageId)
-    : null;
+  const explorationCheck = encounter.flags[MODULE_ID]?.explorationCheck;
 
   // Build out the various lists of combatant types
   // Pc are in parties and can have exploration activities
@@ -156,18 +186,14 @@ async function startCombatWrapper(wrapped, ...args) {
     let rawRollDosDelta = 0;
     if (initiativeCard) {
       ({ rawRollDosDelta } = breakdownRoll(initiativeCard?.rolls?.[0]));
-    } else {
-      const avoidanceCheck =
-        avoidanceCheckMessage?.flags?.[MODULE_ID]?.avoidanceCheck;
-      if (avoidanceCheck) {
-        const tokenId = avoidingCombatant.token.id;
-        if (tokenId in avoidanceCheck.enemyStealth) {
-          rawRollDosDelta =
-            avoidanceCheck.enemyStealth[tokenId].rawRollDosDelta;
-        } else if (tokenId in avoidanceCheck.friendlyStealth) {
-          rawRollDosDelta =
-            avoidanceCheck.friendlyStealth[tokenId].rawRollDosDelta;
-        }
+    } else if (explorationCheck) {
+      const tokenId = avoidingCombatant.token.id;
+      if (tokenId in explorationCheck.enemyStealth) {
+        rawRollDosDelta =
+          explorationCheck.enemyStealth[tokenId].rawRollDosDelta;
+      } else if (tokenId in explorationCheck.friendlyStealth) {
+        rawRollDosDelta =
+          explorationCheck.friendlyStealth[tokenId].rawRollDosDelta;
       }
     }
 

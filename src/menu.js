@@ -65,7 +65,6 @@ const MENU_ITEM = `${MODULE_ID}-menu-item`;
 
 class StealthyContextMenu {
   static show(x, y, choices) {
-    // Clean up any existing menu
     document.getElementById(MENU_ID)?.remove();
 
     const menu = document.createElement("div");
@@ -73,7 +72,6 @@ class StealthyContextMenu {
     menu.style.left = `${x}px`;
     menu.style.top = `${y}px`;
 
-    // 3. Build the list container
     let content = `<ul>`;
 
     choices.forEach((choice, index) => {

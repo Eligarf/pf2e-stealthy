@@ -42,8 +42,9 @@ const SIZE_RANK = {
 
 export function computeCover(origin, target, base = 0) {
   let bonus = base;
-  let creatureBonus = 0;
   let tooltips = [];
+  if (!("x" in origin && "x" in target)) return { bonus, tooltips };
+  let creatureBonus = 0;
   let creatureCover = null;
   if (cachedSettings.wallCoverApi) {
     const wallCover = cachedSettings.wallCoverApi(origin, target);

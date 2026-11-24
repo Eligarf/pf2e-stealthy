@@ -1,22 +1,25 @@
 import { isAvoider } from "./effects.js";
-import { MODULE_ID, SLUGS } from "./const.js";
+import { MODULE_ID } from "./const.js";
 import { findBaseCoverBonus } from "./cover.js";
 import { sendStealthRollToGM } from "./socket.js";
 import { resolveStealthChecks } from "./observation-logic.js";
 import { resolveAvoidNotice } from "./sneak.js";
 import {
+  prepareTargetList,
   renderSummary,
   renderTargetList,
-  prepareTargetList,
 } from "./render-status.js";
 import {
   getToken,
   breakdownRoll,
   debuglog,
   iterateTokensAndParties,
-  localizeString,
   renderTemplateAndEnrich,
 } from "./utils.js";
+import {
+  ExplorationCheckDialog,
+  explorationCheckDialogId,
+} from "./exploration-check-dialog.js";
 
 async function rollStealth(actor, { skipDialog = true, player = false } = {}) {
   const options = { skipDialog, player };
@@ -57,39 +60,7 @@ function resolveStealthRoll({
   });
 }
 
-function makeMissingActorsString() {
-  const clownCar = localizeString("PF2E.Actor.Party.ClownCar.Deposit");
-  const createEncounter = localizeString(
-    `${MODULE_ID}.avoidanceCheck.createEncounter`,
-  );
-  return localizeString(`${MODULE_ID}.avoidanceCheck.missingActors`, {
-    clownCar,
-    createEncounter,
-  });
-}
-
-async function renderEncounterSection(avoidanceCheck, context) {
-  const templateData = {
-    moduleId: MODULE_ID,
-    ...(avoidanceCheck.missing.length > 0
-      ? { missing: makeMissingActorsString() }
-      : {}),
-  };
-  if (avoidanceCheck.missing.length > 0)
-    templateData.missing = makeMissingActorsString();
-  if (!avoidanceCheck.addedToCombat) {
-    const clickId = foundry.utils.randomID();
-    (context["clickIds"] ??= {})[clickId] = createEncounter;
-    templateData.clickId = clickId;
-    templateData.create = `${MODULE_ID}.avoidanceCheck.createEncounter`;
-  }
-  return renderTemplateAndEnrich(
-    `modules/${MODULE_ID}/templates/encounter.hbs`,
-    templateData,
-  );
-}
-
-async function prepareAvoidanceCheckData(tokens) {
+async function prepareExplorationCheck(tokens) {
   const friendlyTokens = tokens.filter((t) => t.document.disposition === 1);
   const enemyTokens = tokens.filter((t) => t.document.disposition !== 1);
 
@@ -139,7 +110,8 @@ async function prepareAvoidanceCheckData(tokens) {
     }
   }
 
-  const avoidanceCheckData = {
+  const explorationCheck = {
+    status: "pending",
     addedToCombat: false,
     noticableEnemies: noticableEnemies,
     enemyIds: enemyTokens.map((t) => t.id),
@@ -149,152 +121,38 @@ async function prepareAvoidanceCheckData(tokens) {
     friendlyStealth: friendlyStealth ?? {},
     missing: friendlies.filter((c) => !getToken(c.id)).map((c) => c.actor.id),
   };
-  return avoidanceCheckData;
+  return explorationCheck;
 }
 
-async function renderAvoidanceCheck(avoidanceCheck, context) {
-  const templateData = {
-    ...(game.user.isGM ? { isGM: true } : {}),
-    moduleId: MODULE_ID,
-    title: `${MODULE_ID}.avoidanceCheck.title`,
-    observedEnemies: `${MODULE_ID}.avoidanceCheck.observedEnemies`,
-    observedFriendlies: `${MODULE_ID}.avoidanceCheck.observedFriendlies`,
-  };
+async function createEncounter(message) {
+  if (!message) return;
+  const explorationCheck = message.flags[MODULE_ID].explorationCheck;
+  if (!explorationCheck) return;
+  const status = explorationCheck?.status ?? "none";
+  if (status !== "complete") return;
+  debuglog("createEncounter", explorationCheck);
 
-  const enemyIds = avoidanceCheck.enemyIds;
-  if (enemyIds.length > 0) {
-    templateData.enemyIds = avoidanceCheck.enemyIds;
-    if (avoidanceCheck.noticableEnemies.length > 0) {
-      templateData.noticableEnemies = avoidanceCheck.noticableEnemies.map(
-        (n) => {
-          const hoverId = foundry.utils.randomID();
-          (context["hoverIds"] ??= {})[hoverId] = n.id;
-          return { hoverId, name: n.name };
-        },
-      );
-    }
-
-    if (Object.keys(avoidanceCheck.enemyStealth).length > 0) {
-      templateData.enemyAvoiders = [];
-      for (let [tokenId, avoider] of Object.entries(
-        avoidanceCheck.enemyStealth,
-      )) {
-        context.avoiderId = tokenId;
-        const summary = await renderSummary(avoider.targetList, context);
-        templateData.enemyAvoiders.push({
-          tokenId,
-          name: avoider.name,
-          label: `${MODULE_ID}.avoidanceCheck.checkLabel`,
-          skillResult: avoider.skillResult,
-          targetList: await renderTargetList(
-            avoider.targetList,
-            summary,
-            context,
-          ),
-        });
-      }
-    }
-  }
-
-  const friendlyIds = avoidanceCheck.friendlyIds;
-  if (friendlyIds.length > 0) {
-    templateData.friendlyIds = friendlyIds;
-    if (avoidanceCheck.noticableFriendlies.length > 0) {
-      templateData.noticableFriendlies = avoidanceCheck.noticableFriendlies.map(
-        (n) => {
-          const hoverId = foundry.utils.randomID();
-          (context["hoverIds"] ??= {})[hoverId] = n.id;
-          return { hoverId, name: n.name };
-        },
-      );
-    }
-
-    if (Object.keys(avoidanceCheck.friendlyStealth).length > 0) {
-      templateData.friendlyAvoiders = [];
-      for (let [tokenId, avoider] of Object.entries(
-        avoidanceCheck.friendlyStealth,
-      )) {
-        context.avoiderId = tokenId;
-        const data = {
-          tokenId,
-          name: avoider.name,
-          label: `${MODULE_ID}.avoidanceCheck.checkLabel`,
-        };
-        if (avoider.skillResult !== null) {
-          const summary = await renderSummary(avoider.targetList, context);
-          data.result = avoider.skillResult;
-          data.targetList = await renderTargetList(
-            avoider.targetList,
-            summary,
-            context,
-          );
-        } else {
-          const clickId = foundry.utils.randomID();
-          (context["clickIds"] ??= {})[clickId] = async (
-            message,
-            event,
-            flags,
-          ) => {
-            return rollClick(message, event, flags.avoidanceCheck, tokenId);
-          };
-          data.clickId = clickId;
-        }
-        templateData.friendlyAvoiders.push(data);
-      }
-    }
-  }
-
-  let content = await renderTemplateAndEnrich(
-    `modules/${MODULE_ID}/templates/avoidance-check.hbs`,
-    templateData,
-  );
-
-  const unrolled = Object.values(avoidanceCheck.friendlyStealth).some(
-    (s) => s.skillResult === null,
-  );
-  if (!unrolled) {
-    content += await renderEncounterSection(avoidanceCheck, context);
-  }
-  return content;
-}
-
-export async function avoidanceCheck(tokens) {
-  const gmIds = game.users.filter((u) => u.isGM).map((u) => u.id);
-  const avoidanceCheckData = await prepareAvoidanceCheckData(tokens);
-  const secret = !avoidanceCheckData.friendlyIds.length;
-  avoidanceCheckData.secret = secret;
-  return ChatMessage.create({
-    rollmode: "gmroll",
-    ...(secret ? { whisper: gmIds } : {}),
-    flags: {
-      [MODULE_ID]: {
-        card: "avoidance-check",
-        avoidanceCheck: avoidanceCheckData,
-      },
-    },
-  });
-}
-
-async function createEncounter(message, _event, flags) {
-  const avoidanceCheck = flags.avoidanceCheck;
   const combat = !game.combat
     ? await Combat.create({ scene: canvas.scene.id, active: true })
     : game.combat;
-  const missing = avoidanceCheck.friendlyIds.filter((id) => !getToken(id));
-  avoidanceCheck.missing = missing;
-  if (missing.length > 0) {
-    ui.notifications.warn(makeMissingActorsString());
-    return message.update({ flags: { [MODULE_ID]: flags } });
-  }
 
   async function addCombatants(ids, stealths) {
     const tokenDocs = ids
+      .map((id) => {
+        const token = canvas.tokens.get(id);
+        if (token) return token.id;
+        const actor = game.actors.get(id);
+        const placed = canvas.tokens.placeables.find(
+          (t) => t.actor?.id === actor?.id && t.document?.actorLink,
+        );
+        return placed?.id ?? null;
+      })
       .filter(
         (id) => !combat.combatants.some((existing) => existing.tokenId === id),
       )
       .map((id) => {
         const token = canvas.tokens.get(id);
-        return token.document ?? token;
+        return token?.document ?? token;
       });
     const combatants =
       await TokenDocument.implementation.createCombatants(tokenDocs);
@@ -312,29 +170,133 @@ async function createEncounter(message, _event, flags) {
     }
   }
 
-  debuglog("createEncounter", { avoidanceCheck });
-  await addCombatants(avoidanceCheck.enemyIds, avoidanceCheck.enemyStealth);
+  debuglog("createEncounter", { explorationCheck });
+  await addCombatants(explorationCheck.enemyIds, explorationCheck.enemyStealth);
   await addCombatants(
-    avoidanceCheck.friendlyIds,
-    avoidanceCheck.friendlyStealth,
+    explorationCheck.friendlyIds,
+    explorationCheck.friendlyStealth,
   );
 
   await combat.update({
-    flags: { [MODULE_ID]: { avoidanceCheckMessageId: message.id } },
+    flags: { [MODULE_ID]: { explorationCheck: explorationCheck } },
   });
-  avoidanceCheck.addedToCombat = true;
-  message.update({ flags: { [MODULE_ID]: flags } });
   await ui.combat.render(true);
 }
 
-async function rollClick(message, event, avoidanceCheck, tokenId) {
-  if (avoidanceCheck.friendlyStealth[tokenId]?.skillResult !== null) return;
+async function renderExplorationCheck(explorationCheck, context) {
+  debuglog("renderExplorationCheck", { explorationCheck, context });
+  const templateData = {
+    ...(game.user.isGM ? { isGM: true } : {}),
+    moduleId: MODULE_ID,
+    title: `${MODULE_ID}.explorationCheck.title`,
+    observedFriendlies: `${MODULE_ID}.explorationCheck.observedFriendlies`,
+  };
+
+  if (explorationCheck.status === "pending") {
+    const clickId = foundry.utils.randomID();
+    (context["clickIds"] ??= {})[clickId] = async (message, _event, _flags) => {
+      const existing = foundry.applications.instances.get(
+        explorationCheckDialogId,
+      );
+      if (existing) {
+        existing.bringToFront();
+      } else {
+        new ExplorationCheckDialog(message, createEncounter).render({
+          force: true,
+        });
+      }
+    };
+    templateData.clickId = clickId;
+    templateData.reopen = `${MODULE_ID}.explorationCheck.reopen`;
+  }
+
+  const friendlyIds = explorationCheck.friendlyIds;
+  if (friendlyIds.length > 0) {
+    templateData.friendlyIds = friendlyIds;
+    if (explorationCheck.noticableFriendlies.length > 0) {
+      templateData.noticableFriendlies =
+        explorationCheck.noticableFriendlies.map((n) => {
+          const hoverId = foundry.utils.randomID();
+          (context["hoverIds"] ??= {})[hoverId] = n.id;
+          return { hoverId, name: n.name };
+        });
+    }
+
+    if (Object.keys(explorationCheck.friendlyStealth).length > 0) {
+      templateData.friendlyAvoiders = [];
+      for (let [tokenId, avoider] of Object.entries(
+        explorationCheck.friendlyStealth,
+      )) {
+        context.avoiderId = tokenId;
+        const data = {
+          tokenId,
+          name: avoider.name,
+          label: `${MODULE_ID}.explorationCheck.checkLabel`,
+        };
+        if (avoider.skillResult !== null) {
+          const summary = await renderSummary(avoider.targetList, context);
+          data.result = avoider.skillResult;
+          data.targetList = await renderTargetList(
+            avoider.targetList,
+            summary,
+            context,
+          );
+        } else {
+          const clickId = foundry.utils.randomID();
+          (context["clickIds"] ??= {})[clickId] = async (
+            message,
+            event,
+            flags,
+          ) => {
+            return rollClick(message, event, flags.explorationCheck, tokenId);
+          };
+          data.clickId = clickId;
+        }
+        templateData.friendlyAvoiders.push(data);
+      }
+    }
+  }
+
+  return renderTemplateAndEnrich(
+    `modules/${MODULE_ID}/templates/exploration-check.hbs`,
+    templateData,
+  );
+}
+
+export async function resolveExplorationStealth(tokens) {
+  const explorationCheck = await prepareExplorationCheck(tokens);
+
+  const existing = foundry.applications.instances.get(explorationCheckDialogId);
+  if (existing) {
+    existing.bringToFront();
+  } else {
+    const message = await ChatMessage.create({
+      rollmode: "gmroll",
+      ...(!Object.keys(explorationCheck.friendlyStealth).length
+        ? { whisper: game.users.filter((u) => u.isGM).map((u) => u.id) }
+        : {}),
+      flags: {
+        [MODULE_ID]: {
+          card: "exploration-check",
+          explorationCheck,
+        },
+      },
+    });
+
+    new ExplorationCheckDialog(message, createEncounter).render({
+      force: true,
+    });
+  }
+}
+
+async function rollClick(message, event, explorationCheck, tokenId) {
+  if (explorationCheck.friendlyStealth[tokenId]?.skillResult !== null) return;
   const actor = canvas.tokens.get(tokenId)?.actor ?? game.actors.get(tokenId);
   if (!actor) return;
   if (!game.user.isGM && !actor.isOwner) return;
   let roll = null;
   let rollMessageId = null;
-  if (avoidanceCheck.secret) {
+  if (explorationCheck.secret) {
     roll = await rollStealth(actor, {
       skipDialog: true,
       player: false,
@@ -378,13 +340,13 @@ export async function onStealthReply({
   if (!message) return;
   const flags = message.flags[MODULE_ID];
   if (!flags) return;
-  const avoidanceCheck = flags.avoidanceCheck;
-  if (!avoidanceCheck) return;
+  const explorationCheck = flags.explorationCheck;
+  if (!explorationCheck) return;
   let avoider =
     canvas.tokens.get(tokenId) || game.actors.get(tokenId)?.prototypeToken;
   if (!avoider) return;
 
-  const targets = avoidanceCheck.enemyIds.map((id) => canvas.tokens.get(id));
+  const targets = explorationCheck.enemyIds.map((id) => canvas.tokens.get(id));
   const checks = resolveStealthRoll({
     avoider,
     rawRollDosDelta,
@@ -393,7 +355,7 @@ export async function onStealthReply({
   }).sort((a, b) => b.dc - a.dc || a.name.localeCompare(b.name));
   const targetList = prepareTargetList(checks);
 
-  const avoiderData = avoidanceCheck.friendlyStealth[tokenId];
+  const avoiderData = explorationCheck.friendlyStealth[tokenId];
   avoiderData.skillResult = skillResult;
   avoiderData.rawRollDosDelta = rawRollDosDelta;
   avoiderData.targetList = targetList;
@@ -404,11 +366,15 @@ export async function onStealthReply({
     },
   };
   await message.update(update);
+  const existing = foundry.applications.instances.get(explorationCheckDialogId);
+  if (existing) {
+    existing.render();
+  }
 }
 
 export async function renderAvoidanceCheckCard(_message, html, _data, flags) {
   const context = { interactive: false, collapsed: true };
-  const content = await renderAvoidanceCheck(flags.avoidanceCheck, context);
+  const content = await renderExplorationCheck(flags.explorationCheck, context);
   html.insertAdjacentHTML("beforeend", content);
   return context;
 }

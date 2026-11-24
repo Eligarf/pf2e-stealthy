@@ -1,5 +1,5 @@
 import { MODULE_ID, STEALTH } from "./const.js";
-import { onStealthReply } from "./avoidance-check.js";
+import { onStealthReply } from "./exploration-check.js";
 import { refreshVisibilityCache } from "./visibility.js";
 import { cachedSettings } from "./settings.js";
 import { debuglog, refreshPerception } from "./utils.js";
