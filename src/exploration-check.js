@@ -277,7 +277,7 @@ export async function resolveExplorationStealth(tokens) {
   // Look for existing messages and turn off their clicks
   //
   const pendingChecks = game.messages.filter(
-    (m) => m.flags[MODULE_ID].explorationCheck?.status === "pending",
+    (m) => m.flags[MODULE_ID]?.explorationCheck?.status === "pending",
   );
   pendingChecks.forEach(async (m) => {
     const update = {
