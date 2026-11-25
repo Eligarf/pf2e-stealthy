@@ -12,9 +12,11 @@ import {
   warnlog,
   refreshPerception,
   localizeString,
+  iterateTokensAndParties,
 } from "./utils.js";
 import { MODULE_ID, SLUGS } from "./const.js";
 import { StartCombatDialog } from "./start-combat-dialog.js";
+import { isAvoider } from "./effects.js";
 
 let lastDeadNotificationTime = 0;
 const NOTIFICATION_COOLDOWN_MS = 500;
@@ -76,39 +78,19 @@ export function findPossibleTargets({
   return { us, them };
 }
 
-export function countAvoiders(tokens) {
-  return tokens.reduce(
-    (acc, t) => {
-      const actor = t.actor;
-      if (!actor) return acc;
-      const isPc = actor.parties?.size > 0 && actor.system?.exploration;
-      const stat = actor.system?.initiative?.statistic;
-      const isStealth = stat === "stealth";
-      if (!isPc) {
-        if (isStealth) {
-          acc[t.document.disposition === 1 ? "party" : "opposition"] += 1;
-        }
-      } else {
-        if (!cachedSettings.requireActivity) {
-          if (isStealth) {
-            acc[t.document.disposition === 1 ? "party" : "opposition"] += 1;
-          }
-        } else {
-          const isAvoiding = actor.system.exploration.some(
-            (a) => actor.items.get(a)?.system?.slug === SLUGS.avoidNotice,
-          );
-          if (isAvoiding) {
-            acc[t.document.disposition === 1 ? "party" : "opposition"] += 1;
-          }
-        }
-      }
-      return acc;
-    },
-    {
-      party: 0,
-      opposition: 0,
-    },
-  );
+export async function countAvoiders(tokens) {
+  const count = {
+    party: 0,
+    opposition: 0,
+  };
+  await iterateTokensAndParties(tokens, (t) => {
+    const avoiding = isAvoider(t);
+    const actor = t?.actor ?? t;
+    if (avoiding) {
+      count[actor.system.details.alliance] += 1;
+    }
+  });
+  return count;
 }
 
 function preCreateCombatant(combatant, _data, _options, userId) {

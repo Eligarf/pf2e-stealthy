@@ -4,7 +4,7 @@ import { fillTokensMenu } from "./tokens-menu.js";
 import { fillConnectedTokensMenu } from "./connected-tokens-menu.js";
 import { warnlog, debuglog, localizeString } from "./utils.js";
 
-function getChoices() {
+async function getChoices() {
   if (!canvas?.ready) {
     warnlog("getChoices has no canvas");
     return true;
@@ -51,7 +51,7 @@ function getChoices() {
   // Otherwise, no need to distiguish between selected and targeted, we can just use whichever one is present.
   else {
     const selection = controlled || targeted;
-    config = fillTokensMenu({ selection });
+    config = await fillTokensMenu({ selection });
   }
   if (config === null) config = {};
   config.rawControlled = controlled;
@@ -132,7 +132,7 @@ function summarizeDispositions(tokens) {
 }
 
 export async function invokeMenu(_event) {
-  const config = getChoices();
+  const config = await getChoices();
   if (!config?.choices?.length) {
     ui.notifications.info(
       localizeString(`${MODULE_ID}.notifications.noToDos`, {

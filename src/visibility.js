@@ -191,42 +191,25 @@ function getDetectionAcuity(detector, target) {
   return acuities;
 }
 
-function controlTokenHook(token, controlled) {
-  // debuglog(`'${token.name}' controlled: ${controlled}`, { token, controlled });
-
-  // if we are releasing control, stop caring about the observing token
-  if (!controlled) {
-    delete observingTokenIds[token.id];
-  }
-
-  // Otherwise, we have a new observer so now we have to pay attention to it
-  // to its senses
-  else {
-    observingTokenIds[token.id] = token;
-  }
-
-  // Handle updating the alertable set which only the GM sees
-  if (!game.user.isGM) return;
-  canvas.perception.initialize();
-  if (controlled) {
+const refreshObservers = foundry.utils.debounce(() => {
+  const controlled = canvas.tokens?.controlled ?? [];
+  observingTokenIds = controlled.reduce((acc, t) => {
+    acc[t.id] = t;
+    return acc;
+  }, {});
+  alertableTokenIds = {};
+  for (const token of controlled) {
     const detectors = findDetectors(token);
     if (detectors)
       alertableTokenIds = mergeAlertables(
         Object.entries(alertableTokenIds),
         detectors,
       );
-  } else {
-    alertableTokenIds = {};
-    for (const id in observingTokenIds) {
-      const token = canvas.tokens.get(id);
-      const detectors = findDetectors(token);
-      if (detectors)
-        alertableTokenIds = mergeAlertables(
-          Object.entries(alertableTokenIds),
-          detectors,
-        );
-    }
   }
+}, 10);
+
+function controlTokenHook(_token, _controlled) {
+  refreshObservers();
 }
 
 function refreshTokenHook(token, options) {
@@ -234,39 +217,51 @@ function refreshTokenHook(token, options) {
 
   // First handle alerts - we show them to enabled GM regardless of
   // other vision states
-  if (game.user.isGM && cachedSettings.alerts) {
-    const isRevealed = token.id in alertableTokenIds;
+  if (game.user.isGM) {
+    if (cachedSettings.alerts) {
+      const isRevealed = token.id in alertableTokenIds;
 
-    // UNDETECTED means nobody is alerted
-    if (!isRevealed) {
-      showAlert({ token, stealth: STEALTH.undetected });
+      // UNDETECTED means nobody is alerted
+      if (!isRevealed) {
+        showAlert({ token, stealth: STEALTH.undetected });
+      }
+
+      // Otherwise we show the appropriate alert, but make sure that we
+      // don't alert on allies if we don't hide from them
+      else {
+        let drawAlert = true;
+        if (!cachedSettings.hideFromAllies) {
+          const us = token.actor?.system?.details?.alliance;
+          const notUs = Object.keys(observingTokenIds).some((id) => {
+            const token = canvas.tokens.get(id);
+            const them = token.actor?.system?.details?.alliance;
+            return them !== us;
+          });
+          if (!notUs) drawAlert = false;
+        }
+        if (drawAlert) {
+          const stealth = alertableTokenIds[token.id];
+          showAlert({ token, stealth });
+        }
+      }
     }
 
-    // Otherwise we show the appropriate alert, but make sure that we
-    // don't alert on allies if we don't hide from them
-    else {
-      if (!cachedSettings.hideFromAllies) {
-        const us = token.actor?.system?.details?.alliance;
-        const notUs = Object.keys(observingTokenIds).some((id) => {
-          const token = canvas.tokens.get(id);
-          const them = token.actor?.system?.details?.alliance;
-          return them !== us;
-        });
-        if (!notUs) return;
-      }
-      const stealth = alertableTokenIds[token.id];
-      showAlert({ token, stealth });
+    // If GM is in gm vision, we leave things alone
+    if (game.pf2e.settings.gmVision) {
+      return;
     }
   }
 
-  // If GM is in gm vision, we leave things alone. Same goes for controlled
-  // tokens, or tokens that are ghosted
-  if (game.pf2e.settings.gmVision) return;
-  if (token.id in observingTokenIds || token.document.hidden) return;
+  // Leave things alone if this is an observing or ghosted token
+  if (token.id in observingTokenIds || token.document.hidden) {
+    return;
+  }
 
   // We only adjust visibility of stealthy actors, so bail if we aren't that
   const actor = token?.actor;
-  if (!actor) return;
+  if (!actor) {
+    return;
+  }
   const stealth = actor?.items.find((i) => i.slug === SLUGS.stealthy);
   if (!stealth) return;
 

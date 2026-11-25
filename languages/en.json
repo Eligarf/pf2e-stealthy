@@ -142,7 +142,7 @@
       "explorationCheck": {
         "avoidLabel": "Resolve Avoid Notice Detection",
         "ambushLabel": "Resolve Ambush Detection",
-        "bothLabel": "Resolve both Ambush vs. Avoid Notice Detection",
+        "bothLabel": "Resolve Ambush vs. Avoid Notice Detection",
         "naLabel": "No exploration stealth resolution needed",
         "hint": "Run a stealth vs perception check for all stealthing {type} tokens"
       },
@@ -198,7 +198,7 @@
       "createEncounter": "Add All to Combat",
       "observedEnemies": "Noticable Enemies",
       "observedFriendlies": "Noticable Party Members",
-      "reopen": "Re-open Resolver"
+      "reopen": "Reopen Resolver"
     },
     "hide": {
       "retain": "Success retains undetected status"
@@ -238,7 +238,8 @@
       "cancel": "Cancel Combat Start",
       "confirm": "Confirm Combat Start",
       "cancelled": "Combat start cancelled",
-      "initLabel": "Initiative({stat}) Check:",
+      "substitute": "(using {skill}) ",
+      "initCheck": "Stealth {substitute}Check: {result}",
       "ineligible": "Ineligible PCs",
       "ineligibleBecause": "These PCs must use the 'Avoid Notice' activity to gain stealth",
       "unrolled1": "{name} needs to roll initiative",
@@ -248,7 +249,7 @@
       "choice": "{message}<p>Do you wish to proceed with combat start anyway?</p>"
     },
     "explorationCheckDialog": {
-      "title": "Exploration Stealth Resolution",
+      "title": "Exploration Stealth Resolver",
       "cancel": "No Combat at this time",
       "confirm": "Add Combatants to Combat",
       "missingActors": "Please {clownCar} to the canvas before adding combatants to combat",

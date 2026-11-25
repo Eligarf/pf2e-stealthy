@@ -137,15 +137,21 @@ async function createEncounter(message) {
     : game.combat;
 
   async function addCombatants(ids, stealths) {
+    const tokenIdsToSourceIds = {};
     const tokenDocs = ids
       .map((id) => {
         const token = canvas.tokens.get(id);
-        if (token) return token.id;
+        if (token) {
+          tokenIdsToSourceIds[token.id] = id;
+          return token.id;
+        }
         const actor = game.actors.get(id);
         const placed = canvas.tokens.placeables.find(
           (t) => t.actor?.id === actor?.id && t.document?.actorLink,
         );
-        return placed?.id ?? null;
+        const placedId = placed?.id;
+        tokenIdsToSourceIds[placedId] = id;
+        return placedId;
       })
       .filter(
         (id) => !combat.combatants.some((existing) => existing.tokenId === id),
@@ -157,10 +163,14 @@ async function createEncounter(message) {
     const combatants =
       await TokenDocument.implementation.createCombatants(tokenDocs);
     const updates = combatants
-      .filter((c) => (stealths[c.tokenId]?.skillResult ?? null) !== null)
+      .filter(
+        (c) =>
+          (stealths[tokenIdsToSourceIds[c.tokenId]]?.skillResult ?? null) !==
+          null,
+      )
       .map((c) => ({
         _id: c.id,
-        initiative: stealths[c.tokenId].skillResult,
+        initiative: stealths[tokenIdsToSourceIds[c.tokenId]].skillResult,
         flags: {
           [game.system.id]: { initiativeStatistic: "stealth" },
         },
@@ -264,6 +274,24 @@ async function renderExplorationCheck(explorationCheck, context) {
 }
 
 export async function resolveExplorationStealth(tokens) {
+  // Look for existing messages and turn off their clicks
+  //
+  const pendingChecks = game.messages.filter(
+    (m) => m.flags[MODULE_ID].explorationCheck?.status === "pending",
+  );
+  pendingChecks.forEach(async (m) => {
+    const update = {
+      flags: {
+        [MODULE_ID]: {
+          explorationCheck: {
+            status: "cancelled",
+            friendlyStealth: _replace({}),
+          },
+        },
+      },
+    };
+    await m.update(update);
+  });
   const explorationCheck = await prepareExplorationCheck(tokens);
 
   const existing = foundry.applications.instances.get(explorationCheckDialogId);

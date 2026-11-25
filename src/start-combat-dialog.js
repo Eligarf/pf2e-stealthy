@@ -54,6 +54,7 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
     context.moduleId = MODULE_ID;
     context.cancelLabel = `${MODULE_ID}.startCombat.cancel`;
     context.confirmLabel = `${MODULE_ID}.startCombat.confirm`;
+    context.result = `${MODULE_ID}.startCombat.result`;
     context.observations = Object.fromEntries(
       Object.entries(this.dialogData.observations).map(([id, o]) => {
         const stat =
@@ -62,15 +63,22 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
           stat === "perception"
             ? o.avoider.combatant.actor.perception
             : o.avoider.combatant.actor.skills[stat];
-        const label = skill?.label;
+        const isStealth = stat === "stealth";
+        const substitute = isStealth
+          ? ""
+          : localizeString(`${MODULE_ID}.startCombat.substitute`, {
+              skill: skill?.label,
+            });
         const alliance = o.avoider.combatant.actor?.alliance ?? "none";
         return [
           id,
           {
             name: o.avoider.combatant.name,
-            isStealth: stat === "stealth",
-            label,
-            skillResult: o.avoider.skillResult,
+            isStealth,
+            label: localizeString(`${MODULE_ID}.startCombat.initCheck`, {
+              substitute,
+              result: o.avoider.skillResult,
+            }),
             alliance,
             observers: Object.fromEntries(
               Object.entries(o.observers).map(([k, v]) => {

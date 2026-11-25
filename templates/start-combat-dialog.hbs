@@ -23,9 +23,11 @@
           <div class="{{@root.moduleId}}-card-body">
             <div class="{{@root.moduleId}}-description">
               <span class="{{@root.moduleId}}-card-label {{#unless isStealth}}{{@root.moduleId}}-not-stealth{{/unless}}">
+                {{#unless isStealth}}
+                  <i class="fa-solid fa-triangle-exclamation fa-fw suspect-icon"></i>
+                {{/unless}}
                 {{label}}
               </span>
-              <span class="initiative-value">{{skillResult}}</span>
             </div>
             <div class="{{@root.moduleId}}-target-list">
               {{#each observers}}

@@ -8,7 +8,7 @@ import { refreshEverybody } from "./socket.js";
 import { declumpInitiative } from "./initiative.js";
 import { countAvoiders } from "./combat.js";
 
-export function fillTokensMenu({ selection }) {
+export async function fillTokensMenu({ selection }) {
   const title = localizeString(`${MODULE_ID}.menu.tokensSelected`, {
     type: selection.type,
   });
@@ -142,7 +142,7 @@ export function fillTokensMenu({ selection }) {
     });
   }
   if (!combat || !combat.started) {
-    const avoiderCount = countAvoiders(selection.tokens);
+    const avoiderCount = await countAvoiders(selection.tokens);
     const labelCase =
       (avoiderCount.party > 0 ? 2 : 0) + (avoiderCount.opposition > 0 ? 1 : 0);
     let label = "naLabel";

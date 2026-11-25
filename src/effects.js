@@ -10,32 +10,55 @@ import { debuglog } from "./utils.js";
 import { cachedSettings } from "./settings.js";
 
 export function isAvoider(tokenOrActor) {
+  // debuglog(`'${tokenOrActor.name}'`, tokenOrActor);
   const actor = tokenOrActor?.actor ?? tokenOrActor;
   // If you have a stealth effect you are an avoider
-  if (actor?.items?.some((item) => item.system.slug === SLUGS.stealthy))
+  if (actor?.items?.some((item) => item.system.slug === SLUGS.stealthy)) {
+    // debuglog("--> by Effect");
     return true;
+  }
 
   // once combat starts, a combantant has to have the stealth effect
   const combat = game?.combat;
   const combatant = combat?.combatants?.contents?.some(
     (c) => c.token?.id === tokenOrActor.id || c.actor?.id === tokenOrActor.id,
   );
-  if (combat?.round > 0 && !!combatant && combatant?.initiative !== null)
+  if (combat?.round > 0 && !!combatant && combatant?.initiative !== null) {
+    // debuglog("--X rejected by combat");
     return false;
+  }
 
   // If activities aren't required, you are an avoider if your initiative is stealth.
   const requireActivity = cachedSettings.requireActivity;
-  if (!requireActivity)
-    return actor?.system?.initiative?.statistic === SLUGS.stealth;
+  if (!requireActivity) {
+    const isAvoider = actor?.system?.initiative?.statistic === SLUGS.stealth;
+    // debuglog(
+    //   isAvoider
+    //     ? "--> accepted by Stealth init"
+    //     : "--X rejected by Stealth init",
+    // );
+    return isAvoider;
+  }
 
   // If you don't have an exploration activity, you are an avoider if your initiative is stealth.
-  if (!(actor?.parties?.size > 0 && actor?.system?.exploration))
-    return actor?.system?.initiative?.statistic === SLUGS.stealth;
+  if (!(actor?.parties?.size > 0 && actor?.system?.exploration)) {
+    const isAvoider = actor?.system?.initiative?.statistic === SLUGS.stealth;
+    // debuglog(
+    //   isAvoider
+    //     ? "--> non-activity accepted by Stealth init"
+    //     : "--X non-activity rejected by Stealth init",
+    // );
+    return isAvoider;
+  }
 
   // You are an avoider if you have an exploration activity with the avoidNotice slug.
-  return actor.system.exploration.some(
+  const isAvoider = actor.system.exploration.some(
     (a) => actor.items.get(a)?.system?.slug === SLUGS.avoidNotice,
   );
+  // debuglog(
+  //   isAvoider ? "--> accepted by Avoid Notice" : "--X rejected by Avoid Notice",
+  // );
+  return isAvoider;
 }
 
 export function getStealthyEffect(token) {

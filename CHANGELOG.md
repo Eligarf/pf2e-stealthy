@@ -2,7 +2,10 @@
 
 ## 1.5.0
 
-- Convert `Check Avoidance` into similar dialog form as `Start Combat`
+- Added a debounce to controlled token vision analysis
+- Fixed a nasty bug where alerts could cause allies or self to be hidden from vision
+- Various labeling improvements to help clarity
+- Rebuilt the Exploration Stealth process (previously Avoidance Check) to use a dialog like Start Combat.
 
 ## 1.4.2, 1.4.3
 
