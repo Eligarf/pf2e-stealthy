@@ -1,5 +1,11 @@
 ## pending
 
+## 1.5.1
+
+- Separate cover icon from the general info icon in the various target lists for sneak/seek/etc.
+- Better strike action detection
+- Seek and Point Out action now get End Stealth buttons when actor is stealthy.
+
 ## 1.5.0
 
 - Added a debounce to controlled token vision analysis

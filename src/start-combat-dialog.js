@@ -30,7 +30,7 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
       modal: true,
     },
     position: {
-      width: 550,
+      width: 630,
       height: "auto",
     },
     actions: {
@@ -88,6 +88,21 @@ export class StartCombatDialog extends HandlebarsApplicationMixin(
                   label: LOCALIZATION_KEYS[v.stealthLabel],
                   dc: localizeString(`${MODULE_ID}.dc`, { dc: v.dc }),
                 };
+                if ((v.coverTooltips || []).length > 0) {
+                  entry.coverTooltips = v.coverTooltips.map((t) =>
+                    localizeString(
+                      t.format,
+                      Object.keys(t.interpolations || {}).length > 0
+                        ? Object.fromEntries(
+                            Object.entries(t.interpolations).map(([k, v]) => [
+                              k,
+                              game.i18n.localize(v),
+                            ]),
+                          )
+                        : {},
+                    ),
+                  );
+                }
                 if ((v.tooltips || []).length > 0) {
                   entry.tooltips = v.tooltips.map((t) =>
                     localizeString(

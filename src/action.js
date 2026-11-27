@@ -128,10 +128,8 @@ Hooks.on("createChatMessage", async (message, _options, userId) => {
   if (context) {
     rollOptions = context.options || [];
     if (rollOptions.includes("action:seek")) {
-      // Something nasty crawls in if I try and put both buttons on this right now
-      // action = -1;
-      // await prepareSeekData(message, userId, actingToken);
-      return await prepareSeekData(message, userId, actingToken);
+      action = -1;
+      await prepareSeekData(message, userId, actingToken);
 
       // Hide/Sneak/Step are okay actions under stealth
     } else if (rollOptions.includes("action:hide")) {
@@ -171,9 +169,11 @@ Hooks.on("createChatMessage", async (message, _options, userId) => {
   // Check roll options first, then flavor text, then content
   // Maybe else-if in the future...
   if (!action && rollOptions) {
-    const actions = rollOptions.filter((o) => o.startsWith("action:"));
+    const actions = rollOptions.filter((o) => o.includes("action:"));
     if (actions.length > 0) {
-      action = actions.some((o) => o.startsWith("action:strike")) ? 1 : -1;
+      action = actions.some((o) => o.startsWith("self:action:slug:strike"))
+        ? 1
+        : -1;
     }
   }
   if (!action && flavorRegex && flavorRegex.test(message.flavor)) {

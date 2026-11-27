@@ -105,8 +105,10 @@ export function resolveStealthCheck({ origin, target, resolver }) {
     origin.baseCoverBonus || 0,
   );
 
-  if (cover.bonus > 0) check.coverBonus = cover.bonus;
-  (check.tooltips ??= []).push(...cover.tooltips);
+  if (cover.bonus > 0) {
+    check.coverBonus = cover.bonus;
+    (check.coverTooltips ??= []).push(...cover.tooltips);
+  }
 
   const delta = origin.skillResult + cover.bonus - check.dc;
   check.delta = delta;

@@ -35,6 +35,15 @@
                   data-avoider="{{@../key}}"
                   data-observer="{{@key}}"
                 >
+                  {{#if coverTooltips}}
+                    <i class="fas fa-shield"
+                      data-tooltip="<div>
+                        {{#each coverTooltips}}
+                          {{#unless @first}}<br>{{/unless}}{{this}}
+                        {{/each}}
+                      </div>"
+                    ></i>
+                  {{/if}}
                   <div class="{{@root.moduleId}}-name">{{name}}</div>
                   <div class="{{@root.moduleId}}-card-result"
                     data-action="cycleStatus"
@@ -44,17 +53,17 @@
                   >
                     <span class="degree-of-success {{dos}}">{{localize label}}</span>
                   </div>
-                  <div class="{{@root.moduleId}}-dc"
-                    {{#if tooltips}}
-                      data-tooltip="<div>
-                        {{#each tooltips}}
-                          {{#unless @first}}<br>{{/unless}}{{this}}
-                        {{/each}}
-                      </div>"
-                    {{/if}}
-                    >
+                  <div class="{{@root.moduleId}}-dc">
                     <span class="degree-of-success {{dos}}">{{dc}}</span>
-                    {{#if tooltips}}<i class="fas fa-info-circle"></i>{{/if}}
+                    {{#if tooltips}}
+                      <i class="fas fa-info-circle"
+                        data-tooltip="<div>
+                          {{#each tooltips}}
+                            {{#unless @first}}<br>{{/unless}}{{this}}
+                          {{/each}}
+                        </div>"
+                      ></i>
+                    {{/if}}
                   </div>
                 </div>
               {{/each}}

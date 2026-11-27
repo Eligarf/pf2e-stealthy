@@ -16,6 +16,15 @@
         {{/if}}
       {{/if}}
     >
+      {{#if coverTooltips}}
+        <i class="fa-regular fa-shield"
+          data-tooltip="<div>
+            {{#each coverTooltips}}
+              {{#unless @first}}<br>{{/unless}}{{this}}
+            {{/each}}
+          </div>"
+        ></i>
+      {{/if}}
       <div class="{{@root.moduleId}}-name">{{vs}}</div>
       <div
         class="{{@root.moduleId}}-result"
@@ -24,17 +33,17 @@
       >
         <span class="degree-of-success {{dos}}">{{localize label}}</span>
       </div>
-      <div class="{{@root.moduleId}}-dc"
-        {{#if tooltips}}
-          data-tooltip="<div>
-            {{#each tooltips}}
-              {{#unless @first}}<br>{{/unless}}{{this}}
-            {{/each}}
-          </div>"
-        {{/if}}
-        >
+      <div class="{{@root.moduleId}}-dc">
         <span class="degree-of-success {{dos}}">{{dc}}</span>
-        {{#if tooltips}}<i class="fas fa-info-circle"></i>{{/if}}
+        {{#if tooltips}}
+          <i class="fas fa-info-circle"
+            data-tooltip="<div>
+              {{#each tooltips}}
+                {{#unless @first}}<br>{{/unless}}{{this}}
+              {{/each}}
+            </div>"
+          ></i>
+        {{/if}}
       </div>
     </div>
   {{/each}}

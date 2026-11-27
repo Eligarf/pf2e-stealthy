@@ -108,6 +108,21 @@ export async function renderTargetList(targetList, summary, context) {
           ),
         );
       }
+      if ((target.coverTooltips || []).length > 0) {
+        result.coverTooltips = target.coverTooltips.map((t) =>
+          localizeString(
+            t.format,
+            Object.keys(t.interpolations || {}).length > 0
+              ? Object.fromEntries(
+                  Object.entries(t.interpolations).map(([k, v]) => [
+                    k,
+                    game.i18n.localize(v),
+                  ]),
+                )
+              : {},
+          ),
+        );
+      }
 
       return result;
     }),
