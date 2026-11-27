@@ -7,7 +7,7 @@
           <div class="{{@root.moduleId}}-card-body">
             <div class="{{@root.moduleId}}-target-list">
               {{#each noticables}}
-                <div class="{{@root.moduleId}}-target">
+                <div class="{{@root.moduleId}}-name-only">
                   <div class="{{@root.moduleId}}-name">{{name}}</div>
                 </div>
               {{/each}}
@@ -28,6 +28,7 @@
                   data-avoider="{{@../key}}"
                   data-observer="{{@key}}"
                 >
+                  <span aria-hidden="true"></span>
                   <div class="{{@root.moduleId}}-name">{{name}}</div>
                   <div class="{{@root.moduleId}}-card-result"
                     data-avoider="{{@../key}}"

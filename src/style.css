@@ -100,6 +100,18 @@
   background-color: #cce;
   border: 1px solid transparent;
 }
+
+.pf2e-stealthy-noticable,
+.pf2e-stealthy-name-only,
+.pf2e-stealthy-detector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
 /* Target list structure */
 
 .pf2e-stealthy-target-list,
@@ -114,11 +126,11 @@
   overflow: hidden;
 }
 
-.pf2e-stealthy-noticable,
-.pf2e-stealthy-detector,
 .pf2e-stealthy-target,
 .pf2e-stealthy-card-target {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr) auto auto;
+  gap: 0.5em;
   align-items: center;
   justify-content: space-between;
   padding: 4px 8px;

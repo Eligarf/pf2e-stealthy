@@ -10,7 +10,7 @@
             </div>
             <div class="{{@root.moduleId}}-target-list">
               {{#each pcs}}
-                <div class="{{@root.moduleId}}-target">
+                <div class="{{@root.moduleId}}-name-only">
                   <div class="{{@root.moduleId}}-name">{{name}}</div>
                 </div>
               {{/each}}
@@ -43,6 +43,8 @@
                         {{/each}}
                       </div>"
                     ></i>
+                  {{else}}
+                    <span aria-hidden="true"></span>
                   {{/if}}
                   <div class="{{@root.moduleId}}-name">{{name}}</div>
                   <div class="{{@root.moduleId}}-card-result"
